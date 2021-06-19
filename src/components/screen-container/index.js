@@ -1,7 +1,13 @@
 import React, { useContext } from 'react';
 import Colors from 'react-native/Libraries/NewAppScreen/components/Colors';
 import { AppContext } from '../../context/app';
-import { Platform, SafeAreaView, ScrollView, StatusBar } from 'react-native';
+import {
+  StyleSheet,
+  Platform,
+  SafeAreaView,
+  ScrollView,
+  StatusBar,
+} from 'react-native';
 import { Appbar } from 'react-native-paper';
 
 const ScreenContainer = ({ headerInfo, children }) => {
@@ -44,5 +50,7 @@ const ScreenContainer = ({ headerInfo, children }) => {
     </SafeAreaView>
   );
 };
+
+const styles = StyleSheet.create({});
 
 export default ScreenContainer;

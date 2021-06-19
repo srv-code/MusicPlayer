@@ -1,10 +1,21 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import ScreenContainer from '../../components/screen-container';
+import screenNames from '../../constants/screen-names';
 
 const Playlists = ({ navigation }) => {
+  const onSearch = term => {
+    console.log(`Searched ${term}`);
+  };
+
   return (
-    <ScreenContainer>
+    <ScreenContainer
+      headerInfo={{
+        title: screenNames.playlists,
+        subtitle: 'Select from your favorite playlists',
+        onSearch,
+        showMore: true,
+      }}>
       <View style={styles.container}>
         <Text>Playlists screen</Text>
       </View>
@@ -13,10 +24,7 @@ const Playlists = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: 'white',
-  },
+  container: {},
 });
 
 export default Playlists;
