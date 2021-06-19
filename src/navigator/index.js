@@ -8,14 +8,14 @@ import Playlists from '../screens/playlists';
 
 const TrackStack = createStackNavigator();
 const TrackStackScreens = () => (
-  <TrackStack.Navigator>
+  <TrackStack.Navigator screenOptions={{ headerShown: false }}>
     <TrackStack.Screen name={screenNames.tracks} component={Tracks} />
   </TrackStack.Navigator>
 );
 
 const PlaylistStack = createStackNavigator();
 const PlaylistStackScreens = () => (
-  <PlaylistStack.Navigator>
+  <PlaylistStack.Navigator screenOptions={{ headerShown: false }}>
     <PlaylistStack.Screen name={screenNames.playlists} component={Playlists} />
   </PlaylistStack.Navigator>
 );
