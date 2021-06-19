@@ -22,6 +22,7 @@ const Tracks = ({ navigation }) => {
       headerColor={enabledDarkTheme ? null : colors.darkBlue2}
       title={screenNames.tracks}
       subtitle="Select from your favorite tracks"
+      searchPlaceholder="Search among all the tracks"
       searchedTerm={searchedTerm}
       onSearch={onSearchHandler}
       showMore>

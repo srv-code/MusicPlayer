@@ -20,6 +20,7 @@ const ScreenContainer = ({
   onBackPress,
   title,
   subtitle,
+  searchPlaceholder,
   searchedTerm,
   onSearch,
   showMore,
@@ -62,7 +63,7 @@ const ScreenContainer = ({
 
       {showSearch && (
         <Searchbar
-          placeholder="Search"
+          placeholder={searchPlaceholder || 'Search'}
           onChangeText={onSearch}
           value={searchedTerm}
           style={styles.searchBar}
