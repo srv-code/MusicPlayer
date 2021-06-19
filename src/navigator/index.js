@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
@@ -7,6 +7,7 @@ import screenNames from '../constants/screen-names';
 import Playlists from '../screens/playlists';
 import { BottomNavigation } from 'react-native-paper';
 import colors from '../constants/colors';
+import { AppContext } from '../context/app';
 
 // const TrackStack = createStackNavigator();
 // const TrackStackScreens = () => (
@@ -37,19 +38,21 @@ import colors from '../constants/colors';
 // );
 
 const BottomTabNavigator = () => {
+  const { enabledDarkTheme } = useContext(AppContext);
+
   const [index, setIndex] = useState(0);
   const [routes] = useState([
     {
       key: 'tracks',
       title: screenNames.tracks,
       icon: 'album',
-      color: colors.darkBlue2,
+      color: enabledDarkTheme ? null : colors.darkBlue2,
     },
     {
       key: 'playlists',
       title: screenNames.playlists,
       icon: 'playlist-music',
-      color: colors.darkBlue,
+      color: enabledDarkTheme ? null : colors.darkBlue,
     },
   ]);
 

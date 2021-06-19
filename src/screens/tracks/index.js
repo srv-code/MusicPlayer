@@ -1,10 +1,14 @@
-import React, { useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import React, { useContext, useState } from 'react';
+import { StyleSheet, View } from 'react-native';
 import ScreenContainer from '../../components/screen-container';
 import screenNames from '../../constants/screen-names';
 import colors from '../../constants/colors';
+import { AppContext } from '../../context/app';
+import { Text } from 'react-native-paper';
 
 const Tracks = ({ navigation }) => {
+  const { enabledDarkTheme } = useContext(AppContext);
+
   const [searchedTerm, setSearchedTerm] = useState('');
 
   const onSearchHandler = term => {
@@ -15,7 +19,7 @@ const Tracks = ({ navigation }) => {
   return (
     <ScreenContainer
       showHeader
-      headerColor={colors.darkBlue2}
+      headerColor={enabledDarkTheme ? null : colors.darkBlue2}
       title={screenNames.tracks}
       subtitle="Select from your favorite tracks"
       searchedTerm={searchedTerm}

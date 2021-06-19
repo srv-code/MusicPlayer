@@ -12,7 +12,7 @@ const App = () => {
   const appContext = useMemo(() => {
     return {
       toggleDarkTheme: setEnabledDarkTheme.bind(this, !enabledDarkTheme),
-      darkTheme: enabledDarkTheme,
+      enabledDarkTheme,
     };
   }, [enabledDarkTheme]);
 
