@@ -6,6 +6,7 @@ import Tracks from '../screens/tracks';
 import screenNames from '../constants/screen-names';
 import Playlists from '../screens/playlists';
 import { BottomNavigation } from 'react-native-paper';
+import colors from '../constants/colors';
 
 // const TrackStack = createStackNavigator();
 // const TrackStackScreens = () => (
@@ -42,13 +43,13 @@ const BottomTabNavigator = () => {
       key: 'tracks',
       title: screenNames.tracks,
       icon: 'album',
-      color: '#3F51B5',
+      color: colors.darkBlue2,
     },
     {
       key: 'playlists',
       title: screenNames.playlists,
       icon: 'playlist-music',
-      color: '#009688',
+      color: colors.darkBlue,
     },
   ]);
 
@@ -59,6 +60,7 @@ const BottomTabNavigator = () => {
 
   return (
     <BottomNavigation
+      shifting
       navigationState={{ index, routes }}
       onIndexChange={setIndex}
       renderScene={renderScene}

@@ -12,6 +12,7 @@ import { Appbar } from 'react-native-paper';
 
 const ScreenContainer = ({
   showHeader,
+  headerColor,
   onBackPress,
   title,
   subtitle,
@@ -34,7 +35,7 @@ const ScreenContainer = ({
         barStyle={enabledDarkTheme ? 'dark-content' : 'light-content'}
       />
       {showHeader && (
-        <Appbar.Header>
+        <Appbar.Header style={{ backgroundColor: headerColor }}>
           {onBackPress && <Appbar.BackAction onPress={onBackPress} />}
           <Appbar.Content title={title} subtitle={subtitle} />
           {onSearch && <Appbar.Action icon="magnify" onPress={onSearch} />}

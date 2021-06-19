@@ -2,6 +2,7 @@ import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import ScreenContainer from '../../components/screen-container';
 import screenNames from '../../constants/screen-names';
+import colors from '../../constants/colors';
 
 const Playlists = ({ navigation }) => {
   const onSearch = term => {
@@ -11,6 +12,7 @@ const Playlists = ({ navigation }) => {
   return (
     <ScreenContainer
       showHeader
+      headerColor={colors.darkBlue}
       title={screenNames.playlists}
       subtitle="Select from your favorite playlists"
       onSearch={onSearch}
