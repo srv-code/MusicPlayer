@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import Colors from 'react-native/Libraries/NewAppScreen/components/Colors';
 import { AppContext } from '../../context/app';
 import {
@@ -8,7 +8,7 @@ import {
   ScrollView,
   StatusBar,
 } from 'react-native';
-import { Appbar } from 'react-native-paper';
+import { Appbar, Searchbar } from 'react-native-paper';
 
 const ScreenContainer = ({
   showHeader,
@@ -16,10 +16,13 @@ const ScreenContainer = ({
   onBackPress,
   title,
   subtitle,
+  searchedTerm,
   onSearch,
   showMore,
   children,
 }) => {
+  const [showSearch, setShowSearch] = useState(false);
+
   const { enabledDarkTheme } = useContext(AppContext);
 
   const backgroundStyle = {
@@ -38,7 +41,12 @@ const ScreenContainer = ({
         <Appbar.Header style={{ backgroundColor: headerColor }}>
           {onBackPress && <Appbar.BackAction onPress={onBackPress} />}
           <Appbar.Content title={title} subtitle={subtitle} />
-          {onSearch && <Appbar.Action icon="magnify" onPress={onSearch} />}
+          {onSearch && (
+            <Appbar.Action
+              icon="magnify"
+              onPress={setShowSearch.bind(this, !showSearch)}
+            />
+          )}
           {showMore && (
             <Appbar.Action
               icon={Platform.OS === 'ios' ? 'dots-horizontal' : 'dots-vertical'}
@@ -47,6 +55,15 @@ const ScreenContainer = ({
           )}
         </Appbar.Header>
       )}
+
+      {showSearch && (
+        <Searchbar
+          placeholder="Search"
+          onChangeText={onSearch}
+          value={searchedTerm}
+        />
+      )}
+
       <ScrollView
         contentInsetAdjustmentBehavior="automatic"
         style={backgroundStyle}>
