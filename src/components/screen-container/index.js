@@ -10,7 +10,15 @@ import {
 } from 'react-native';
 import { Appbar } from 'react-native-paper';
 
-const ScreenContainer = ({ headerInfo, children }) => {
+const ScreenContainer = ({
+  showHeader,
+  onBackPress,
+  title,
+  subtitle,
+  onSearch,
+  showMore,
+  children,
+}) => {
   const { enabledDarkTheme } = useContext(AppContext);
 
   const backgroundStyle = {
@@ -25,16 +33,12 @@ const ScreenContainer = ({ headerInfo, children }) => {
       <StatusBar
         barStyle={enabledDarkTheme ? 'dark-content' : 'light-content'}
       />
-      {headerInfo && (
+      {showHeader && (
         <Appbar.Header>
-          <Appbar.Content
-            title={headerInfo.title}
-            subtitle={headerInfo.subtitle}
-          />
-          {Boolean(headerInfo.onSearch) && (
-            <Appbar.Action icon="magnify" onPress={headerInfo.onSearch} />
-          )}
-          {headerInfo.showMore && (
+          {onBackPress && <Appbar.BackAction onPress={onBackPress} />}
+          <Appbar.Content title={title} subtitle={subtitle} />
+          {onSearch && <Appbar.Action icon="magnify" onPress={onSearch} />}
+          {showMore && (
             <Appbar.Action
               icon={Platform.OS === 'ios' ? 'dots-horizontal' : 'dots-vertical'}
               onPress={showMoreOptionsHandler}

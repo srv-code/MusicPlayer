@@ -10,12 +10,11 @@ const Playlists = ({ navigation }) => {
 
   return (
     <ScreenContainer
-      headerInfo={{
-        title: screenNames.playlists,
-        subtitle: 'Select from your favorite playlists',
-        onSearch,
-        showMore: true,
-      }}>
+      showHeader
+      title={screenNames.playlists}
+      subtitle="Select from your favorite playlists"
+      onSearch={onSearch}
+      showMore>
       <View style={styles.container}>
         <Text>Playlists screen</Text>
       </View>

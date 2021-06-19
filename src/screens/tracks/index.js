@@ -10,12 +10,11 @@ const Tracks = ({ navigation }) => {
 
   return (
     <ScreenContainer
-      headerInfo={{
-        title: screenNames.tracks,
-        subtitle: 'Select from your favorite tracks',
-        onSearch,
-        showMore: true,
-      }}>
+      showHeader
+      title={screenNames.tracks}
+      subtitle="Select from your favorite tracks"
+      onSearch={onSearch}
+      showMore>
       <View style={styles.container}>
         <Text>Tracks screen</Text>
       </View>
