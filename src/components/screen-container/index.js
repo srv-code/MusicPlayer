@@ -9,6 +9,10 @@ import {
   StatusBar,
 } from 'react-native';
 import { Appbar, Searchbar } from 'react-native-paper';
+import {
+  heightPercentageToDP as hp,
+  widthPercentageToDP as wp,
+} from 'react-native-responsive-screen';
 
 const ScreenContainer = ({
   showHeader,
@@ -61,18 +65,28 @@ const ScreenContainer = ({
           placeholder="Search"
           onChangeText={onSearch}
           value={searchedTerm}
+          style={styles.searchBar}
         />
       )}
 
       <ScrollView
         contentInsetAdjustmentBehavior="automatic"
-        style={backgroundStyle}>
+        style={styles.scrollView}>
         {children}
       </ScrollView>
     </SafeAreaView>
   );
 };
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+  scrollView: {
+    flex: 1,
+    paddingHorizontal: wp(3),
+  },
+  searchBar: {
+    marginVertical: hp(1),
+    marginHorizontal: wp(3),
+  },
+});
 
 export default ScreenContainer;
