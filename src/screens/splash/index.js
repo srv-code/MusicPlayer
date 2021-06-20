@@ -47,7 +47,7 @@ const Splash = () => {
           ]}>
           Welcome to the World of Music 🎵
         </Text>
-        <Text style={styles.text}>Your own very personalized music app</Text>
+        <Text style={styles.text}>Your own very personalized music app ❤</Text>
         {/*<View style={styles.button}>*/}
         {/*  <LinearGradient colors={['#08d4c4', '#01ab9d']} style={styles.signIn}>*/}
         {/*    <Text style={styles.textSign}>Get Started</Text>*/}

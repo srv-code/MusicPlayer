@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useColorScheme } from 'react-native';
 import { PreferencesContext } from './src/context/preferences';
 import Navigator from './src/navigator';
@@ -11,13 +11,16 @@ import {
   DefaultTheme as NavigationDefaultTheme,
   DarkTheme as NavigationDarkTheme,
 } from '@react-navigation/native';
-import Splash from "./src/screens/splash";
+import Splash from './src/screens/splash';
+
+const SPLASH_TIMEOUT = 1600;
 
 const App = () => {
   const [enabledDarkTheme, setEnabledDarkTheme] = useState(
     // useColorScheme() === 'dark',
     false, // for testing purpose
   );
+  const [showSplash, setShowSplash] = useState(true);
 
   const preferencesContextValue = useMemo(() => {
     return {
@@ -38,7 +41,14 @@ const App = () => {
 
   const theme = enabledDarkTheme ? MergedDarkTheme : MergedDefaultTheme;
 
-  return <Splash />
+  useEffect(() => {
+    if (showSplash)
+      setTimeout(() => {
+        setShowSplash(false);
+      }, SPLASH_TIMEOUT);
+  }, []);
+
+  if (showSplash) return <Splash />;
 
   return (
     <PaperProvider theme={theme}>
