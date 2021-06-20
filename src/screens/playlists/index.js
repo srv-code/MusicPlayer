@@ -16,7 +16,6 @@ const Playlists = ({ navigation }) => {
   return (
     <ScreenContainer
       showHeader
-      // headerColor={enabledDarkTheme ? null : colors.darkBlue}
       title={screenNames.playlists}
       subtitle="Select from your favorite playlists"
       onSearch={onSearch}

@@ -15,6 +15,7 @@ import {
 } from 'react-native-responsive-screen';
 import colors from '../../constants/colors';
 import { useBackHandler } from '@react-native-community/hooks';
+import screenNames from '../../constants/screen-names';
 
 const ScreenContainer = ({
   showHeader,
@@ -24,7 +25,7 @@ const ScreenContainer = ({
   searchPlaceholder,
   searchedTerm,
   onSearch,
-  showSettings,
+  onPressSettings,
   children,
 }) => {
   const [showSearch, setShowSearch] = useState(false);
@@ -43,8 +44,6 @@ const ScreenContainer = ({
     flex: 1,
     backgroundColor: enabledDarkTheme ? Colors.darker : Colors.lighter,
   };
-
-  const showSettingsHandler = () => {};
 
   return (
     <SafeAreaView style={backgroundStyle}>
@@ -65,8 +64,8 @@ const ScreenContainer = ({
               onPress={setShowSearch.bind(this, !showSearch)}
             />
           )}
-          {showSettings && (
-            <Appbar.Action icon="cog" onPress={showSettingsHandler} />
+          {onPressSettings && (
+            <Appbar.Action icon="cog" onPress={onPressSettings} />
           )}
         </Appbar.Header>
       )}

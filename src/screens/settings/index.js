@@ -4,30 +4,33 @@ import ScreenContainer from '../../components/screen-container';
 import screenNames from '../../constants/screen-names';
 import colors from '../../constants/colors';
 import { PreferencesContext } from '../../context/preferences';
-import { Text } from 'react-native-paper';
+import { Switch, Text, TouchableRipple } from 'react-native-paper';
+import {
+  heightPercentageToDP as hp,
+  widthPercentageToDP as wp,
+} from 'react-native-responsive-screen';
 
 const Settings = ({ navigation }) => {
-  const { enabledDarkTheme } = useContext(PreferencesContext);
-
-  const [searchedTerm, setSearchedTerm] = useState('');
-
-  const onSearchHandler = term => {
-    setSearchedTerm(term);
-    console.log(`Searched ${term}`);
-  };
+  const { enabledDarkTheme, toggleDarkTheme } = useContext(PreferencesContext);
 
   return (
     <ScreenContainer
       showHeader
-      // headerColor={enabledDarkTheme ? null : colors.darkBlue2}
-      title={screenNames.tracks}
+      onBackPress={navigation.goBack}
+      title={screenNames.settings}
       subtitle="Set your own preferences"
-      searchPlaceholder="Search among settings"
-      searchedTerm={searchedTerm}
-      onSearch={onSearchHandler}
       showSettings>
       <View style={styles.container}>
         <Text>Settings screen</Text>
+
+        <TouchableRipple
+          onPress={toggleDarkTheme}
+          rippleColor={colors.lightBlack}>
+          <View style={styles.row}>
+            <Text style={styles.attributeText}>Dark mode</Text>
+            <Switch value={enabledDarkTheme} onValueChange={toggleDarkTheme} />
+          </View>
+        </TouchableRipple>
       </View>
     </ScreenContainer>
   );
@@ -35,6 +38,15 @@ const Settings = ({ navigation }) => {
 
 const styles = StyleSheet.create({
   container: {},
+  row: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: hp(1),
+  },
+  attributeText: {
+    fontSize: wp(5),
+  },
 });
 
 export default Settings;
