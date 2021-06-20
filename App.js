@@ -15,7 +15,7 @@ import {
 const App = () => {
   const [enabledDarkTheme, setEnabledDarkTheme] = useState(
     // useColorScheme() === 'dark',
-    false, // disabled for testing purpose
+    false, // for testing purpose
   );
 
   const preferencesContextValue = useMemo(() => {

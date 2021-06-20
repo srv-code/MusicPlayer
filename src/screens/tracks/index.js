@@ -4,10 +4,10 @@ import ScreenContainer from '../../components/screen-container';
 import screenNames from '../../constants/screen-names';
 import colors from '../../constants/colors';
 import { PreferencesContext } from '../../context/preferences';
-import { Text } from 'react-native-paper';
+import { Switch, Text, TouchableRipple } from 'react-native-paper';
 
 const Tracks = ({ navigation }) => {
-  const { enabledDarkTheme } = useContext(PreferencesContext);
+  const { enabledDarkTheme, toggleDarkTheme } = useContext(PreferencesContext);
 
   const [searchedTerm, setSearchedTerm] = useState('');
 
@@ -28,6 +28,20 @@ const Tracks = ({ navigation }) => {
       showMore>
       <View style={styles.container}>
         <Text>Tracks screen</Text>
+
+        <TouchableRipple
+          onPress={toggleDarkTheme}
+          rippleColor={colors.lightBlack}>
+          <View
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+            }}>
+            <Text>Dark mode</Text>
+            <Switch value={enabledDarkTheme} onValueChange={toggleDarkTheme} />
+          </View>
+        </TouchableRipple>
       </View>
     </ScreenContainer>
   );
