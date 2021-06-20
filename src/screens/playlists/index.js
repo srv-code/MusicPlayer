@@ -20,7 +20,7 @@ const Playlists = ({ navigation }) => {
       title={screenNames.playlists}
       subtitle="Select from your favorite playlists"
       onSearch={onSearch}
-      showMore>
+      showSettings>
       <View style={styles.container}>
         <Text>Playlists screen</Text>
       </View>

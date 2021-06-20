@@ -25,7 +25,7 @@ const Tracks = ({ navigation }) => {
       searchPlaceholder="Search among all the tracks"
       searchedTerm={searchedTerm}
       onSearch={onSearchHandler}
-      showMore>
+      showSettings>
       <View style={styles.container}>
         <Text>Tracks screen</Text>
 

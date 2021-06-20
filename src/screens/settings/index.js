@@ -25,7 +25,7 @@ const Settings = ({ navigation }) => {
       searchPlaceholder="Search among settings"
       searchedTerm={searchedTerm}
       onSearch={onSearchHandler}
-      showMore>
+      showSettings>
       <View style={styles.container}>
         <Text>Settings screen</Text>
       </View>

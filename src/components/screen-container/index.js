@@ -23,7 +23,7 @@ const ScreenContainer = ({
   searchPlaceholder,
   searchedTerm,
   onSearch,
-  showMore,
+  showSettings,
   children,
 }) => {
   const [showSearch, setShowSearch] = useState(false);
@@ -35,7 +35,7 @@ const ScreenContainer = ({
     backgroundColor: enabledDarkTheme ? Colors.darker : Colors.lighter,
   };
 
-  const showMoreOptionsHandler = () => {};
+  const showSettingsHandler = () => {};
 
   return (
     <SafeAreaView style={backgroundStyle}>
@@ -56,11 +56,8 @@ const ScreenContainer = ({
               onPress={setShowSearch.bind(this, !showSearch)}
             />
           )}
-          {showMore && (
-            <Appbar.Action
-              icon={Platform.OS === 'ios' ? 'dots-horizontal' : 'dots-vertical'}
-              onPress={showMoreOptionsHandler}
-            />
+          {showSettings && (
+            <Appbar.Action icon="cog" onPress={showSettingsHandler} />
           )}
         </Appbar.Header>
       )}
