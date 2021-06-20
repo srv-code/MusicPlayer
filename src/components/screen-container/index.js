@@ -14,6 +14,7 @@ import {
   widthPercentageToDP as wp,
 } from 'react-native-responsive-screen';
 import colors from '../../constants/colors';
+import { useBackHandler } from '@react-native-community/hooks';
 
 const ScreenContainer = ({
   showHeader,
@@ -27,6 +28,14 @@ const ScreenContainer = ({
   children,
 }) => {
   const [showSearch, setShowSearch] = useState(false);
+
+  useBackHandler(() => {
+    if (showSearch) {
+      setShowSearch(false);
+      return true;
+    }
+    return false;
+  });
 
   const { enabledDarkTheme } = useContext(PreferencesContext);
 
