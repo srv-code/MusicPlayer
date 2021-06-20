@@ -44,15 +44,7 @@ const Navigator = ({ enabledDarkTheme, theme }) => {
 
   const BottomTabs = createMaterialBottomTabNavigator();
   const BottomTabScreen = () => (
-    <BottomTabs.Navigator
-      shifting
-      sceneAnimationEnabled
-      // style={{
-      //   borderWidth: 1,
-      //   borderColor: 'yellow',
-      //   backgroundColor: 'yellow',
-      // }}
-    >
+    <BottomTabs.Navigator shifting sceneAnimationEnabled>
       <BottomTabs.Screen
         name={screenNames.tracks}
         component={TrackStackScreens}
@@ -74,40 +66,6 @@ const Navigator = ({ enabledDarkTheme, theme }) => {
     </BottomTabs.Navigator>
   );
 
-  // const BottomTabNavigator = () => {
-  //   const { enabledDarkTheme } = useContext(AppContext);
-  //
-  //   const [index, setIndex] = useState(0);
-  //   const [routes] = useState([
-  //     {
-  //       key: 'tracks',
-  //       title: screenNames.tracks,
-  //       icon: 'album',
-  //       color: enabledDarkTheme ? null : colors.darkBlue2,
-  //     },
-  //     {
-  //       key: 'playlists',
-  //       title: screenNames.playlists,
-  //       icon: 'playlist-music',
-  //       color: enabledDarkTheme ? null : colors.darkBlue,
-  //     },
-  //   ]);
-  //
-  //   const renderScene = BottomNavigation.SceneMap({
-  //     tracks: Tracks,
-  //     playlists: Playlists,
-  //   });
-  //
-  //   return (
-  //     <BottomNavigation
-  //       shifting
-  //       navigationState={{ index, routes }}
-  //       onIndexChange={setIndex}
-  //       renderScene={renderScene}
-  //     />
-  //   );
-  // };
-
   const RootStack = createStackNavigator();
   const RootStackScreen = () => (
     <RootStack.Navigator headerMode="none">
@@ -125,10 +83,6 @@ const Navigator = ({ enabledDarkTheme, theme }) => {
 
   return (
     <NavigationContainer theme={theme}>
-      {/*<BottomTabScreen />*/}
-      {/*<PlaybackStackScreens />*/}
-      {/*<SettingsStackScreens />*/}
-      {/*<BottomTabNavigator />*/}
       <RootStackScreen />
     </NavigationContainer>
   );
