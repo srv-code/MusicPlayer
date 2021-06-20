@@ -9,6 +9,7 @@ import Settings from '../screens/settings';
 import Playback from '../screens/playback';
 import Icons from '../constants/icons';
 import colors from '../constants/colors';
+import Splash from '../screens/splash';
 
 const Navigator = ({ enabledDarkTheme, theme }) => {
   const TrackStack = createStackNavigator();
@@ -69,6 +70,7 @@ const Navigator = ({ enabledDarkTheme, theme }) => {
   const RootStack = createStackNavigator();
   const RootStackScreen = () => (
     <RootStack.Navigator headerMode="none">
+      {/*<RootStack.Screen name="Splash" component={Splash}/>*/}
       <RootStack.Screen name={screenNames.tracks} component={BottomTabScreen} />
       <RootStack.Screen
         name={screenNames.playback}

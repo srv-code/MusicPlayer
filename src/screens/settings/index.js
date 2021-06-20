@@ -19,7 +19,7 @@ const Settings = ({ navigation }) => {
   return (
     <ScreenContainer
       showHeader
-      headerColor={enabledDarkTheme ? null : colors.darkBlue2}
+      // headerColor={enabledDarkTheme ? null : colors.darkBlue2}
       title={screenNames.tracks}
       subtitle="Set your own preferences"
       searchPlaceholder="Search among settings"

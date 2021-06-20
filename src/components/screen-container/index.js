@@ -13,10 +13,10 @@ import {
   heightPercentageToDP as hp,
   widthPercentageToDP as wp,
 } from 'react-native-responsive-screen';
+import colors from '../../constants/colors';
 
 const ScreenContainer = ({
   showHeader,
-  headerColor,
   onBackPress,
   title,
   subtitle,
@@ -40,10 +40,14 @@ const ScreenContainer = ({
   return (
     <SafeAreaView style={backgroundStyle}>
       <StatusBar
-        barStyle={enabledDarkTheme ? 'dark-content' : 'light-content'}
+        backgroundColor={enabledDarkTheme ? Colors.darker : colors.darkBlue2}
+        barStyle="light-content"
       />
       {showHeader && (
-        <Appbar.Header style={{ backgroundColor: headerColor }}>
+        <Appbar.Header
+          style={{
+            backgroundColor: enabledDarkTheme ? null : colors.darkBlue2,
+          }}>
           {onBackPress && <Appbar.BackAction onPress={onBackPress} />}
           <Appbar.Content title={title} subtitle={subtitle} />
           {onSearch && (
