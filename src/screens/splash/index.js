@@ -1,20 +1,16 @@
 import React from 'react';
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  Dimensions,
-  StyleSheet,
-  StatusBar,
-  Image,
-} from 'react-native';
+import { View, Text, Dimensions, StyleSheet, StatusBar } from 'react-native';
 import * as Animatable from 'react-native-animatable';
 import LinearGradient from 'react-native-linear-gradient';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { useTheme } from '@react-navigation/native';
 import appColors from '../../constants/colors';
+import Icons from '../../constants/icons';
 
-const Splash = ({ navigation }) => {
+const { height } = Dimensions.get('screen');
+const height_logo = height * 0.28;
+
+const Splash = () => {
   const { colors } = useTheme();
 
   return (
@@ -27,7 +23,7 @@ const Splash = ({ navigation }) => {
         <Animatable.Image
           animation="bounceIn"
           duraton="1500"
-          source={require('../../../assets/images/logo.png')}
+          source={Icons.Logo}
           style={styles.logo}
           resizeMode="stretch"
         />
@@ -35,9 +31,9 @@ const Splash = ({ navigation }) => {
       <Animatable.View
         style={[
           styles.footer,
-          {
-            backgroundColor: colors.background,
-          },
+          // {
+          //   backgroundColor: colors.background,
+          // },
         ]}
         animation="fadeInUpBig">
         <Text
@@ -45,28 +41,23 @@ const Splash = ({ navigation }) => {
             styles.title,
             {
               color: colors.text,
+              textAlign: 'center',
+              lineHeight: 50,
             },
           ]}>
-          Stay connected with everyone!
+          Welcome to the World of Music 🎵
         </Text>
-        <Text style={styles.text}>Sign in with account</Text>
-        <View style={styles.button}>
-          <TouchableOpacity onPress={() => navigation.navigate('SignInScreen')}>
-            <LinearGradient
-              colors={['#08d4c4', '#01ab9d']}
-              style={styles.signIn}>
-              <Text style={styles.textSign}>Get Started</Text>
-              <MaterialIcons name="navigate-next" color="#fff" size={20} />
-            </LinearGradient>
-          </TouchableOpacity>
-        </View>
+        <Text style={styles.text}>Your own very personalized music app</Text>
+        {/*<View style={styles.button}>*/}
+        {/*  <LinearGradient colors={['#08d4c4', '#01ab9d']} style={styles.signIn}>*/}
+        {/*    <Text style={styles.textSign}>Get Started</Text>*/}
+        {/*    <MaterialIcons name="navigate-next" color="#fff" size={20} />*/}
+        {/*  </LinearGradient>*/}
+        {/*</View>*/}
       </Animatable.View>
     </View>
   );
 };
-
-const { height } = Dimensions.get('screen');
-const height_logo = height * 0.28;
 
 const styles = StyleSheet.create({
   container: {
@@ -80,15 +71,15 @@ const styles = StyleSheet.create({
   },
   footer: {
     flex: 1,
-    backgroundColor: appColors.white,
+    // backgroundColor: appColors.white,
     borderTopLeftRadius: 30,
     borderTopRightRadius: 30,
     paddingVertical: 50,
     paddingHorizontal: 30,
   },
   logo: {
-    width: 100,
-    height: 100,
+    width: height_logo,
+    height: height_logo,
   },
   title: {
     color: '#05375a',
@@ -96,8 +87,10 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   text: {
-    color: 'grey',
-    marginTop: 5,
+    color: '#cfcfcf',
+    textAlign: 'center',
+    fontSize: 17,
+    marginTop: 20,
   },
   button: {
     alignItems: 'flex-end',

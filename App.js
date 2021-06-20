@@ -11,6 +11,7 @@ import {
   DefaultTheme as NavigationDefaultTheme,
   DarkTheme as NavigationDarkTheme,
 } from '@react-navigation/native';
+import Splash from "./src/screens/splash";
 
 const App = () => {
   const [enabledDarkTheme, setEnabledDarkTheme] = useState(
@@ -36,6 +37,8 @@ const App = () => {
   };
 
   const theme = enabledDarkTheme ? MergedDarkTheme : MergedDefaultTheme;
+
+  return <Splash />
 
   return (
     <PaperProvider theme={theme}>
