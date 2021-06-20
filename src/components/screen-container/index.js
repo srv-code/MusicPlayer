@@ -1,6 +1,6 @@
 import React, { useContext, useState } from 'react';
 import Colors from 'react-native/Libraries/NewAppScreen/components/Colors';
-import { AppContext } from '../../context/app';
+import { PreferencesContext } from '../../context/preferences';
 import {
   StyleSheet,
   Platform,
@@ -28,7 +28,7 @@ const ScreenContainer = ({
 }) => {
   const [showSearch, setShowSearch] = useState(false);
 
-  const { enabledDarkTheme } = useContext(AppContext);
+  const { enabledDarkTheme } = useContext(PreferencesContext);
 
   const backgroundStyle = {
     flex: 1,
