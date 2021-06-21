@@ -5617,6 +5617,11 @@ react-native-linear-gradient@^2.5.6:
   resolved "https://registry.yarnpkg.com/react-native-linear-gradient/-/react-native-linear-gradient-2.5.6.tgz#96215cbc5ec7a01247a20890888aa75b834d44a0"
   integrity sha512-HDwEaXcQIuXXCV70O+bK1rizFong3wj+5Q/jSyifKFLg0VWF95xh8XQgfzXwtq0NggL9vNjPKXa016KuFu+VFg==
 
+react-native-music-files@^1.0.7:
+  version "1.0.7"
+  resolved "https://registry.yarnpkg.com/react-native-music-files/-/react-native-music-files-1.0.7.tgz#84419a6dc13a9ca1442288b99a806bea3de9c593"
+  integrity sha512-+OGvEI+L4uA1B1rsKwS7WV4wP3Qyyu4+8o2Kc6rRdOKqoWeTDN+fS5LECZTmP0WcHUQokYc7GcVCHsdmC/vNlA==
+
 react-native-paper@^4.9.1:
   version "4.9.1"
   resolved "https://registry.yarnpkg.com/react-native-paper/-/react-native-paper-4.9.1.tgz#9b2aadcb1bd48ff6825641df60821e20e0cc8276"

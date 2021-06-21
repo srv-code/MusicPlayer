@@ -1,7 +1,6 @@
 package com.musicplayer;
 
 import com.facebook.react.ReactActivity;
-import com.reactlibrary.RNReatNativeGetMusicFilesPackage;
 
 public class MainActivity extends ReactActivity {
 
