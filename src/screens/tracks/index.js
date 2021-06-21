@@ -7,7 +7,6 @@ import { Text } from 'react-native-paper';
 
 const Tracks = ({ navigation }) => {
   const [searchedTerm, setSearchedTerm] = useState('');
-
   const onSearchHandler = term => {
     setSearchedTerm(term);
     console.log(`Searched ${term}`);

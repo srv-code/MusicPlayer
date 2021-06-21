@@ -14,6 +14,8 @@ target 'MusicPlayer' do
 
   pod 'RNVectorIcons', :path => '../node_modules/react-native-vector-icons'
 
+  pod 'RNReactNativeGetMusicFiles', :path => '../node_modules/react-native-get-music-files'
+
   target 'MusicPlayerTests' do
     inherit! :complete
     # Pods for testing
