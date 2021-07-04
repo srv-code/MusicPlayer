@@ -18,6 +18,7 @@ import {
 } from 'react-native-responsive-screen';
 import screenNames from '../../constants/screen-names';
 import { ActivityIndicator, Text } from 'react-native-paper';
+import { fetchAllMusicTracks } from '../../utils/tracks';
 
 const { height } = Dimensions.get('screen');
 const LOGO_HEIGHT = height * 0.28;
@@ -35,6 +36,8 @@ const Splash = ({ navigation }) => {
   });
 
   const initializeData = async required => {
+    console.log('required:', required);
+
     for (const require of required) {
       if (require.type === 'permission') {
         setLoadingInfo({ loading: true, info: 'Requesting for permissions' });
@@ -49,18 +52,13 @@ const Splash = ({ navigation }) => {
           // }
         );
         if (granted !== PermissionsAndroid.RESULTS.GRANTED) {
-          Alert.alert(
-            'Permission Denied',
-            'Application permission denied!\nCannot proceed further.',
-          );
+          // Alert.alert(
+          //   'Permission Denied',
+          //   'Application permission denied!\nCannot proceed further.',
+          //   [{ text: 'Exit', onPress: BackHandler.exitApp }],
+          // );
 
-          Alert.alert(
-            'Permission Denied',
-            'Application permission denied!\nCannot proceed further.',
-            [{ text: 'Exit', onPress: BackHandler.exitApp }],
-          );
-
-          BackHandler.exitApp();
+          // BackHandler.exitApp();
         }
       }
     }
@@ -104,7 +102,8 @@ const Splash = ({ navigation }) => {
       }
     }
 
-    
+    // check info: playlist
+    fetchAllMusicTracks();
 
     return requires;
   };

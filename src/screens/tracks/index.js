@@ -2,11 +2,9 @@ import React, { useState } from 'react';
 import { Alert, PermissionsAndroid, StyleSheet, View } from 'react-native';
 import ScreenContainer from '../../components/screen-container';
 import screenNames from '../../constants/screen-names';
-import colors from '../../constants/colors';
-import { Button, Text, IconButton } from 'react-native-paper';
-import MusicFiles from 'react-native-get-music-files';
-import { getTracks, MusicFile } from 'react-native-music-files';
-import ToastAndroid from 'react-native/Libraries/Components/ToastAndroid/ToastAndroid';
+import { Button, Text } from 'react-native-paper';
+import MusicFiles from '@yajanarao/react-native-get-music-files';
+import { getTracks } from 'react-native-music-files';
 
 const Tracks = ({ navigation }) => {
   const [searchedTerm, setSearchedTerm] = useState('');
