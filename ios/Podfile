@@ -16,6 +16,8 @@ target 'MusicPlayer' do
 
   pod 'RNReactNativeGetMusicFiles', :path => '../node_modules/react-native-get-music-files'
 
+  pod 'RNPermissions', :path => '../node_modules/react-native-permissions'
+
   target 'MusicPlayerTests' do
     inherit! :complete
     # Pods for testing

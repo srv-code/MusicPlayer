@@ -5,5 +5,6 @@ const colors = {
   lightGrey: '#009387',
   lightGrey1: '#cfcfcf',
   lightBlack: 'rgba(0, 0, 0, .32)',
+  nastyPink: '#800080',
 };
 export default colors;
