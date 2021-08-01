@@ -46,7 +46,7 @@ const Splash = ({ navigation }) => {
           })
           .catch(e => console.log('permission error:', e));
       }
-      // navigation.navigate(screenNames.tracks);
+      navigation.navigate(screenNames.tracks);
     }, SPLASH_TIMEOUT);
 
     // checkForInitialDataStatus()
