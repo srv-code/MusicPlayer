@@ -14,6 +14,8 @@ import {
 // import Splash from './src/screens/splash';
 
 const App = () => {
+  console.log('App loaded');
+
   const [enabledDarkTheme, setEnabledDarkTheme] = useState(
     // useColorScheme() === 'dark',
     false, // TODO revert later, for testing purpose only

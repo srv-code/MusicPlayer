@@ -18,7 +18,6 @@ import {
 } from 'react-native-responsive-screen';
 import screenNames from '../../constants/screen-names';
 import { ActivityIndicator, Text } from 'react-native-paper';
-import { fetchAllMusicTracks } from '../../utils/tracks';
 
 const { height } = Dimensions.get('screen');
 const LOGO_HEIGHT = height * 0.28;
@@ -30,98 +29,39 @@ const requiredPermissions = [
 ];
 
 const Splash = ({ navigation }) => {
-  const [loadingInfo, setLoadingInfo] = useState({
-    loading: false,
-    info: null,
-  });
+  console.log('Splash loaded');
 
-  const initializeData = async required => {
-    console.log('required:', required);
-
-    for (const require of required) {
-      if (require.type === 'permission') {
-        setLoadingInfo({ loading: true, info: 'Requesting for permissions' });
-        const granted = await PermissionsAndroid.request(
-          require.perm,
-          // {
-          //   title: 'Require Permission',
-          //   message: `Music Player requires ${require.perm} permission`,
-          // r  // buttonNeutral: 'Not Now',
-          //   buttonPositive: 'Yes',
-          //   buttonNegative: 'No',
-          // }
-        );
-        if (granted !== PermissionsAndroid.RESULTS.GRANTED) {
-          // Alert.alert(
-          //   'Permission Denied',
-          //   'Application permission denied!\nCannot proceed further.',
-          //   [{ text: 'Exit', onPress: BackHandler.exitApp }],
-          // );
-
-          // BackHandler.exitApp();
-        }
-      }
-    }
-
-    // if (required)
-    //   // ask for permissions
-    //   setLoadingInfo({ loading: true, info: 'Requesting for permissions' });
-    // const result = await PermissionsAndroid.requestMultiple([
-    //   PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
-    //   PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
-    // ]);
-
-    // console.log('>> permission result:', result);
-
-    // if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-    //   console.log('Permission granted');
-    // } else {
-    //   console.log('Permission denied');
-    // }
-
-    // const granted = await PermissionsAndroid.request(
-    //   PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
-    //   {
-    //     title: 'Require Permission',
-    //     message: 'Music Player requires storage read permission',
-    //     buttonNeutral: 'Not Now',
-    //     buttonNegative: 'Cancel',
-    //     buttonPositive: 'OK',
-    //   },
-    // );
-  };
-
-  const checkForInitialDataStatus = async () => {
-    const requires = [];
-
-    // check for permissions
-    if (Platform.OS === 'android') {
-      for (const perm of requiredPermissions) {
-        if (!(await PermissionsAndroid.check(perm)))
-          requires.push({ type: 'permission', perm });
-      }
-    }
-
-    // check info: playlist
-    fetchAllMusicTracks();
-
-    return requires;
-  };
+  // const [loadingInfo, setLoadingInfo] = useState({
+  //   loading: false,
+  //   info: null,
+  // });
 
   useEffect(() => {
-    checkForInitialDataStatus()
-      .then(requires => {
-        if (!requires.length) navigation.navigate(screenNames.tracks);
+    setTimeout(() => {
+      if (Platform.OS === 'android') {
+        console.log('asking permissions');
+        PermissionsAndroid.requestMultiple(requiredPermissions)
+          .then(response => {
+            console.log('permission response:', response);
+          })
+          .catch(e => console.log('permission error:', e));
+      }
+      // navigation.navigate(screenNames.tracks);
+    }, SPLASH_TIMEOUT);
 
-        setTimeout(() => {
-          initializeData(requires)
-            .then(() => {
-              navigation.navigate(screenNames.tracks);
-            })
-            .catch(e => Alert.alert('Error', 'Error occurred:' + e));
-        }, SPLASH_TIMEOUT);
-      })
-      .catch(e => Alert.alert('Application Error', 'Error encountered: ' + e));
+    // checkForInitialDataStatus()
+    //   .then(requires => {
+    //     if (!requires.length) navigation.navigate(screenNames.tracks);
+    //
+    //     setTimeout(() => {
+    //       initializeData(requires)
+    //         .then(() => {
+    //           navigation.navigate(screenNames.tracks);
+    //         })
+    //         .catch(e => Alert.alert('Error', 'Error occurred:' + e));
+    //     }, SPLASH_TIMEOUT);
+    //   })
+    //   .catch(e => Alert.alert('Application Error', 'Error encountered: ' + e));
   }, []);
 
   return (
@@ -133,29 +73,31 @@ const Splash = ({ navigation }) => {
       <View style={styles.header}>
         <Animatable.Image
           animation="bounceIn"
-          duraton={LOGO_ANIMATION_DURATION}
+          duration={LOGO_ANIMATION_DURATION}
           source={Icons.Logo}
           style={styles.logo}
           resizeMode="stretch"
         />
       </View>
-      <View
-        style={{
-          // borderWidth: 1,
-          flexDirection: 'row',
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}>
-        <ActivityIndicator
-          animating={loadingInfo.loading}
-          size={wp(4)}
-          color={appColors.nastyPink}
-          style={{ marginRight: wp(2) }}
-        />
-        <Text style={{ fontSize: wp(4), color: appColors.nastyPink }}>
-          {loadingInfo.info}
-        </Text>
-      </View>
+
+      {/*<View*/}
+      {/*  style={{*/}
+      {/*    // borderWidth: 1,*/}
+      {/*    flexDirection: 'row',*/}
+      {/*    alignItems: 'center',*/}
+      {/*    justifyContent: 'center',*/}
+      {/*  }}>*/}
+      {/*  <ActivityIndicator*/}
+      {/*    animating={loadingInfo.loading}*/}
+      {/*    size={wp(4)}*/}
+      {/*    color={appColors.nastyPink}*/}
+      {/*    style={{ marginRight: wp(2) }}*/}
+      {/*  />*/}
+      {/*  <Text style={{ fontSize: wp(4), color: appColors.nastyPink }}>*/}
+      {/*    {loadingInfo.info}*/}
+      {/*  </Text>*/}
+      {/*</View>*/}
+
       <Animatable.View style={styles.footer} animation="fadeInUpBig">
         <Text style={styles.title}>Welcome to the World of Music 🎵</Text>
         <Text style={styles.text}>Your own very personalized music app ❤</Text>
