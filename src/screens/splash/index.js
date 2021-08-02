@@ -28,7 +28,8 @@ const requiredPermissions = [
   PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
 ];
 
-const Splash = ({ navigation }) => {
+// const Splash = ({ navigation }) => {
+const Splash = () => {
   console.log('Splash loaded');
 
   // const [loadingInfo, setLoadingInfo] = useState({
@@ -46,7 +47,7 @@ const Splash = ({ navigation }) => {
           })
           .catch(e => console.log('permission error:', e));
       }
-      navigation.navigate(screenNames.tracks);
+      // navigation.navigate(screenNames.tracks);
     }, SPLASH_TIMEOUT);
 
     // checkForInitialDataStatus()

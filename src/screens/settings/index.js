@@ -10,13 +10,16 @@ import {
   widthPercentageToDP as wp,
 } from 'react-native-responsive-screen';
 
-const Settings = ({ navigation }) => {
+// const Settings = ({ navigation }) => {
+const Settings = () => {
+  return <View style={{ flex: 1, backgroundColor: 'blue' }} />;
+
   const { enabledDarkTheme, toggleDarkTheme } = useContext(PreferencesContext);
 
   return (
     <ScreenContainer
       showHeader
-      onBackPress={navigation.goBack}
+      // onBackPress={navigation.goBack}
       title={screenNames.settings}
       subtitle="Set your own preferences"
       showSettings>

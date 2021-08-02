@@ -4,8 +4,10 @@ import ScreenContainer from '../../components/screen-container';
 import screenNames from '../../constants/screen-names';
 import { Button, Text } from 'react-native-paper';
 
-const Tracks = ({ navigation }) => {
+// const Tracks = ({ navigation }) => {
+const Tracks = () => {
   console.log('Tracks loaded');
+  return <View style={{ flex: 1, backgroundColor: 'yellow' }} />;
 
   const [searchedTerm, setSearchedTerm] = useState('');
 
@@ -22,7 +24,8 @@ const Tracks = ({ navigation }) => {
       searchPlaceholder="Search among all the tracks"
       searchedTerm={searchedTerm}
       onSearch={onSearchHandler}
-      onPressSettings={navigation.push.bind(this, screenNames.settings)}>
+      // onPressSettings={navigation.push.bind(this, screenNames.settings)}
+    >
       <View style={styles.container}>
         <Text>Tracks screen</Text>
         <Button mode="outlined" uppercase={false}>

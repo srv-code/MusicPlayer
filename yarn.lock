@@ -5617,6 +5617,11 @@ react-native-linear-gradient@^2.5.6:
   resolved "https://registry.yarnpkg.com/react-native-linear-gradient/-/react-native-linear-gradient-2.5.6.tgz#96215cbc5ec7a01247a20890888aa75b834d44a0"
   integrity sha512-HDwEaXcQIuXXCV70O+bK1rizFong3wj+5Q/jSyifKFLg0VWF95xh8XQgfzXwtq0NggL9vNjPKXa016KuFu+VFg==
 
+react-native-pager-view@^5.4.0:
+  version "5.4.0"
+  resolved "https://registry.yarnpkg.com/react-native-pager-view/-/react-native-pager-view-5.4.0.tgz#8e30a391a68da26e59f4ae724341b9208924b2ee"
+  integrity sha512-pYy3I8p5s6cPaymT1GibuDRHmicY3JdHHZyTH+Fra1S0wupaJhoZy33f2prrMJqQfk9kaqwCsb3pVmj4GuJTjA==
+
 react-native-paper@^4.9.1:
   version "4.9.1"
   resolved "https://registry.yarnpkg.com/react-native-paper/-/react-native-paper-4.9.1.tgz#9b2aadcb1bd48ff6825641df60821e20e0cc8276"
@@ -5665,6 +5670,11 @@ react-native-svg@^12.1.1:
   dependencies:
     css-select "^2.1.0"
     css-tree "^1.0.0-alpha.39"
+
+react-native-tab-view@^3.1.1:
+  version "3.1.1"
+  resolved "https://registry.yarnpkg.com/react-native-tab-view/-/react-native-tab-view-3.1.1.tgz#1f8d7a835ab4f5b1b1407ec8dddc1053b53fa3c6"
+  integrity sha512-M5pRN6utQfytKWoKlKVzg5NbkYu308qNoW1khGTtEOTs1k14p2dHJ/BWOJoJYHKbPVUyZldbG9MFT7gUl4YHnw==
 
 react-native-track-player@^1.2.7:
   version "1.2.7"

@@ -1,93 +1,72 @@
 import React from 'react';
+// import { useWindowDimensions } from 'react-native';
+import { TabView, SceneMap } from 'react-native-tab-view';
 import { NavigationContainer } from '@react-navigation/native';
-import { createStackNavigator } from '@react-navigation/stack';
-import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
 import screenNames from '../constants/screen-names';
 import Tracks from '../screens/tracks';
+// import Splash from '../screens/splash';
 import Playlists from '../screens/playlists';
 import Settings from '../screens/settings';
 import Playback from '../screens/playback';
 import Icons from '../constants/icons';
 import colors from '../constants/colors';
-import Splash from '../screens/splash';
+
+const routeData = [
+  // { name: screenNames.splash, screen: Splash },
+  { name: screenNames.playback, screen: Playback },
+  { name: screenNames.playlists, screen: Playlists },
+  { name: screenNames.settings, screen: Settings },
+  { name: screenNames.tracks, screen: Tracks },
+];
 
 const Navigator = ({ enabledDarkTheme, theme }) => {
-  const TrackStack = createStackNavigator();
-  const TrackStackScreens = () => (
-    <TrackStack.Navigator screenOptions={{ headerShown: false }}>
-      <TrackStack.Screen name={screenNames.tracks} component={Tracks} />
-    </TrackStack.Navigator>
+  // const layout = useWindowDimensions();
+
+  // TODO make them inline, for testing purposes only
+  const _routes = routeData.map(data => ({ key: data.name, title: data.name }));
+  const _sceneMap = {};
+  routeData.forEach(data => (_sceneMap[data.name] = data.screen));
+  console.log('navigator:', { _routes, _sceneMaps: _sceneMap });
+
+  const [index, setIndex] = React.useState(0);
+  const [routes] = React.useState(
+    // // sample
+    // [
+    //   { key: 'Splash', title: 'Splash' },
+    //   { key: 'Tracks', title: 'Tracks' },
+    // ],
+
+    _routes,
   );
 
-  const PlaylistStack = createStackNavigator();
-  const PlaylistStackScreens = () => (
-    <PlaylistStack.Navigator screenOptions={{ headerShown: false }}>
-      <PlaylistStack.Screen
-        name={screenNames.playlists}
-        component={Playlists}
-      />
-    </PlaylistStack.Navigator>
-  );
+  const renderScene = SceneMap(
+    // (() => {
+    //   // TODO move the calculation here
+    //   // sample
+    //   return {
+    //     // Splash: Splash,
+    //     Playback: Playback,
+    //     Playlists: Playlists,
+    //     Settings: Settings,
+    //     Tracks: Tracks,
+    //   };
+    // })(),
 
-  const PlaybackStack = createStackNavigator();
-  const PlaybackStackScreens = () => (
-    <PlaybackStack.Navigator screenOptions={{ headerShown: false }}>
-      <PlaybackStack.Screen name={screenNames.playback} component={Playback} />
-    </PlaybackStack.Navigator>
-  );
+    // routeData.map(data => ({ [data.name]: data.screen })),
 
-  const SettingsStack = createStackNavigator();
-  const SettingsStackScreens = () => (
-    <SettingsStack.Navigator screenOptions={{ headerShown: false }}>
-      <SettingsStack.Screen name={screenNames.settings} component={Settings} />
-    </SettingsStack.Navigator>
-  );
-
-  const BottomTabs = createMaterialBottomTabNavigator();
-  const BottomTabScreen = () => (
-    <BottomTabs.Navigator shifting sceneAnimationEnabled>
-      <BottomTabs.Screen
-        name={screenNames.tracks}
-        component={TrackStackScreens}
-        options={{
-          tabBarLabel: screenNames.tracks,
-          tabBarColor: enabledDarkTheme ? null : colors.darkBlue2,
-          tabBarIcon: Icons.Album,
-        }}
-      />
-      <BottomTabs.Screen
-        name={screenNames.playlists}
-        component={PlaylistStackScreens}
-        options={{
-          tabBarLabel: screenNames.playlists,
-          tabBarColor: enabledDarkTheme ? null : colors.darkBlue,
-          tabBarIcon: Icons.PlaylistMusic,
-        }}
-      />
-    </BottomTabs.Navigator>
-  );
-
-  const RootStack = createStackNavigator();
-  const RootStackScreen = () => (
-    <RootStack.Navigator headerMode="none">
-      <RootStack.Screen name="Splash" component={Splash} />
-      <RootStack.Screen name={screenNames.tracks} component={BottomTabScreen} />
-      <RootStack.Screen
-        name={screenNames.playback}
-        component={PlaybackStackScreens}
-      />
-      <RootStack.Screen
-        name={screenNames.settings}
-        component={SettingsStackScreens}
-      />
-    </RootStack.Navigator>
+    _sceneMap,
   );
 
   return (
-    <NavigationContainer theme={theme}>
-      <RootStackScreen />
-    </NavigationContainer>
+    // <NavigationContainer theme={theme}>
+    <TabView
+      swipeEnabled={true}
+      navigationState={{ index, routes }}
+      onIndexChange={setIndex}
+      // initialLayout={{ width: layout.width }}
+      renderScene={renderScene}
+    />
+    // </NavigationContainer>
   );
 };
-
 export default Navigator;

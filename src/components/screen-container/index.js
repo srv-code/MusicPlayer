@@ -8,7 +8,7 @@ import {
   ScrollView,
   StatusBar,
 } from 'react-native';
-import { Appbar, Searchbar } from 'react-native-paper';
+import { Appbar, Searchbar, Text } from 'react-native-paper';
 import {
   heightPercentageToDP as hp,
   widthPercentageToDP as wp,
@@ -43,47 +43,50 @@ const ScreenContainer = ({
   const backgroundStyle = {
     flex: 1,
     backgroundColor: enabledDarkTheme ? Colors.darker : Colors.lighter,
+    backgroundColor: 'red',
   };
 
   return (
     <SafeAreaView style={backgroundStyle}>
-      <StatusBar
-        backgroundColor={enabledDarkTheme ? Colors.darker : colors.darkBlue2}
-        barStyle="light-content"
-      />
-      {showHeader && (
-        <Appbar.Header
-          style={{
-            backgroundColor: enabledDarkTheme ? null : colors.darkBlue2,
-          }}>
-          {onBackPress && <Appbar.BackAction onPress={onBackPress} />}
-          <Appbar.Content title={title} subtitle={subtitle} />
-          {onSearch && (
-            <Appbar.Action
-              icon="magnify"
-              onPress={setShowSearch.bind(this, !showSearch)}
-            />
-          )}
-          {onPressSettings && (
-            <Appbar.Action icon="cog" onPress={onPressSettings} />
-          )}
-        </Appbar.Header>
-      )}
+      <Text>{(title + ', ' +subtitle)}</Text>
+      {/*TODO move to App.js*/}
+      {/*<StatusBar*/}
+      {/*  backgroundColor={enabledDarkTheme ? Colors.darker : colors.darkBlue2}*/}
+      {/*  barStyle="light-content"*/}
+      {/*/>*/}
+      {/*{showHeader && (*/}
+      {/*  <Appbar.Header*/}
+      {/*    style={{*/}
+      {/*      backgroundColor: enabledDarkTheme ? null : colors.darkBlue2,*/}
+      {/*    }}>*/}
+      {/*    {onBackPress && <Appbar.BackAction onPress={onBackPress} />}*/}
+      {/*    <Appbar.Content title={title} subtitle={subtitle} />*/}
+      {/*    {onSearch && (*/}
+      {/*      <Appbar.Action*/}
+      {/*        icon="magnify"*/}
+      {/*        onPress={setShowSearch.bind(this, !showSearch)}*/}
+      {/*      />*/}
+      {/*    )}*/}
+      {/*    {onPressSettings && (*/}
+      {/*      <Appbar.Action icon="cog" onPress={onPressSettings} />*/}
+      {/*    )}*/}
+      {/*  </Appbar.Header>*/}
+      {/*)}*/}
 
-      {showSearch && (
-        <Searchbar
-          placeholder={searchPlaceholder || 'Search'}
-          onChangeText={onSearch}
-          value={searchedTerm}
-          style={styles.searchBar}
-        />
-      )}
+      {/*{showSearch && (*/}
+      {/*  <Searchbar*/}
+      {/*    placeholder={searchPlaceholder || 'Search'}*/}
+      {/*    onChangeText={onSearch}*/}
+      {/*    value={searchedTerm}*/}
+      {/*    style={styles.searchBar}*/}
+      {/*  />*/}
+      {/*)}*/}
 
-      <ScrollView
-        contentInsetAdjustmentBehavior="automatic"
-        style={styles.scrollView}>
-        {children}
-      </ScrollView>
+      {/*<ScrollView*/}
+      {/*  contentInsetAdjustmentBehavior="automatic"*/}
+      {/*  style={styles.scrollView}>*/}
+      {/*  {children}*/}
+      {/*</ScrollView>*/}
     </SafeAreaView>
   );
 };

@@ -11,6 +11,7 @@ import {
   DefaultTheme as NavigationDefaultTheme,
   DarkTheme as NavigationDarkTheme,
 } from '@react-navigation/native';
+import { SafeAreaProvider } from 'react-native-safe-area-context/src/SafeAreaContext';
 // import Splash from './src/screens/splash';
 
 const App = () => {
@@ -53,7 +54,9 @@ const App = () => {
   return (
     <PaperProvider theme={theme}>
       <PreferencesContext.Provider value={preferencesContextValue}>
-        <Navigator enabledDarkTheme={enabledDarkTheme} theme={theme} />
+        <SafeAreaProvider>
+          <Navigator enabledDarkTheme={enabledDarkTheme} theme={theme} />
+        </SafeAreaProvider>
       </PreferencesContext.Provider>
     </PaperProvider>
   );

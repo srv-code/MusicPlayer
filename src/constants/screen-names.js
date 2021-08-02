@@ -1,8 +1,9 @@
 const screenNames = {
-  tracks: 'Tracks',
-  playback: 'Playback',
-  playlists: 'Playlists',
-  settings: 'Settings',
+  splash: 'splash',
+  tracks: 'tracks',
+  playback: 'playback',
+  playlists: 'playlists',
+  settings: 'settings',
 };
 
 export default screenNames;
