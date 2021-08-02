@@ -58,15 +58,15 @@ const Navigator = ({ enabledDarkTheme, theme }) => {
   );
 
   return (
-    // <NavigationContainer theme={theme}>
-    <TabView
-      swipeEnabled={true}
-      navigationState={{ index, routes }}
-      onIndexChange={setIndex}
-      // initialLayout={{ width: layout.width }}
-      renderScene={renderScene}
-    />
-    // </NavigationContainer>
+    <NavigationContainer theme={theme}>
+      <TabView
+        swipeEnabled={true}
+        navigationState={{ index, routes }}
+        onIndexChange={setIndex}
+        // initialLayout={{ width: layout.width }}
+        renderScene={renderScene}
+      />
+    </NavigationContainer>
   );
 };
 export default Navigator;

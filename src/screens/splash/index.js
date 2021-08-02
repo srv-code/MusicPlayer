@@ -29,7 +29,7 @@ const requiredPermissions = [
 ];
 
 // const Splash = ({ navigation }) => {
-const Splash = () => {
+const Splash = ({ setShow }) => {
   console.log('Splash loaded');
 
   // const [loadingInfo, setLoadingInfo] = useState({
@@ -48,6 +48,7 @@ const Splash = () => {
           .catch(e => console.log('permission error:', e));
       }
       // navigation.navigate(screenNames.tracks);
+      setShow(false);
     }, SPLASH_TIMEOUT);
 
     // checkForInitialDataStatus()

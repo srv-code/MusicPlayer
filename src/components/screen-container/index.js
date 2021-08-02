@@ -50,10 +50,7 @@ const ScreenContainer = ({
     <SafeAreaView style={backgroundStyle}>
       <Text>{(title + ', ' +subtitle)}</Text>
       {/*TODO move to App.js*/}
-      {/*<StatusBar*/}
-      {/*  backgroundColor={enabledDarkTheme ? Colors.darker : colors.darkBlue2}*/}
-      {/*  barStyle="light-content"*/}
-      {/*/>*/}
+
       {/*{showHeader && (*/}
       {/*  <Appbar.Header*/}
       {/*    style={{*/}
