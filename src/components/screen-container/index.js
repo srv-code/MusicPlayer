@@ -28,29 +28,27 @@ const ScreenContainer = ({
   onPressSettings,
   children,
 }) => {
-  const [showSearch, setShowSearch] = useState(false);
+  // const [showSearch, setShowSearch] = useState(false);
 
-  useBackHandler(() => {
-    if (showSearch) {
-      setShowSearch(false);
-      return true;
-    }
-    return false;
-  });
+  // useBackHandler(() => {
+  //   if (showSearch) {
+  //     setShowSearch(false);
+  //     return true;
+  //   }
+  //   return false;
+  // });
 
   const { enabledDarkTheme } = useContext(PreferencesContext);
 
   const backgroundStyle = {
     flex: 1,
     backgroundColor: enabledDarkTheme ? Colors.darker : Colors.lighter,
-    backgroundColor: 'red',
+    // backgroundColor: 'red',
   };
 
   return (
     <SafeAreaView style={backgroundStyle}>
-      <Text>{(title + ', ' +subtitle)}</Text>
-      {/*TODO move to App.js*/}
-
+      {/*<Text>jdfhkjdfhdkfhkj</Text>*/}
       {/*{showHeader && (*/}
       {/*  <Appbar.Header*/}
       {/*    style={{*/}
@@ -79,11 +77,11 @@ const ScreenContainer = ({
       {/*  />*/}
       {/*)}*/}
 
-      {/*<ScrollView*/}
-      {/*  contentInsetAdjustmentBehavior="automatic"*/}
-      {/*  style={styles.scrollView}>*/}
-      {/*  {children}*/}
-      {/*</ScrollView>*/}
+      <ScrollView
+        contentInsetAdjustmentBehavior="automatic"
+        style={styles.scrollView}>
+        {children}
+      </ScrollView>
     </SafeAreaView>
   );
 };

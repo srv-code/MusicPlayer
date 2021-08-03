@@ -4,7 +4,7 @@ import ScreenContainer from '../../components/screen-container';
 import screenNames from '../../constants/screen-names';
 
 // const Playback = ({ navigation }) => {
-const Playback = () => {
+const Search = () => {
   // return <View style={{ flex: 1, backgroundColor: 'red' }} />;
 
   return (
@@ -12,9 +12,9 @@ const Playback = () => {
       // onBackPress={navigation.goBack}
       showHeader
       title={screenNames.playback}
-      subtitle="<Playback track info>">
+      subtitle="<Search track info>">
       <View style={styles.container}>
-        <Text>Playback screen</Text>
+        <Text>Search screen</Text>
       </View>
     </ScreenContainer>
   );
@@ -24,4 +24,4 @@ const styles = StyleSheet.create({
   container: {},
 });
 
-export default Playback;
+export default Search;

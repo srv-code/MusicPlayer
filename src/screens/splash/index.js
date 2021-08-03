@@ -47,7 +47,9 @@ const Splash = ({ setShow }) => {
           })
           .catch(e => console.log('permission error:', e));
       }
-      // navigation.navigate(screenNames.tracks);
+      // navigation.navigate('tab-view', {
+      //   screen: screenNames.playback,
+      // });
       setShow(false);
     }, SPLASH_TIMEOUT);
 

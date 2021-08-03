@@ -22,7 +22,8 @@ const App = () => {
 
   const [enabledDarkTheme, setEnabledDarkTheme] = useState(
     // useColorScheme() === 'dark',
-    false, // TODO revert later, for testing purpose only
+    // false, // TODO revert later, for testing purpose only
+    true,
   );
   const [showSplash, setShowSplash] = useState(true);
 
@@ -52,17 +53,17 @@ const App = () => {
   //     }, SPLASH_TIMEOUT);
   // }, []);
 
+  console.log('App', useColorScheme());
+
   if (showSplash) return <Splash setShow={setShowSplash} />;
   return (
     <PaperProvider theme={theme}>
       <PreferencesContext.Provider value={preferencesContextValue}>
+        <StatusBar
+          backgroundColor={enabledDarkTheme ? Colors.darker : colors.darkBlue2}
+          barStyle="light-content"
+        />
         <SafeAreaProvider>
-          <StatusBar
-            backgroundColor={
-              enabledDarkTheme ? Colors.darker : colors.darkBlue2
-            }
-            barStyle="light-content"
-          />
           <Navigator enabledDarkTheme={enabledDarkTheme} theme={theme} />
         </SafeAreaProvider>
       </PreferencesContext.Provider>
