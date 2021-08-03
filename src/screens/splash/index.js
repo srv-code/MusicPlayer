@@ -78,7 +78,7 @@ const Splash = ({ setShow }) => {
         <Animatable.Image
           animation="bounceIn"
           duration={LOGO_ANIMATION_DURATION}
-          source={Icons.Logo}
+          source={Icons.LargeLogo}
           style={styles.logo}
           resizeMode="stretch"
         />

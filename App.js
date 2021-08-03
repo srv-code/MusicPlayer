@@ -63,7 +63,7 @@ const App = () => {
           barStyle="light-content"
         />
         <SafeAreaProvider>
-          <Navigator enabledDarkTheme={enabledDarkTheme} theme={theme} />
+          <Navigator theme={theme} />
         </SafeAreaProvider>
       </PreferencesContext.Provider>
     </PaperProvider>

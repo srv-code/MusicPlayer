@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { useBackHandler } from '@react-native-community/hooks';
-import { SceneMap, TabView } from 'react-native-tab-view';
-import { Appbar, Menu } from 'react-native-paper';
+import { Image, View, StyleSheet } from 'react-native';
+import { SceneMap, TabBar, TabView } from 'react-native-tab-view';
+import { Appbar, Badge, Menu, Text } from 'react-native-paper';
 import { Platform } from 'react-native';
-// import { useWindowDimensions } from 'react-native';
 import screenNames from '../../constants/screen-names';
 import Playlists from '../../screens/playlists';
 import Tracks from '../../screens/tracks';
@@ -11,22 +11,90 @@ import Favorites from '../../screens/favorites';
 import Albums from '../../screens/albums';
 import Artists from '../../screens/artists';
 import colors from '../../constants/colors';
+import { width } from '../../constants/dimensions';
+import {
+  heightPercentageToDP as hp,
+  widthPercentageToDP as wp,
+} from 'react-native-responsive-screen';
+import { PreferencesContext } from '../../context/preferences';
+import Colors from 'react-native/Libraries/NewAppScreen/components/Colors';
+import Icon from '../../components/icon';
+import labels from '../../constants/labels';
+import Icons from '../../constants/icons';
 
 const routeData = [
-  { name: screenNames.favorites, screen: Favorites },
-  { name: screenNames.playlists, screen: Playlists },
-  { name: screenNames.tracks, screen: Tracks },
-  { name: screenNames.albums, screen: Albums },
-  { name: screenNames.artists, screen: Artists },
+  {
+    key: screenNames.favorites,
+    title: screenNames.favorites,
+    screen: Favorites,
+    icon: {
+      color: colors.red,
+      type: 'MaterialCommunityIcons',
+      name: {
+        filled: 'heart',
+        outlined: 'heart-outline',
+      },
+    },
+  },
+  {
+    key: screenNames.playlists,
+    title: screenNames.playlists,
+    screen: Playlists,
+    icon: {
+      color: '#007600',
+      type: 'MaterialCommunityIcons',
+      name: {
+        filled: 'playlist-music',
+        outlined: 'playlist-music-outline',
+      },
+    },
+  },
+  {
+    key: screenNames.tracks,
+    title: screenNames.tracks,
+    screen: Tracks,
+    icon: {
+      color: '#0080ff',
+      type: 'Ionicons',
+      name: {
+        filled: 'musical-notes',
+        outlined: 'musical-notes-outline',
+      },
+    },
+  },
+  {
+    key: screenNames.albums,
+    title: screenNames.albums,
+    screen: Albums,
+    icon: {
+      color: '#c4c4ff',
+      type: 'Ionicons',
+      name: {
+        filled: 'disc',
+        outlined: 'disc-outline',
+      },
+    },
+  },
+  {
+    key: screenNames.artists,
+    title: screenNames.artists,
+    screen: Artists,
+    icon: {
+      color: '#4e4e00',
+      type: 'MaterialCommunityIcons',
+      name: {
+        filled: 'account-music',
+        outlined: 'account-music-outline',
+      },
+    },
+  },
 ];
 
 const TabbedView = ({ navigation }) => {
-  // const layout = useWindowDimensions();
+  const { enabledDarkTheme } = useContext(PreferencesContext);
 
   const [index, setIndex] = useState(0);
-  const [routes] = useState(
-    routeData.map(data => ({ key: data.name, title: data.name })),
-  );
+  const [routes] = useState(routeData);
   const [showSearch, setShowSearch] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
 
@@ -42,7 +110,7 @@ const TabbedView = ({ navigation }) => {
   const renderScene = SceneMap(
     (() => {
       const _sceneMap = {};
-      routeData.forEach(data => (_sceneMap[data.name] = data.screen));
+      routeData.forEach(data => (_sceneMap[data.key] = data.screen));
       return _sceneMap;
     })(),
   );
@@ -52,7 +120,8 @@ const TabbedView = ({ navigation }) => {
 
   const renderAppbar = () => (
     <Appbar.Header>
-      <Appbar.Content title="Music Player" />
+      <Image source={Icons.Logo} resizeMode="stretch" style={styles.logo} />
+      <Appbar.Content title={labels.musicPlayer} />
       <Appbar.Action icon="magnify" onPress={() => {}} />
       <Menu
         visible={isMenuVisible}
@@ -82,14 +151,60 @@ const TabbedView = ({ navigation }) => {
     </Appbar.Header>
   );
 
-  const renderTabView = () => (
-    <TabView
-      navigationState={{ index, routes }}
-      onIndexChange={setIndex}
-      // initialLayout={{ width: layout.width }}
-      renderScene={renderScene}
-    />
-  );
+  const renderTabView = () => {
+    const renderTabBar = props => (
+      <TabBar
+        {...props}
+        scrollEnabled
+        bounces
+        renderLabel={({ route, focused, color }) => (
+          <View style={styles.tabBarItemLabelContainer}>
+            <Icon
+              type={route.icon.type}
+              name={focused ? route.icon.name.filled : route.icon.name.outlined}
+              color={route.icon.color}
+              size={wp(focused ? 5.5 : 3.8)}
+              style={{ opacity: focused ? 1 : 0.5 }}
+            />
+            <Text
+              style={{
+                ...styles.tabBarItemLabelTextBase,
+                opacity: focused ? 1 : 0.5,
+                fontSize: wp(focused ? 5.5 : 3.8),
+                fontWeight: focused ? 'bold' : 'normal',
+              }}>
+              {route.title}
+            </Text>
+            <Badge
+              size={focused ? 20 : 15}
+              style={{
+                opacity: focused ? 1 : 0.5,
+                backgroundColor: focused ? colors.lightGrey1 : colors.lightGrey,
+                alignSelf: 'center',
+              }}>
+              3
+            </Badge>
+          </View>
+        )}
+        renderIndicator={() => null}
+        tabStyle={{
+          height: hp(6),
+          backgroundColor: enabledDarkTheme ? Colors.darker : colors.white2,
+        }}
+        style={styles.tabBar}
+      />
+    );
+
+    return (
+      <TabView
+        navigationState={{ index, routes }}
+        onIndexChange={setIndex}
+        initialLayout={{ width }}
+        renderScene={renderScene}
+        renderTabBar={renderTabBar}
+      />
+    );
+  };
 
   return (
     <>
@@ -98,5 +213,28 @@ const TabbedView = ({ navigation }) => {
     </>
   );
 };
+
+const styles = StyleSheet.create({
+  logo: {
+    height: hp(3.8),
+    width: hp(3.8),
+    marginLeft: wp(2),
+    marginRight: wp(-2),
+  },
+  tabBarItemLabelContainer: {
+    height: hp(3.5),
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  tabBarItemLabelTextBase: {
+    paddingHorizontal: wp(1),
+    textAlignVertical: 'center',
+    textTransform: 'capitalize',
+  },
+  tabBar: {
+    elevation: 0,
+  },
+});
 
 export default TabbedView;
