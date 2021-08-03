@@ -41,7 +41,7 @@ const routeData = [
     title: screenNames.playlists,
     screen: Playlists,
     icon: {
-      color: '#007600',
+      color: colors.green1,
       type: 'MaterialCommunityIcons',
       name: {
         filled: 'playlist-music',
@@ -54,7 +54,7 @@ const routeData = [
     title: screenNames.tracks,
     screen: Tracks,
     icon: {
-      color: '#0080ff',
+      color: colors.lightPurple,
       type: 'Ionicons',
       name: {
         filled: 'musical-notes',
@@ -67,7 +67,7 @@ const routeData = [
     title: screenNames.albums,
     screen: Albums,
     icon: {
-      color: '#c4c4ff',
+      color: colors.lightBlue1,
       type: 'Ionicons',
       name: {
         filled: 'disc',
@@ -80,7 +80,7 @@ const routeData = [
     title: screenNames.artists,
     screen: Artists,
     icon: {
-      color: '#4e4e00',
+      color: colors.darkGreen,
       type: 'MaterialCommunityIcons',
       name: {
         filled: 'account-music',
