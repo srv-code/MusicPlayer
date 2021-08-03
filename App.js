@@ -12,7 +12,6 @@ import {
   DarkTheme as NavigationDarkTheme,
 } from '@react-navigation/native';
 import { SafeAreaProvider } from 'react-native-safe-area-context/src/SafeAreaContext';
-// import Splash from './src/screens/splash';
 import Colors from 'react-native/Libraries/NewAppScreen/components/Colors';
 import colors from './src/constants/colors';
 import Splash from './src/screens/splash';
@@ -22,8 +21,8 @@ const App = () => {
 
   const [enabledDarkTheme, setEnabledDarkTheme] = useState(
     // useColorScheme() === 'dark',
-    // false, // TODO revert later, for testing purpose only
-    true,
+    false, // TODO revert later, for testing purpose only
+    // true,
   );
   const [showSplash, setShowSplash] = useState(true);
 
@@ -53,7 +52,7 @@ const App = () => {
   //     }, SPLASH_TIMEOUT);
   // }, []);
 
-  console.log('App', useColorScheme());
+  // console.log('App', useColorScheme());
 
   if (showSplash) return <Splash setShow={setShowSplash} />;
   return (

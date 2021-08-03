@@ -1,43 +1,34 @@
 import React, { useState } from 'react';
-// import { useWindowDimensions } from 'react-native';
-import screenNames from '../../constants/screen-names';
-import Playback from '../../screens/playback';
-import Playlists from '../../screens/playlists';
-import Tracks from '../../screens/tracks';
 import { useBackHandler } from '@react-native-community/hooks';
 import { SceneMap, TabView } from 'react-native-tab-view';
 import { Appbar, Menu } from 'react-native-paper';
 import { Platform } from 'react-native';
+// import { useWindowDimensions } from 'react-native';
+import screenNames from '../../constants/screen-names';
+import Playlists from '../../screens/playlists';
+import Tracks from '../../screens/tracks';
+import Favorites from '../../screens/favorites';
+import Albums from '../../screens/albums';
+import Artists from '../../screens/artists';
 import colors from '../../constants/colors';
 
 const routeData = [
-  { name: screenNames.playback, screen: Playback },
+  { name: screenNames.favorites, screen: Favorites },
   { name: screenNames.playlists, screen: Playlists },
   { name: screenNames.tracks, screen: Tracks },
+  { name: screenNames.albums, screen: Albums },
+  { name: screenNames.artists, screen: Artists },
 ];
 
 const TabbedView = ({ navigation }) => {
   // const layout = useWindowDimensions();
 
-  // TODO make them inline, for testing purposes only
-  const _routes = routeData.map(data => ({ key: data.name, title: data.name }));
-  const _sceneMap = {};
-  routeData.forEach(data => (_sceneMap[data.name] = data.screen));
-
   const [index, setIndex] = useState(0);
   const [routes] = useState(
-    // // sample
-    // [
-    //   { key: 'Splash', title: 'Splash' },
-    //   { key: 'Tracks', title: 'Tracks' },
-    // ],
-
-    _routes,
+    routeData.map(data => ({ key: data.name, title: data.name })),
   );
   const [showSearch, setShowSearch] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
-
-  console.log('navigator:', { index, _routes, _sceneMaps: _sceneMap });
 
   useBackHandler(() => {
     if (showSearch) {
@@ -49,41 +40,22 @@ const TabbedView = ({ navigation }) => {
   });
 
   const renderScene = SceneMap(
-    // (() => {
-    //   // TODO move the calculation here
-    //   // sample
-    //   return {
-    //     // Splash: Splash,
-    //     Playback: Playback,
-    //     Playlists: Playlists,
-    //     Settings: Settings,
-    //     Tracks: Tracks,
-    //   };
-    // })(),
-
-    // routeData.map(data => ({ [data.name]: data.screen })),
-
-    _sceneMap,
+    (() => {
+      const _sceneMap = {};
+      routeData.forEach(data => (_sceneMap[data.name] = data.screen));
+      return _sceneMap;
+    })(),
   );
 
   const [isMenuVisible, setIsMenuVisible] = useState(false);
-  // const _getVisible = (name: string) => !!visible[name];
-  // const _toggleMenu = (name: string) => () =>
-  //   setVisible({ ...visible, [name]: !visible[name] });
   const toggleMenuVisibility = () => setIsMenuVisible(!isMenuVisible);
 
   const renderAppbar = () => (
     <Appbar.Header>
       <Appbar.Content title="Music Player" />
       <Appbar.Action icon="magnify" onPress={() => {}} />
-      {/*<Appbar.Action*/}
-      {/*  icon={Platform.OS === 'ios' ? 'dots-horizontal' : 'dots-vertical'}*/}
-      {/*  onPress={() => {}}*/}
-      {/*/>*/}
       <Menu
         visible={isMenuVisible}
-        // visible={_getVisible('menu1')}
-        // onDismiss={_toggleMenu('menu1')}
         onDismiss={toggleMenuVisibility}
         anchor={
           <Appbar.Action
