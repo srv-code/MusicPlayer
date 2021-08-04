@@ -2,53 +2,72 @@ import React, { useContext, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import ScreenContainer from '../../components/screen-container';
 import screenNames from '../../constants/screen-names';
-import colors from '../../constants/colors';
-import { PreferencesContext } from '../../context/preferences';
-import { Switch, Text, TouchableRipple } from 'react-native-paper';
+import { Searchbar, Text } from 'react-native-paper';
+import Icon from '../../components/icon';
 import {
   heightPercentageToDP as hp,
   widthPercentageToDP as wp,
 } from 'react-native-responsive-screen';
+import MusicContext from '../../context/music';
+import { PreferencesContext } from '../../context/preferences';
+import { useBackHandler } from '@react-native-community/hooks';
 
-// const Settings = ({ navigation }) => {
-const Settings = () => {
-  return <View style={{ flex: 1, backgroundColor: 'blue' }} />;
+const Settings = ({ navigation }) => {
+  const prefInfo = useContext(PreferencesContext);
 
-  const { enabledDarkTheme, toggleDarkTheme } = useContext(PreferencesContext);
+  const [showSearch, setShowSearch] = useState(false);
+  const [searchedTerm, setSearchedTerm] = useState('');
+
+  useBackHandler(() => {
+    if (showSearch) {
+      cancelSearch();
+      return true;
+    }
+    return false;
+  });
+
+  const cancelSearch = () => {
+    setShowSearch(!showSearch);
+    setSearchedTerm('');
+  };
 
   return (
     <ScreenContainer
       showHeader
-      // onBackPress={navigation.goBack}
-      title={screenNames.settings}
-      subtitle="Set your own preferences"
-      showSettings>
-      <View style={styles.container}>
-        <Text>Settings screen</Text>
+      title={screenNames.info}
+      iconName="cog-outline"
+      onBackPress={navigation.goBack}
+      onSearch={cancelSearch}>
+      <View style={styles.iconContainer}>
+        <Icon name="cog-outline" size={hp(20)} />
+        <Text style={{ fontSize: wp(7) }}>Settings</Text>
+      </View>
 
-        <TouchableRipple
-          onPress={toggleDarkTheme}
-          rippleColor={colors.lightBlack}>
-          <View style={styles.row}>
-            <Text style={styles.attributeText}>Dark mode</Text>
-            <Switch value={enabledDarkTheme} onValueChange={toggleDarkTheme} />
-          </View>
-        </TouchableRipple>
+      {showSearch && (
+        <Searchbar
+          placeholder="Search within app settings"
+          onChangeText={setSearchedTerm}
+          value={searchedTerm}
+          style={{
+            marginTop: hp(2),
+          }}
+        />
+      )}
+
+      <View
+        style={{
+          marginVertical: hp(2),
+        }}>
+        <Text>{`Preferences Info:
+${JSON.stringify(prefInfo)}`}</Text>
       </View>
     </ScreenContainer>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {},
-  row: {
-    flexDirection: 'row',
+  iconContainer: {
     alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingVertical: hp(1),
-  },
-  attributeText: {
-    fontSize: wp(5),
   },
 });
 

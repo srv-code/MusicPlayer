@@ -1,27 +1,33 @@
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import ScreenContainer from '../../components/screen-container';
 import screenNames from '../../constants/screen-names';
+import { Text } from 'react-native-paper';
+import Icon from '../../components/icon';
+import {
+  heightPercentageToDP as hp,
+  widthPercentageToDP as wp,
+} from 'react-native-responsive-screen';
 
-// const Playback = ({ navigation }) => {
-const About = () => {
-  // return <View style={{ flex: 1, backgroundColor: 'red' }} />;
-
+const About = ({ navigation }) => {
   return (
     <ScreenContainer
-      // onBackPress={navigation.goBack}
       showHeader
-      title={screenNames.playback}
-      subtitle="<About track info>">
-      <View style={styles.container}>
-        <Text>About screen</Text>
+      title={screenNames.about}
+      iconName="information-outline"
+      onBackPress={navigation.goBack}>
+      <View style={styles.iconContainer}>
+        <Icon name="information-outline" size={hp(20)} />
+        <Text style={{ fontSize: wp(7) }}>About</Text>
       </View>
     </ScreenContainer>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {},
+  iconContainer: {
+    alignItems: 'center',
+  },
 });
 
 export default About;

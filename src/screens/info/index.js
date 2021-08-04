@@ -41,7 +41,7 @@ const Info = ({ navigation }) => {
       onSearch={cancelSearch}>
       <View style={styles.iconContainer}>
         <Icon name="bug-outline" size={hp(20)} />
-        <Text style={{ fontSize: wp(7) }}>App Info</Text>
+        <Text style={{ fontSize: wp(7) }}>Information</Text>
       </View>
 
       {showSearch && (
