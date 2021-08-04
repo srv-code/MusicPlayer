@@ -24,7 +24,7 @@ const ScreenContainer = ({
 
   const backgroundStyle = {
     flex: 1,
-    backgroundColor: enabledDarkTheme ? Colors.darker : colors.white1,
+    backgroundColor: enabledDarkTheme ? null : colors.white1,
   };
 
   return (
@@ -32,7 +32,7 @@ const ScreenContainer = ({
       {showHeader && (
         <Appbar.Header
           style={{
-            backgroundColor: enabledDarkTheme ? null : colors.darkBlue2,
+            backgroundColor: enabledDarkTheme ? Colors.darker : colors.darkBlue2,
           }}>
           {onBackPress && <Appbar.BackAction onPress={onBackPress} />}
           {iconName && <Icon name={iconName} />}

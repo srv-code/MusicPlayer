@@ -8,7 +8,6 @@ import {
   heightPercentageToDP as hp,
   widthPercentageToDP as wp,
 } from 'react-native-responsive-screen';
-import MusicContext from '../../context/music';
 import { PreferencesContext } from '../../context/preferences';
 import { useBackHandler } from '@react-native-community/hooks';
 

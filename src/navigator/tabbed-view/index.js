@@ -121,10 +121,17 @@ const TabbedView = ({ navigation }) => {
   const onDataSync = () => {};
 
   const renderAppbar = () => (
-    <Appbar.Header>
+    <Appbar.Header
+      style={{
+        backgroundColor: enabledDarkTheme ? Colors.darker : colors.darkBlue2,
+        elevation: 0,
+      }}>
       <Image source={Icons.Logo} resizeMode="stretch" style={styles.logo} />
       <Appbar.Content title={labels.musicPlayer} />
-      <Appbar.Action icon="magnify" onPress={() => {}} />
+      <Appbar.Action
+        icon="magnify"
+        onPress={navigation.navigate.bind(this, screenNames.search)}
+      />
       <Menu
         visible={isMenuVisible}
         onDismiss={toggleMenuVisibility}
