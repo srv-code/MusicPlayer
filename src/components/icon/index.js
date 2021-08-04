@@ -1,8 +1,16 @@
 import React from 'react';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import { widthPercentageToDP as wp } from 'react-native-responsive-screen';
+import colors from '../../constants/colors';
 
-const Icon = ({ type, name, style, color, size }) => {
+const Icon = ({
+  type = 'MaterialCommunityIcons',
+  name,
+  style,
+  color = colors.lightGrey,
+  size = wp(7),
+}) => {
   let _Icon = null;
   switch (type) {
     case 'MaterialCommunityIcons':

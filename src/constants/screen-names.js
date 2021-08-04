@@ -1,5 +1,4 @@
 const screenNames = {
-  // tabbedScreens: 'tabbed-screens',
   search: 'search',
   tracks: 'tracks',
   playlists: 'playlists',

@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { StatusBar, useColorScheme } from 'react-native';
 import { PreferencesContext } from './src/context/preferences';
+import MusicContext, { musicContextValue } from './src/context/music';
 import Navigator from './src/navigator';
 import {
   Provider as PaperProvider,
@@ -58,13 +59,17 @@ const App = () => {
   return (
     <PaperProvider theme={theme}>
       <PreferencesContext.Provider value={preferencesContextValue}>
-        <StatusBar
-          backgroundColor={enabledDarkTheme ? Colors.darker : colors.darkBlue2}
-          barStyle="light-content"
-        />
-        <SafeAreaProvider>
-          <Navigator theme={theme} />
-        </SafeAreaProvider>
+        <MusicContext.Provider value={musicContextValue}>
+          <StatusBar
+            backgroundColor={
+              enabledDarkTheme ? Colors.darker : colors.darkBlue2
+            }
+            barStyle="light-content"
+          />
+          <SafeAreaProvider>
+            <Navigator theme={theme} />
+          </SafeAreaProvider>
+        </MusicContext.Provider>
       </PreferencesContext.Provider>
     </PaperProvider>
   );

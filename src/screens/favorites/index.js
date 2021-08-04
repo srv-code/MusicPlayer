@@ -8,7 +8,7 @@ import { Text } from 'react-native-paper';
 
 // const Playlists = ({ navigation }) => {
 const Favorites = () => {
-  return <View style={{ flex: 1, backgroundColor: colors.white2 }} />;
+  return <View style={{ flex: 1, backgroundColor: colors.white1 }} />;
 
   const { enabledDarkTheme } = useContext(PreferencesContext);
 

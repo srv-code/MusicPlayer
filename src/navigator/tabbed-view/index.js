@@ -209,7 +209,7 @@ const TabbedView = ({ navigation }) => {
         renderIndicator={() => null}
         tabStyle={{
           height: hp(6),
-          backgroundColor: enabledDarkTheme ? Colors.darker : colors.white2,
+          backgroundColor: enabledDarkTheme ? Colors.darker : colors.white1,
         }}
         style={styles.tabBar}
       />
