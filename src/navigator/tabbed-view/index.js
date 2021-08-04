@@ -93,7 +93,7 @@ const routeData = [
 const TabbedView = ({ navigation }) => {
   const { enabledDarkTheme } = useContext(PreferencesContext);
 
-  const [index, setIndex] = useState(0);
+  const [currentRouteIndex, setCurrentRouteIndex] = useState(2);
   const [routes] = useState(routeData);
   const [showSearch, setShowSearch] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
@@ -118,6 +118,8 @@ const TabbedView = ({ navigation }) => {
   const [isMenuVisible, setIsMenuVisible] = useState(false);
   const toggleMenuVisibility = () => setIsMenuVisible(!isMenuVisible);
 
+  const onDataSync = () => {};
+
   const renderAppbar = () => (
     <Appbar.Header>
       <Image source={Icons.Logo} resizeMode="stretch" style={styles.logo} />
@@ -135,15 +137,33 @@ const TabbedView = ({ navigation }) => {
         }>
         <Menu.Item
           icon="sync"
-          title="Sync"
+          title={labels.sync}
           onPress={() => {
+            onDataSync();
             toggleMenuVisibility();
           }}
         />
         <Menu.Item
           icon="cog-outline"
-          title="Settings"
+          title={labels.settings}
           onPress={() => {
+            navigation.navigate(screenNames.settings);
+            toggleMenuVisibility();
+          }}
+        />
+        <Menu.Item
+          icon="bug-outline"
+          title={labels.info}
+          onPress={() => {
+            navigation.navigate(screenNames.info);
+            toggleMenuVisibility();
+          }}
+        />
+        <Menu.Item
+          icon="information-outline"
+          title={labels.about}
+          onPress={() => {
+            navigation.navigate(screenNames.about);
             toggleMenuVisibility();
           }}
         />
@@ -197,8 +217,8 @@ const TabbedView = ({ navigation }) => {
 
     return (
       <TabView
-        navigationState={{ index, routes }}
-        onIndexChange={setIndex}
+        navigationState={{ index: currentRouteIndex, routes }}
+        onIndexChange={setCurrentRouteIndex}
         initialLayout={{ width }}
         renderScene={renderScene}
         renderTabBar={renderTabBar}
