@@ -22,17 +22,14 @@ const ScreenContainer = ({
 }) => {
   const { enabledDarkTheme } = useContext(PreferencesContext);
 
-  const backgroundStyle = {
-    flex: 1,
-    backgroundColor: enabledDarkTheme ? null : colors.white1,
-  };
-
   return (
-    <SafeAreaView style={backgroundStyle}>
+    <SafeAreaView style={styles.background}>
       {showHeader && (
         <Appbar.Header
           style={{
-            backgroundColor: enabledDarkTheme ? Colors.darker : colors.darkBlue2,
+            backgroundColor: enabledDarkTheme
+              ? Colors.darker
+              : colors.darkBlue2,
           }}>
           {onBackPress && <Appbar.BackAction onPress={onBackPress} />}
           {iconName && <Icon name={iconName} />}
@@ -57,7 +54,9 @@ const ScreenContainer = ({
 };
 
 const styles = StyleSheet.create({
-  scrollView: {},
+  background: {
+    flex: 1,
+  },
   titleText: {
     textTransform: 'capitalize',
     fontSize: wp(6),

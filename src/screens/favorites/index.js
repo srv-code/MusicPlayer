@@ -5,10 +5,11 @@ import screenNames from '../../constants/screen-names';
 import colors from '../../constants/colors';
 import { PreferencesContext } from '../../context/preferences';
 import { Text } from 'react-native-paper';
+import Colors from 'react-native/Libraries/NewAppScreen/components/Colors';
 
 // const Playlists = ({ navigation }) => {
 const Favorites = () => {
-  return <View style={{ flex: 1, backgroundColor: colors.white1 }} />;
+  return <View style={{ flex: 1, backgroundColor: Colors.lighter }} />;
 
   const { enabledDarkTheme } = useContext(PreferencesContext);
 
