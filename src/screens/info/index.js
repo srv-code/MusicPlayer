@@ -358,6 +358,7 @@ const styles = StyleSheet.create({
   },
   titleText: {
     fontSize: wp(5),
+    fontWeight: 'bold',
   },
   text: {
     fontSize: wp(3.5),
