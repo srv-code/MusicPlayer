@@ -8,6 +8,7 @@ const screenNames = {
   albums: 'albums',
   info: 'info',
   about: 'about',
+  folders: 'folders',
 };
 
 export default screenNames;

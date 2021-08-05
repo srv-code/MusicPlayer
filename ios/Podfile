@@ -18,6 +18,8 @@ target 'MusicPlayer' do
 
   pod 'RNPermissions', :path => '../node_modules/react-native-permissions'
 
+  pod 'react-native-appearance', :path => '../node_modules/react-native-appearance'
+
   target 'MusicPlayerTests' do
     inherit! :complete
     # Pods for testing

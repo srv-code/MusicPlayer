@@ -19,13 +19,13 @@ const Settings = ({ navigation }) => {
 
   useBackHandler(() => {
     if (showSearch) {
-      cancelSearch();
+      toggleSearch();
       return true;
     }
     return false;
   });
 
-  const cancelSearch = () => {
+  const toggleSearch = () => {
     setShowSearch(!showSearch);
     setSearchedTerm('');
   };
@@ -36,7 +36,7 @@ const Settings = ({ navigation }) => {
       title={screenNames.info}
       iconName="cog-outline"
       onBackPress={navigation.goBack}
-      onSearch={cancelSearch}>
+      actionIcons={[{ name: 'magnify', onPress: toggleSearch }]}>
       <View style={styles.iconContainer}>
         <Icon name="cog-outline" size={hp(20)} />
         <Text style={{ fontSize: wp(7) }}>Settings</Text>

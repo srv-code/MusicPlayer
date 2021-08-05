@@ -7,7 +7,7 @@ import { PreferencesContext } from '../../context/preferences';
 import { Text } from 'react-native-paper';
 
 // const Playlists = ({ navigation }) => {
-const Playlists = () => {
+const Folders = () => {
   const { enabledDarkTheme } = useContext(PreferencesContext);
 
   const [showSearch, setShowSearch] = useState(false);
@@ -25,7 +25,7 @@ const Playlists = () => {
       subtitle="Select from your favorite playlists"
       actionIcons={[{ name: 'magnify', onPress: toggleSearch }]}>
       <View style={styles.container}>
-        <Text>Playlists screen</Text>
+        <Text>Folders screen</Text>
       </View>
     </ScreenContainer>
   );
@@ -35,4 +35,4 @@ const styles = StyleSheet.create({
   container: {},
 });
 
-export default Playlists;
+export default Folders;

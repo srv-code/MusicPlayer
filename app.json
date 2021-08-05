@@ -1,4 +1,5 @@
 {
   "name": "MusicPlayer",
-  "displayName": "MusicPlayer"
+  "displayName": "MusicPlayer",
+  "userInterfaceStyle": "automatic"
 }

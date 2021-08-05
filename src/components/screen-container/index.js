@@ -15,7 +15,7 @@ const ScreenContainer = ({
   title,
   subtitle,
   onBackPress,
-  onSearch,
+  actionIcons,
   iconName,
   style,
   children,
@@ -40,12 +40,19 @@ const ScreenContainer = ({
               subtitle={subtitle}
             />
           )}
-          {onSearch && <Appbar.Action icon="magnify" onPress={onSearch} />}
+          {actionIcons?.map((icon, index) => (
+            <Appbar.Action
+              key={index}
+              icon={icon.name}
+              onPress={icon.onPress}
+            />
+          ))}
         </Appbar.Header>
       )}
 
       <ScrollView
         contentInsetAdjustmentBehavior="automatic"
+        style={styles.scrollView}
         contentContainerStyle={[styles.scrollViewContent, style]}>
         {children}
       </ScrollView>
@@ -61,8 +68,10 @@ const styles = StyleSheet.create({
     textTransform: 'capitalize',
     fontSize: wp(6),
   },
-  scrollViewContent: {
+  scrollView: {
     flex: 1,
+  },
+  scrollViewContent: {
     // backgroundColor: 'red',
     paddingHorizontal: wp(5),
     paddingVertical: hp(2),

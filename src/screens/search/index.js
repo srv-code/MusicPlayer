@@ -19,13 +19,13 @@ const Search = ({ navigation }) => {
 
   useBackHandler(() => {
     if (showSearch) {
-      cancelSearch();
+      toggleSearch();
       return true;
     }
     return false;
   });
 
-  const cancelSearch = () => {
+  const toggleSearch = () => {
     setShowSearch(!showSearch);
     setSearchedTerm('');
   };
@@ -36,7 +36,7 @@ const Search = ({ navigation }) => {
       title={screenNames.search}
       iconName="text-search"
       onBackPress={navigation.goBack}
-      onSearch={cancelSearch}>
+      actionIcons={[{ name: 'magnify', onPress: toggleSearch }]}>
       <View style={styles.iconContainer}>
         <Icon name="text-search" size={hp(20)} />
         <Text style={{ fontSize: wp(7) }}>Search Music</Text>

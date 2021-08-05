@@ -21,6 +21,7 @@ import Colors from 'react-native/Libraries/NewAppScreen/components/Colors';
 import Icon from '../../components/icon';
 import labels from '../../constants/labels';
 import Icons from '../../constants/icons';
+import Folders from '../../screens/folders';
 
 const routeData = [
   {
@@ -85,6 +86,19 @@ const routeData = [
       name: {
         filled: 'account-music',
         outlined: 'account-music-outline',
+      },
+    },
+  },
+  {
+    key: screenNames.folders,
+    title: screenNames.folders,
+    screen: Folders,
+    icon: {
+      color: colors.lightGreen,
+      type: 'MaterialCommunityIcons',
+      name: {
+        filled: 'folder-music',
+        outlined: 'folder-music-outline',
       },
     },
   },

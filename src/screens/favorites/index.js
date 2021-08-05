@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import ScreenContainer from '../../components/screen-container';
 import screenNames from '../../constants/screen-names';
@@ -9,21 +9,22 @@ import Colors from 'react-native/Libraries/NewAppScreen/components/Colors';
 
 // const Playlists = ({ navigation }) => {
 const Favorites = () => {
-  return <View style={{ flex: 1, backgroundColor: Colors.lighter }} />;
-
   const { enabledDarkTheme } = useContext(PreferencesContext);
 
-  const onSearch = term => {
-    console.log(`Searched ${term}`);
+  const [showSearch, setShowSearch] = useState(false);
+  const [searchedTerm, setSearchedTerm] = useState('');
+
+  const toggleSearch = () => {
+    setShowSearch(!showSearch);
+    setSearchedTerm('');
   };
+
   return (
     <ScreenContainer
       showHeader
       title={screenNames.playlists}
       subtitle="Select from your favorite playlists"
-      onSearch={onSearch}
-      // onPressSettings={navigation.push.bind(this, screenNames.settings)}
-    >
+      actionIcons={[{ name: 'magnify', onPress: toggleSearch }]}>
       <View style={styles.container}>
         <Text>Favorites screen</Text>
       </View>

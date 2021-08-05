@@ -1,7 +1,7 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import { StatusBar, useColorScheme } from 'react-native';
+import React, { useMemo, useState } from 'react';
+import { StatusBar } from 'react-native';
 import { PreferencesContext } from './src/context/preferences';
-import MusicContext, { musicContextValue } from './src/context/music';
+import { MusicContext } from './src/context/music';
 import Navigator from './src/navigator';
 import {
   Provider as PaperProvider,
@@ -16,6 +16,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context/src/SafeAreaCon
 import Colors from 'react-native/Libraries/NewAppScreen/components/Colors';
 import colors from './src/constants/colors';
 import Splash from './src/screens/splash';
+import useColorScheme from 'react-native/Libraries/Utilities/useColorScheme';
 
 const App = () => {
   console.log('App loaded');
@@ -25,7 +26,12 @@ const App = () => {
     false, // TODO revert later, for testing purpose only
     // true,
   );
+  const [musicInfo, setMusicInfo] = useState(null);
   const [showSplash, setShowSplash] = useState(true);
+
+  const musicContextValue = useMemo(() => {
+    return { musicInfo, setMusicInfo };
+  }, [musicInfo]);
 
   const preferencesContextValue = useMemo(() => {
     return {
@@ -53,14 +59,21 @@ const App = () => {
   //     }, SPLASH_TIMEOUT);
   // }, []);
 
-  // console.log('App', useColorScheme());
-
-  if (showSplash) return <Splash setShow={setShowSplash} />;
+  if (showSplash)
+    return (
+      <Splash
+        setShow={setShowSplash}
+        musicContext={musicContextValue}
+        preferencesContext={preferencesContextValue}
+      />
+    );
   return (
     <PaperProvider theme={theme}>
       <PreferencesContext.Provider value={preferencesContextValue}>
         <MusicContext.Provider value={musicContextValue}>
           <StatusBar
+            style="auto"
+            animated
             backgroundColor={
               enabledDarkTheme ? Colors.darker : colors.darkBlue2
             }

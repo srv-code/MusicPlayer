@@ -12,5 +12,6 @@ const colors = {
   nastyPink: '#800080',
   green1: '#007600',
   darkGreen: '#4e4e00',
+  lightGreen: '#898976',
 };
 export default colors;

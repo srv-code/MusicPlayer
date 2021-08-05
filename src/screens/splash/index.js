@@ -16,8 +16,10 @@ import {
   heightPercentageToDP as hp,
   widthPercentageToDP as wp,
 } from 'react-native-responsive-screen';
-import screenNames from '../../constants/screen-names';
 import { ActivityIndicator, Text } from 'react-native-paper';
+import { fetchAllMusicTracks } from '../../utils/tracks';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import storageKeys from '../../constants/storage-keys';
 
 const { height } = Dimensions.get('screen');
 const LOGO_HEIGHT = height * 0.28;
@@ -29,27 +31,128 @@ const requiredPermissions = [
 ];
 
 // const Splash = ({ navigation }) => {
-const Splash = ({ setShow }) => {
-  console.log('Splash loaded');
+const Splash = ({ setShow, musicContext, preferencesContext }) => {
+  // console.log('Splash loaded', { setShow, musicContext, preferencesContext });
 
-  // const [loadingInfo, setLoadingInfo] = useState({
-  //   loading: false,
-  //   info: null,
-  // });
+  // const musicInfo = useContext(MusicContext);
+  // console.log('Splash', { musicInfo });
+
+  const [loadingInfo, setLoadingInfo] = useState({
+    loading: false,
+    info: null,
+  });
+
+  const stripTracks = data => {
+    // ----- sample track info ------
+    // duration: "229175"
+    // title: " baby I Like It -enrique ft pitbull"
+    // genre: null
+    // fileName: "tumblr_l6qv0j8bce1qbjng1o1.mp3"
+    // album: "World Wide Urban Music"
+    // author: "Enrique Iglesias ft. Pitbull"
+    // path: "/storage/emulated/0/Music/Others/tumblr_l6qv0j8bce1qbjng1o1.mp3"
+    // id: "5347"
+
+    const tracks = data,
+      albums = [],
+      artists = [],
+      folders = [];
+
+    data.forEach(track => {
+      if (track.album && !albums.includes(track.album))
+        albums.push(track.album);
+
+      if (track.author && !artists.includes(track.author))
+        artists.push(track.author);
+
+      const pathComponents = track.path.split('/'),
+        folder = {
+          name: pathComponents[pathComponents.length - 2],
+          path: track.path.substr(
+            0,
+            track.path.length - track.fileName.length - 1,
+          ),
+        };
+      if (folders.every(f => f.name !== folder.name && f.path !== folder.path))
+        folders.push(folder);
+    });
+
+    return { tracks, albums, artists, folders };
+  };
 
   useEffect(() => {
-    setTimeout(() => {
-      if (Platform.OS === 'android') {
-        console.log('asking permissions');
-        PermissionsAndroid.requestMultiple(requiredPermissions)
-          .then(response => {
-            console.log('permission response:', response);
-          })
-          .catch(e => console.log('permission error:', e));
+    setTimeout(async () => {
+      const errorMessage = {};
+      try {
+        // Check Android permissions
+        if (Platform.OS === 'android') {
+          setLoadingInfo({
+            loading: true,
+            info: 'Checking for app permissions...',
+          });
+
+          errorMessage.title = 'Permission Error';
+          errorMessage.message = `Application permission error`;
+
+          const response = await PermissionsAndroid.requestMultiple(
+            requiredPermissions,
+          );
+          console.log('Splash: permission response:', response);
+          // TODO should throw error from here in case any of the permission is not PermissionsAndroid.RESULTS.GRANTED
+        }
+
+        // Check for music info from async-storage
+        setLoadingInfo({
+          loading: true,
+          info: 'Loading music tracks...',
+        });
+
+        errorMessage.title = 'Storage Read Error';
+        errorMessage.message = `Failed reading music information from storage`;
+
+        let musicInfo = JSON.parse(
+          await AsyncStorage.getItem(storageKeys.MUSIC_INFO),
+        );
+        // console.log('Splash:', { musicInfo });
+
+        if (!musicInfo) {
+          // Load all music tracks
+          errorMessage.title = 'I/O Error';
+          errorMessage.message = `Failed loading music tracks`;
+
+          const tracks = await fetchAllMusicTracks();
+          // console.log('fetchAllMusicTracks:', { tracks });
+
+          // Write music tracks to async-storage
+          errorMessage.title = 'Storage Read Error';
+          errorMessage.message = `Failed writing music information in storage`;
+
+          await AsyncStorage.setItem(
+            storageKeys.MUSIC_INFO,
+            JSON.stringify(tracks),
+          );
+
+          musicInfo = tracks;
+        }
+
+        // Update stripped data in context
+        musicContext.setMusicInfo(stripTracks(musicInfo));
+      } catch (error) {
+        Alert.alert(
+          errorMessage.title,
+          `${errorMessage.message}\nReason: ${error.message}`,
+          [
+            {
+              text: 'Exit',
+              onPress: BackHandler.exitApp,
+              style: 'cancel',
+            },
+          ],
+        );
       }
-      // navigation.navigate('tab-view', {
-      //   screen: screenNames.playback,
-      // });
+
+      // finally
+      setLoadingInfo({ loading: false, info: null });
       setShow(false);
     }, SPLASH_TIMEOUT);
 
@@ -84,23 +187,23 @@ const Splash = ({ setShow }) => {
         />
       </View>
 
-      {/*<View*/}
-      {/*  style={{*/}
-      {/*    // borderWidth: 1,*/}
-      {/*    flexDirection: 'row',*/}
-      {/*    alignItems: 'center',*/}
-      {/*    justifyContent: 'center',*/}
-      {/*  }}>*/}
-      {/*  <ActivityIndicator*/}
-      {/*    animating={loadingInfo.loading}*/}
-      {/*    size={wp(4)}*/}
-      {/*    color={appColors.nastyPink}*/}
-      {/*    style={{ marginRight: wp(2) }}*/}
-      {/*  />*/}
-      {/*  <Text style={{ fontSize: wp(4), color: appColors.nastyPink }}>*/}
-      {/*    {loadingInfo.info}*/}
-      {/*  </Text>*/}
-      {/*</View>*/}
+      <View
+        style={{
+          // borderWidth: 1,
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}>
+        <ActivityIndicator
+          animating={loadingInfo.loading}
+          size={wp(4)}
+          color={appColors.nastyPink}
+          style={{ marginRight: wp(2) }}
+        />
+        <Text style={{ fontSize: wp(4), color: appColors.nastyPink }}>
+          {loadingInfo.info}
+        </Text>
+      </View>
 
       <Animatable.View style={styles.footer} animation="fadeInUpBig">
         <Text style={styles.title}>Welcome to the World of Music 🎵</Text>
