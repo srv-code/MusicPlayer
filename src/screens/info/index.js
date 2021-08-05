@@ -2,17 +2,7 @@ import React, { useContext, useEffect, useState } from 'react';
 import { Alert, FlatList, StyleSheet, View } from 'react-native';
 import ScreenContainer from '../../components/screen-container';
 import screenNames from '../../constants/screen-names';
-import {
-  Button,
-  Caption,
-  Divider,
-  Headline,
-  Paragraph,
-  Searchbar,
-  Subheading,
-  Text,
-  Title,
-} from 'react-native-paper';
+import { Button, Divider, Searchbar, Text } from 'react-native-paper';
 import Icon from '../../components/icon';
 import {
   heightPercentageToDP as hp,
@@ -316,7 +306,18 @@ path: ${track.path}`}
       onBackPress={navigation.goBack}
       actionIcons={[
         {
+          name: 'arrow-expand',
+          disabled: !musicData || expandedAccordionIds.length === 4,
+          onPress: setExpandedAccordionIds.bind(this, [
+            accordionIds.TRACKS,
+            accordionIds.ALBUMS,
+            accordionIds.ARTISTS,
+            accordionIds.FOLDERS,
+          ]),
+        },
+        {
           name: 'arrow-collapse',
+          disabled: !musicData || !expandedAccordionIds.length,
           onPress: setExpandedAccordionIds.bind(this, []),
         },
         { name: 'magnify', onPress: toggleSearch },

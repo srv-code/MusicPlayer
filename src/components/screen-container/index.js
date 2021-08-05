@@ -43,6 +43,7 @@ const ScreenContainer = ({
           {actionIcons?.map((icon, index) => (
             <Appbar.Action
               key={index}
+              disabled={icon.disabled}
               icon={icon.name}
               onPress={icon.onPress}
             />
