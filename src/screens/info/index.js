@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { Alert, FlatList, StyleSheet, View } from 'react-native';
 import ScreenContainer from '../../components/screen-container';
 import screenNames from '../../constants/screen-names';
@@ -39,15 +39,25 @@ const inProgressKeys = {
 };
 
 const Info = ({ navigation }) => {
-  const { musicInfo, setMusicInfo } = useContext(MusicContext);
-  const { enabledDarkTheme } = useContext(PreferencesContext);
-
-  console.log('[Info]', { musicInfo, enabledDarkTheme });
+  const musicContext = useContext(MusicContext);
+  const preferencesContext = useContext(PreferencesContext);
 
   const [showSearch, setShowSearch] = useState(false);
   const [searchedTerm, setSearchedTerm] = useState('');
   const [expandedAccordionIds, setExpandedAccordionIds] = useState([]);
   const [inProgress, setInProgress] = useState(null);
+  const [musicData, setMusicData] = useState(null);
+  const [prefData, setPrefData] = useState(null);
+
+  console.log('[Info]', { musicData, prefData, searchedTerm });
+
+  useEffect(() => {
+    setMusicData(musicContext.musicInfo);
+  }, [musicContext.musicInfo]);
+
+  useEffect(() => {
+    setPrefData({ enabledDarkTheme: preferencesContext.enabledDarkTheme });
+  }, [preferencesContext.enabledDarkTheme]);
 
   useBackHandler(() => {
     if (showSearch) {
@@ -56,6 +66,38 @@ const Info = ({ navigation }) => {
     }
     return false;
   });
+
+  useEffect(() => {
+    if (musicContext.musicInfo) {
+      setMusicData({
+        // matches with: tracks { id, title }
+        tracks: musicContext.musicInfo?.tracks?.filter(
+          x =>
+            x.id?.toLowerCase().includes(searchedTerm.toLowerCase()) ||
+            x.title?.toLowerCase().includes(searchedTerm.toLowerCase()),
+        ),
+
+        // matches with: albums: <string>
+        albums: musicContext.musicInfo?.albums?.filter(x =>
+          x.toLowerCase().includes(searchedTerm.toLowerCase()),
+        ),
+
+        // matches with: artists: <string>
+        artists: musicContext.musicInfo?.artists?.filter(x =>
+          x.toLowerCase().includes(searchedTerm.toLowerCase()),
+        ),
+
+        // matches with: folders { name, path }
+        folders: musicContext.musicInfo?.folders?.filter(
+          x =>
+            x.name?.toLowerCase().includes(searchedTerm.toLowerCase()) ||
+            x.path?.toLowerCase().includes(searchedTerm.toLowerCase()),
+        ),
+      });
+    }
+    // if (prefData) {
+    // }
+  }, [searchedTerm]);
 
   const toggleSearch = () => {
     setShowSearch(!showSearch);
@@ -73,7 +115,7 @@ const Info = ({ navigation }) => {
   const renderData = () => {
     const deleteMusicCache = async () => {
       setInProgress(inProgressKeys.DELETE_MUSIC_CACHE);
-      setMusicInfo(null);
+      musicContext.setMusicInfo(null);
       AsyncStorage.removeItem(storageKeys.MUSIC_INFO)
         .catch(error =>
           Alert.alert(
@@ -98,6 +140,7 @@ const Info = ({ navigation }) => {
               icon="delete"
               mode="outlined"
               uppercase={false}
+              disabled={!musicData}
               loading={inProgress === inProgressKeys.DELETE_MUSIC_CACHE}
               style={styles.button}
               onPress={deleteMusicCache}>
@@ -109,12 +152,12 @@ const Info = ({ navigation }) => {
             id={accordionIds.TRACKS}
             expanded={isAccordionExpanded(accordionIds.TRACKS)}
             onPress={toggleAccordionExpansion.bind(this, accordionIds.TRACKS)}
-            title={`${accordionIds.TRACKS} (${musicInfo?.tracks?.length || 0})`}
+            title={`${accordionIds.TRACKS} (${musicData?.tracks?.length || 0})`}
             titleStyle={styles.accordionTitleText}
             left={props => <List.Icon {...props} icon="music" />}>
-            {musicInfo?.tracks ? (
+            {musicData?.tracks?.length ? (
               <FlatList
-                data={musicInfo.tracks}
+                data={musicData.tracks}
                 keyExtractor={(_, index) => index.toString()}
                 renderItem={({ item: track }) => (
                   <View
@@ -149,12 +192,12 @@ path: ${track.path}`}
             id={accordionIds.ALBUMS}
             expanded={isAccordionExpanded(accordionIds.ALBUMS)}
             onPress={toggleAccordionExpansion.bind(this, accordionIds.ALBUMS)}
-            title={`${accordionIds.ALBUMS} (${musicInfo?.albums?.length || 0})`}
+            title={`${accordionIds.ALBUMS} (${musicData?.albums?.length || 0})`}
             titleStyle={styles.accordionTitleText}
             left={props => <List.Icon {...props} icon="disc" />}>
-            {musicInfo?.albums ? (
+            {musicData?.albums?.length ? (
               <FlatList
-                data={musicInfo.albums}
+                data={musicData.albums}
                 keyExtractor={(_, index) => index.toString()}
                 renderItem={({ item: album }) => (
                   <List.Item
@@ -178,11 +221,11 @@ path: ${track.path}`}
             id={accordionIds.ARTISTS}
             expanded={isAccordionExpanded(accordionIds.ARTISTS)}
             onPress={toggleAccordionExpansion.bind(this, accordionIds.ARTISTS)}
-            title={`Artists (${musicInfo?.artists?.length || 0})`}
+            title={`Artists (${musicData?.artists?.length || 0})`}
             left={props => <List.Icon {...props} icon="account-music" />}>
-            {musicInfo?.artists ? (
+            {musicData?.artists?.length ? (
               <FlatList
-                data={musicInfo.artists}
+                data={musicData.artists}
                 keyExtractor={(_, index) => index.toString()}
                 renderItem={({ item: artist }) => (
                   <List.Item
@@ -207,13 +250,13 @@ path: ${track.path}`}
             expanded={isAccordionExpanded(accordionIds.FOLDERS)}
             onPress={toggleAccordionExpansion.bind(this, accordionIds.FOLDERS)}
             title={`${accordionIds.FOLDERS} (${
-              musicInfo?.folders?.length || 0
+              musicData?.folders?.length || 0
             })`}
             titleStyle={styles.accordionTitleText}
             left={props => <List.Icon {...props} icon="folder-music" />}>
-            {musicInfo?.folders ? (
+            {musicData?.folders?.length ? (
               <FlatList
-                data={musicInfo.folders}
+                data={musicData.folders}
                 keyExtractor={(_, index) => index.toString()}
                 renderItem={({ item: folder }) => (
                   <List.Item
@@ -244,6 +287,7 @@ path: ${track.path}`}
               icon="delete"
               mode="outlined"
               uppercase={false}
+              disabled={!prefData}
               loading={inProgress === inProgressKeys.DELETE_PREFERENCES_CACHE}
               style={styles.button}
               onPress={deletePrefCache}>
@@ -252,11 +296,12 @@ path: ${track.path}`}
           </View>
           <List.Item
             titleStyle={
-              enabledDarkTheme === null || enabledDarkTheme === undefined
+              prefData?.enabledDarkTheme === null ||
+              prefData?.enabledDarkTheme === undefined
                 ? styles.errorText
                 : styles.text
             }
-            title={`enabledDarkTheme: ${enabledDarkTheme ?? 'N/A'}`}
+            title={`enabledDarkTheme: ${prefData?.enabledDarkTheme ?? 'N/A'}`}
           />
         </View>
       </View>
