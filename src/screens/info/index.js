@@ -1,9 +1,11 @@
 import React, { useContext, useState } from 'react';
-import { FlatList, StyleSheet, View } from 'react-native';
+import { Alert, FlatList, StyleSheet, View } from 'react-native';
 import ScreenContainer from '../../components/screen-container';
 import screenNames from '../../constants/screen-names';
 import {
+  Button,
   Caption,
+  Divider,
   Headline,
   Paragraph,
   Searchbar,
@@ -21,9 +23,23 @@ import { PreferencesContext } from '../../context/preferences';
 import { useBackHandler } from '@react-native-community/hooks';
 import { List } from 'react-native-paper';
 import colors from '../../constants/colors';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import storageKeys from '../../constants/storage-keys';
+
+const accordionIds = {
+  TRACKS: 'tracks',
+  ALBUMS: 'albums',
+  ARTISTS: 'artists',
+  FOLDERS: 'folders',
+};
+
+const inProgressKeys = {
+  DELETE_MUSIC_CACHE: 'delete-music-cache',
+  DELETE_PREFERENCES_CACHE: 'delete-pref-cache',
+};
 
 const Info = ({ navigation }) => {
-  const { musicInfo } = useContext(MusicContext);
+  const { musicInfo, setMusicInfo } = useContext(MusicContext);
   const { enabledDarkTheme } = useContext(PreferencesContext);
 
   console.log('[Info]', { musicInfo, enabledDarkTheme });
@@ -31,6 +47,7 @@ const Info = ({ navigation }) => {
   const [showSearch, setShowSearch] = useState(false);
   const [searchedTerm, setSearchedTerm] = useState('');
   const [expandedAccordionIds, setExpandedAccordionIds] = useState([]);
+  const [inProgress, setInProgress] = useState(null);
 
   useBackHandler(() => {
     if (showSearch) {
@@ -54,21 +71,45 @@ const Info = ({ navigation }) => {
     );
 
   const renderData = () => {
-    const accordionIds = {
-      tracks: 'tracks',
-      albums: 'albums',
-      artists: 'artists',
-      folders: 'folders',
+    const deleteMusicCache = async () => {
+      setInProgress(inProgressKeys.DELETE_MUSIC_CACHE);
+      setMusicInfo(null);
+      AsyncStorage.removeItem(storageKeys.MUSIC_INFO)
+        .catch(error =>
+          Alert.alert(
+            'I/O Error',
+            `Failed removing music cache: ${error.message}`,
+          ),
+        )
+        .finally(setInProgress);
+    };
+
+    const deletePrefCache = async () => {
+      setInProgress(inProgressKeys.DELETE_PREFERENCES_CACHE);
+      setInProgress(null);
     };
 
     return (
       <View>
-        <List.Section titleStyle={styles.titleText} title="Music Info">
+        <View>
+          <View style={styles.row}>
+            <Text style={styles.titleText}>Music Info</Text>
+            <Button
+              icon="delete"
+              mode="outlined"
+              uppercase={false}
+              loading={inProgress === inProgressKeys.DELETE_MUSIC_CACHE}
+              style={styles.button}
+              onPress={deleteMusicCache}>
+              Delete Cache
+            </Button>
+          </View>
+
           <List.Accordion
-            id={accordionIds.tracks}
-            expanded={isAccordionExpanded(accordionIds.tracks)}
-            onPress={toggleAccordionExpansion.bind(this, accordionIds.tracks)}
-            title={`${accordionIds.tracks} (${musicInfo?.tracks?.length || 0})`}
+            id={accordionIds.TRACKS}
+            expanded={isAccordionExpanded(accordionIds.TRACKS)}
+            onPress={toggleAccordionExpansion.bind(this, accordionIds.TRACKS)}
+            title={`${accordionIds.TRACKS} (${musicInfo?.tracks?.length || 0})`}
             titleStyle={styles.accordionTitleText}
             left={props => <List.Icon {...props} icon="music" />}>
             {musicInfo?.tracks ? (
@@ -105,10 +146,10 @@ path: ${track.path}`}
           </List.Accordion>
 
           <List.Accordion
-            id={accordionIds.albums}
-            expanded={isAccordionExpanded(accordionIds.albums)}
-            onPress={toggleAccordionExpansion.bind(this, accordionIds.albums)}
-            title={`${accordionIds.albums} (${musicInfo?.albums?.length || 0})`}
+            id={accordionIds.ALBUMS}
+            expanded={isAccordionExpanded(accordionIds.ALBUMS)}
+            onPress={toggleAccordionExpansion.bind(this, accordionIds.ALBUMS)}
+            title={`${accordionIds.ALBUMS} (${musicInfo?.albums?.length || 0})`}
             titleStyle={styles.accordionTitleText}
             left={props => <List.Icon {...props} icon="disc" />}>
             {musicInfo?.albums ? (
@@ -134,9 +175,9 @@ path: ${track.path}`}
           </List.Accordion>
 
           <List.Accordion
-            id={accordionIds.artists}
-            expanded={isAccordionExpanded(accordionIds.artists)}
-            onPress={toggleAccordionExpansion.bind(this, accordionIds.artists)}
+            id={accordionIds.ARTISTS}
+            expanded={isAccordionExpanded(accordionIds.ARTISTS)}
+            onPress={toggleAccordionExpansion.bind(this, accordionIds.ARTISTS)}
             title={`Artists (${musicInfo?.artists?.length || 0})`}
             left={props => <List.Icon {...props} icon="account-music" />}>
             {musicInfo?.artists ? (
@@ -162,10 +203,10 @@ path: ${track.path}`}
           </List.Accordion>
 
           <List.Accordion
-            id={accordionIds.folders}
-            expanded={isAccordionExpanded(accordionIds.folders)}
-            onPress={toggleAccordionExpansion.bind(this, accordionIds.folders)}
-            title={`${accordionIds.folders} (${
+            id={accordionIds.FOLDERS}
+            expanded={isAccordionExpanded(accordionIds.FOLDERS)}
+            onPress={toggleAccordionExpansion.bind(this, accordionIds.FOLDERS)}
+            title={`${accordionIds.FOLDERS} (${
               musicInfo?.folders?.length || 0
             })`}
             titleStyle={styles.accordionTitleText}
@@ -192,9 +233,23 @@ path: ${track.path}`}
               <Text style={styles.errorText}>{`N/A`}</Text>
             )}
           </List.Accordion>
-        </List.Section>
+        </View>
 
-        <List.Section titleStyle={styles.titleText} title="Preferences">
+        <Divider style={styles.divider} />
+
+        <View>
+          <View style={styles.row}>
+            <Text style={styles.titleText}>Preferences</Text>
+            <Button
+              icon="delete"
+              mode="outlined"
+              uppercase={false}
+              loading={inProgress === inProgressKeys.DELETE_PREFERENCES_CACHE}
+              style={styles.button}
+              onPress={deletePrefCache}>
+              Delete Cache
+            </Button>
+          </View>
           <List.Item
             titleStyle={
               enabledDarkTheme === null || enabledDarkTheme === undefined
@@ -203,7 +258,7 @@ path: ${track.path}`}
             }
             title={`enabledDarkTheme: ${enabledDarkTheme ?? 'N/A'}`}
           />
-        </List.Section>
+        </View>
       </View>
     );
   };
@@ -248,6 +303,11 @@ path: ${track.path}`}
 };
 
 const styles = StyleSheet.create({
+  row: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
   iconContainer: {
     alignItems: 'center',
   },
@@ -263,6 +323,12 @@ const styles = StyleSheet.create({
   },
   accordionTitleText: {
     textTransform: 'capitalize',
+  },
+  button: {
+    alignSelf: 'flex-start',
+  },
+  divider: {
+    marginVertical: hp(2),
   },
 });
 
