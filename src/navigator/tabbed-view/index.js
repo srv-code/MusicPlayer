@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { useBackHandler } from '@react-native-community/hooks';
 import { Image, View, StyleSheet } from 'react-native';
 import { SceneMap, TabBar, TabView } from 'react-native-tab-view';
@@ -22,6 +22,7 @@ import Icon from '../../components/icon';
 import labels from '../../constants/labels';
 import Icons from '../../constants/icons';
 import Folders from '../../screens/folders';
+import { MusicContext } from '../../context/music';
 
 const routeData = [
   {
@@ -106,11 +107,20 @@ const routeData = [
 
 const TabbedView = ({ navigation }) => {
   const { enabledDarkTheme } = useContext(PreferencesContext);
+  const { musicInfo } = useContext(MusicContext);
 
   const [currentRouteIndex, setCurrentRouteIndex] = useState(2);
   const [routes] = useState(routeData);
   const [showSearch, setShowSearch] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
+  const [tabItemCounts, setTabItemCounts] = useState({
+    [screenNames.favorites]: null,
+    [screenNames.playlists]: null,
+    [screenNames.tracks]: null,
+    [screenNames.albums]: null,
+    [screenNames.artists]: null,
+    [screenNames.folders]: null,
+  });
 
   useBackHandler(() => {
     if (showSearch) {
@@ -120,6 +130,19 @@ const TabbedView = ({ navigation }) => {
     }
     return false;
   });
+
+  useEffect(() => {
+    if (musicInfo) {
+      setTabItemCounts({
+        [screenNames.favorites]: null,
+        [screenNames.playlists]: null,
+        [screenNames.tracks]: musicInfo?.tracks?.length,
+        [screenNames.albums]: musicInfo?.albums?.length,
+        [screenNames.artists]: musicInfo?.artists?.length,
+        [screenNames.folders]: musicInfo?.folders?.length,
+      });
+    }
+  }, [musicInfo]);
 
   const renderScene = SceneMap(
     (() => {
@@ -216,15 +239,19 @@ const TabbedView = ({ navigation }) => {
               }}>
               {route.title}
             </Text>
-            <Badge
-              size={focused ? 20 : 15}
-              style={{
-                opacity: focused ? 1 : 0.5,
-                backgroundColor: focused ? colors.lightGrey1 : colors.lightGrey,
-                alignSelf: 'center',
-              }}>
-              3
-            </Badge>
+            {tabItemCounts[route.key] && (
+              <Badge
+                size={focused ? 20 : 15}
+                style={{
+                  opacity: focused ? 1 : 0.5,
+                  backgroundColor: focused
+                    ? colors.lightGrey1
+                    : colors.lightGrey,
+                  alignSelf: 'center',
+                }}>
+                {tabItemCounts[route.key]}
+              </Badge>
+            )}
           </View>
         )}
         renderIndicator={() => null}
