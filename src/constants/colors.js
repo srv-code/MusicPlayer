@@ -8,6 +8,7 @@ const colors = {
   lightPurple: '#0080ff',
   lightGrey: '#009387',
   lightGrey1: '#cfcfcf',
+  black: '#000',
   lightBlack: 'rgba(0, 0, 0, .32)',
   nastyPink: '#800080',
   green1: '#007600',

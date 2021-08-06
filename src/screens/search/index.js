@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { FlatList, StyleSheet, View } from 'react-native';
+import { FlatList, Platform, StyleSheet, View } from 'react-native';
 import ScreenContainer from '../../components/screen-container';
 import screenNames from '../../constants/screen-names';
 import {
@@ -10,6 +10,8 @@ import {
   Text,
   IconButton,
   Divider,
+  Appbar,
+  Menu,
 } from 'react-native-paper';
 import Icon from '../../components/icon';
 import {
@@ -20,6 +22,7 @@ import { MusicContext } from '../../context/music';
 import colors from '../../constants/colors';
 import DateTimeUtils from '../../utils/datetime';
 import { PreferencesContext } from '../../context/preferences';
+import labels from '../../constants/labels';
 
 // TODO
 //  - Save the searched term in async-storage (avoid dups)
@@ -39,6 +42,7 @@ const Search = ({ navigation }) => {
   const [previousSearchedTerms, setPreviousSearchedTerms] = useState([]);
   const [musicData, setMusicData] = useState(null);
   const [expandedAccordionIds, setExpandedAccordionIds] = useState([]);
+  const [showMoreOptionFor, setShowMoreOptionFor] = useState(null);
 
   console.log('[Info]', { musicData, searchedTerm, previousSearchedTerms });
 
@@ -144,19 +148,35 @@ const Search = ({ navigation }) => {
                 contentContainerStyle={{ marginLeft: wp(-9) }}
                 data={musicData.tracks}
                 keyExtractor={(_, index) => index.toString()}
-                renderItem={({ item: track }) => (
+                renderItem={({ item: track, index }) => (
                   <>
                     <List.Item
-                      // style={{
-                      //   marginBottom: hp(1),
-                      //   backgroundColor: colors.lightGrey,
-                      //   borderRadius: 10,
-                      //   flexWrap: 'wrap',
-                      // }}
-                      titleStyle={styles.text}
+                      style={
+                        {
+                          // marginBottom: hp(1),
+                          // backgroundColor: colors.lightGrey,
+                          // borderRadius: 10,
+                          // flexWrap: 'wrap',
+                          // alignItems: 'flex-start',
+                        }
+                      }
+                      onPress={() => {
+                        alert(`Selected: ${JSON.stringify(track)}`);
+                      }}
+                      titleEllipsizeMode={'tail'}
+                      titleNumberOfLines={1}
+                      titleStyle={{
+                        fontSize: wp(3.5),
+                        marginBottom: hp(0.3),
+                        // justifyContent: 'flex-start',
+                        // alignSelf: 'flex-start',
+                        // backgroundColor: 'red'
+                      }}
                       title={track.title}
+                      descriptionEllipsizeMode={'tail'}
+                      descriptionNumberOfLines={2}
                       description={
-                        <View
+                        <Text
                           style={{
                             flexDirection: 'row',
                             alignItems: 'center',
@@ -174,25 +194,29 @@ const Search = ({ navigation }) => {
                             }}>
                             {DateTimeUtils.msToTime(track.duration)}
                           </Text>
-                          <Icon
-                            name={'dot-single'}
-                            type={'Entypo'}
-                            size={wp(3.2)}
-                            color={colors.lightGrey}
-                          />
-                          <Icon
-                            name={'account-music'}
-                            size={wp(3.2)}
-                            color={colors.lightGrey}
-                          />
-                          <Text
-                            style={{
-                              fontSize: wp(3.2),
-                              color: colors.lightGrey,
-                              marginLeft: wp(0.2),
-                            }}>
-                            {track.artist}
-                          </Text>
+                          {track.artist && (
+                            <>
+                              <Icon
+                                name={'dot-single'}
+                                type={'Entypo'}
+                                size={wp(3.2)}
+                                color={colors.lightGrey}
+                              />
+                              <Icon
+                                name={'account-music'}
+                                size={wp(3.2)}
+                                color={colors.lightGrey}
+                              />
+                              <Text
+                                style={{
+                                  fontSize: wp(3.2),
+                                  color: colors.lightGrey,
+                                  marginLeft: wp(0.2),
+                                }}>
+                                {track.artist}
+                              </Text>
+                            </>
+                          )}
                           <Icon
                             name={'dot-single'}
                             type={'Entypo'}
@@ -212,12 +236,11 @@ const Search = ({ navigation }) => {
                             }}>
                             {track.folder.name}
                           </Text>
-                        </View>
+                        </Text>
                       }
                       left={props =>
                         track.coverExists ? (
                           <Avatar.Image
-                            {...props}
                             size={hp(6)}
                             source={{ uri: track.coverFilePath }}
                           />
@@ -225,18 +248,61 @@ const Search = ({ navigation }) => {
                           <Avatar.Icon
                             size={hp(6)}
                             icon="music"
-                            style={{
-                              backgroundColor: colors.lightPurple,
-                            }}
+                            style={{ backgroundColor: colors.lightPurple }}
                           />
                         )
                       }
                       right={props => (
-                        <IconButton
+                        <Menu
                           {...props}
-                          icon="dots-vertical"
-                          onPress={() => {}}
-                        />
+                          visible={
+                            showMoreOptionFor?.type === accordionIds.TRACKS &&
+                            showMoreOptionFor?.index === index
+                          }
+                          onDismiss={setShowMoreOptionFor}
+                          anchor={
+                            <IconButton
+                              {...props}
+                              icon="dots-vertical"
+                              onPress={setShowMoreOptionFor.bind(this, {
+                                type: accordionIds.TRACKS,
+                                index,
+                              })}
+                            />
+                          }>
+                          <Menu.Item
+                            icon="skip-next-outline"
+                            title={labels.playNext}
+                            onPress={() => {
+                              alert(JSON.stringify(props));
+                              setShowMoreOptionFor(null);
+                            }}
+                          />
+                          <Menu.Item
+                            icon="playlist-plus"
+                            title={labels.addToPlaylist}
+                            onPress={() => {
+                              alert(JSON.stringify(props));
+                              setShowMoreOptionFor(null);
+                            }}
+                          />
+                          <Menu.Item
+                            icon="table-column-plus-after"
+                            title={labels.addToQueue}
+                            onPress={() => {
+                              alert(JSON.stringify(props));
+                              setShowMoreOptionFor(null);
+                            }}
+                          />
+                          <Menu.Item
+                            icon="information-variant"
+                            title={labels.songInfo}
+                            onPress={() => {
+                              alert(JSON.stringify(props));
+                              setShowMoreOptionFor(null);
+                            }}
+                          />
+                        </Menu>
                       )}
                     />
                     <Divider inset />
