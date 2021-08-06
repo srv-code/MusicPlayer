@@ -62,19 +62,15 @@ const Splash = ({ setShow, musicContext, preferencesContext }) => {
       if (track.album && !albums.includes(track.album))
         albums.push(track.album);
 
-      if (track.author && !artists.includes(track.author))
-        artists.push(track.author);
+      if (track.artist && !artists.includes(track.artist))
+        artists.push(track.artist);
 
-      const pathComponents = track.path.split('/'),
-        folder = {
-          name: pathComponents[pathComponents.length - 2],
-          path: track.path.substr(
-            0,
-            track.path.length - track.fileName.length - 1,
-          ),
-        };
-      if (folders.every(f => f.name !== folder.name && f.path !== folder.path))
-        folders.push(folder);
+      if (
+        folders.every(
+          f => f.name !== track.folder.name && f.path !== track.folder.path,
+        )
+      )
+        folders.push(track.folder);
     });
 
     return { tracks, albums, artists, folders };

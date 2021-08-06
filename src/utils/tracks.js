@@ -1,9 +1,10 @@
 import MusicFiles from '@yajanarao/react-native-get-music-files';
+import FileSystem from 'react-native-fs';
 
 export const fetchAllMusicTracks = async () => {
   console.log('[fetchAllMusicTracks] invoked');
 
-  return await MusicFiles.getAll({
+  const tracks = await MusicFiles.getAll({
     id: true, // get id
     duration: true, // get duration
     title: true, // get title
@@ -33,4 +34,20 @@ export const fetchAllMusicTracks = async () => {
       'duration',
     ], // for iOs Version
   });
+
+  for (const track of tracks) {
+    track.coverFilePath = `file://${FileSystem.ExternalStorageDirectoryPath}/${track.id}.jpg`;
+    track.coverExists = await FileSystem.exists(track.coverFilePath);
+
+    track.artist = track.author;
+    delete track.author;
+
+    const pathComponents = track.path.split('/');
+    track.folder = {
+      name: pathComponents[pathComponents.length - 2],
+      path: track.path.substr(0, track.path.length - track.fileName.length - 1),
+    };
+  }
+
+  return tracks;
 };

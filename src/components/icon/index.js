@@ -1,6 +1,7 @@
 import React from 'react';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import Entypo from 'react-native-vector-icons/Entypo';
 import { widthPercentageToDP as wp } from 'react-native-responsive-screen';
 import colors from '../../constants/colors';
 
@@ -18,6 +19,9 @@ const Icon = ({
       break;
     case 'Ionicons':
       _Icon = Ionicons;
+      break;
+    case 'Entypo':
+      _Icon = Entypo;
       break;
     default:
       throw new Error(`Invalid type: ${type}`);

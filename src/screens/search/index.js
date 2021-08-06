@@ -1,16 +1,17 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { Alert, FlatList, StyleSheet, View } from 'react-native';
+import { FlatList, StyleSheet, View } from 'react-native';
 import ScreenContainer from '../../components/screen-container';
 import screenNames from '../../constants/screen-names';
-import { Button, Divider, List, Searchbar, Text } from 'react-native-paper';
+import { List, Searchbar, Card, Avatar, Text } from 'react-native-paper';
 import Icon from '../../components/icon';
 import {
   heightPercentageToDP as hp,
   widthPercentageToDP as wp,
 } from 'react-native-responsive-screen';
 import { MusicContext } from '../../context/music';
-import { useBackHandler } from '@react-native-community/hooks';
 import colors from '../../constants/colors';
+import DateTimeUtils from '../../utils/datetime';
+import { PreferencesContext } from '../../context/preferences';
 
 // TODO
 //  - Save the searched term in async-storage (avoid dups)
@@ -24,22 +25,14 @@ const accordionIds = {
 
 const Search = ({ navigation }) => {
   const musicContext = useContext(MusicContext);
+  const { enabledDarkTheme } = useContext(PreferencesContext);
 
-  const [showSearch, setShowSearch] = useState(false);
   const [searchedTerm, setSearchedTerm] = useState('');
   const [previousSearchedTerms, setPreviousSearchedTerms] = useState([]);
   const [musicData, setMusicData] = useState(null);
   const [expandedAccordionIds, setExpandedAccordionIds] = useState([]);
 
   console.log('[Info]', { musicData, searchedTerm, previousSearchedTerms });
-
-  useBackHandler(() => {
-    if (showSearch) {
-      toggleSearch();
-      return true;
-    }
-    return false;
-  });
 
   useEffect(() => {
     setMusicData(musicContext.musicInfo);
@@ -91,11 +84,39 @@ const Search = ({ navigation }) => {
     return (
       <View>
         <View>
-          {resultCount ? (
-            <Text style={styles.text}>{`${resultCount} results found`}</Text>
-          ) : (
-            <Text style={styles.errorText}>No results found</Text>
-          )}
+          <View
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              marginBottom: hp(1),
+            }}>
+            {resultCount ? (
+              <>
+                <Icon
+                  name={'text-search'}
+                  size={wp(3.5)}
+                  color={colors.lightGrey}
+                  style={{ marginRight: wp(0.5) }}
+                />
+                <Text
+                  style={{
+                    fontSize: wp(3.5),
+                    color: colors.lightGrey,
+                  }}>{`${resultCount} results found`}</Text>
+              </>
+            ) : (
+              <>
+                <Icon
+                  name={'circle-with-cross'}
+                  type={'Entypo'}
+                  size={wp(3.5)}
+                  color={colors.red}
+                  style={{ marginRight: wp(0.5) }}
+                />
+                <Text style={styles.errorText}>No results found!</Text>
+              </>
+            )}
+          </View>
           {!!musicData?.tracks?.length && (
             <List.Accordion
               id={accordionIds.TRACKS}
@@ -103,20 +124,122 @@ const Search = ({ navigation }) => {
               onPress={toggleAccordionExpansion.bind(this, accordionIds.TRACKS)}
               title={`${accordionIds.TRACKS} (${musicData.tracks.length})`}
               titleStyle={styles.accordionTitleText}
+              // style={{
+              //   borderWidth: 1,
+              //   borderColor: colors.lightGrey1,
+              //   elevation: 1,
+              //   borderRadius: 5,
+              //   marginVertical: hp(0.5),
+              // }}
               left={props => <List.Icon {...props} icon="music" />}>
               <FlatList
+                contentContainerStyle={{ marginLeft: wp(-8) }}
                 data={musicData.tracks}
                 keyExtractor={(_, index) => index.toString()}
                 renderItem={({ item: track }) => (
-                  <List.Item
-                    style={{
-                      marginBottom: hp(1),
-                      backgroundColor: colors.lightGrey,
-                      borderRadius: 10,
-                      flexWrap: 'wrap',
-                    }}
-                    titleStyle={styles.text}
+                  // <List.Item
+                  //   style={{
+                  //     marginBottom: hp(1),
+                  //     backgroundColor: colors.lightGrey,
+                  //     borderRadius: 10,
+                  //     flexWrap: 'wrap',
+                  //   }}
+                  //   titleStyle={styles.text}
+                  //   title={track.title}
+                  // />
+
+                  <Card.Title
+                    style={
+                      {
+                        // borderWidth: 1,
+                        // elevation: 1,
+                        // marginBottom: hp(1),
+                        // borderRadius: 5,
+                        // marginLeft: wp(-10),
+                        // backgroundColor: enabledDarkTheme
+                        //   ? null
+                        //   : colors.darkGreen,
+                      }
+                    }
                     title={track.title}
+                    subtitle={
+                      <View
+                        style={{
+                          flexDirection: 'row',
+                          alignItems: 'center',
+                        }}>
+                        <Icon
+                          name={'clock-time-five-outline'}
+                          size={wp(3.2)}
+                          color={colors.lightGrey}
+                        />
+                        <Text
+                          style={{
+                            fontSize: wp(3.2),
+                            color: colors.lightGrey,
+                            marginLeft: wp(0.2),
+                          }}>
+                          {DateTimeUtils.msToTime(track.duration)}
+                        </Text>
+                        <Icon
+                          name={'dot-single'}
+                          type={'Entypo'}
+                          size={wp(3.2)}
+                          color={colors.lightGrey}
+                        />
+                        <Icon
+                          name={'account-music'}
+                          size={wp(3.2)}
+                          color={colors.lightGrey}
+                        />
+                        <Text
+                          style={{
+                            fontSize: wp(3.2),
+                            color: colors.lightGrey,
+                            marginLeft: wp(0.2),
+                          }}>
+                          {track.artist}
+                        </Text>
+                        <Icon
+                          name={'dot-single'}
+                          type={'Entypo'}
+                          size={wp(3.2)}
+                          color={colors.lightGrey}
+                        />
+                        <Icon
+                          name={'folder-music'}
+                          size={wp(3.2)}
+                          color={colors.lightGrey}
+                        />
+                        <Text
+                          style={{
+                            fontSize: wp(3.2),
+                            color: colors.lightGrey,
+                            marginLeft: wp(0.2),
+                          }}>
+                          {track.folder.name}
+                        </Text>
+                      </View>
+                    }
+                    left={props =>
+                      track.coverExists ? (
+                        <Avatar.Image
+                          {...props}
+                          size={hp(6)}
+                          source={{ uri: track.coverFilePath }}
+                        />
+                      ) : (
+                        <Avatar.Icon
+                          size={hp(6)}
+                          icon="music"
+                          style={{
+                            backgroundColor: colors.lightPurple,
+                          }}
+                        />
+                      )
+                    }
+                    // left={(props) => <Avatar.Icon {...props} icon="folder" />}
+                    // right={(props) => <IconButton {...props} icon="more-vert" onPress={() => {}} />}
                   />
                 )}
               />
@@ -214,11 +337,6 @@ const Search = ({ navigation }) => {
     );
   };
 
-  const toggleSearch = () => {
-    setShowSearch(!showSearch);
-    setSearchedTerm('');
-  };
-
   return (
     <ScreenContainer
       showHeader
@@ -258,6 +376,16 @@ const Search = ({ navigation }) => {
         </View>
       )}
 
+      {/*<Text>*/}
+      {/*  {JSON.stringify({*/}
+      {/*    DocumentDirectoryPath: FileSystem.DocumentDirectoryPath,*/}
+      {/*    TemporaryDirectoryPath: FileSystem.TemporaryDirectoryPath,*/}
+      {/*    LibraryDirectoryPath: FileSystem.LibraryDirectoryPath,*/}
+      {/*    ExternalDirectoryPath: FileSystem.ExternalDirectoryPath,*/}
+      {/*    ExternalStorageDirectoryPath: FileSystem.ExternalStorageDirectoryPath,*/}
+      {/*  })}*/}
+      {/*</Text>*/}
+
       <View
         style={{
           marginVertical: hp(2),
@@ -281,7 +409,7 @@ const styles = StyleSheet.create({
   },
   errorText: {
     fontSize: wp(3.5),
-    color: 'red',
+    color: colors.red,
   },
   accordionTitleText: {
     textTransform: 'capitalize',
