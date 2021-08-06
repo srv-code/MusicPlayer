@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { FlatList, Platform, StyleSheet, View } from 'react-native';
+import { Alert, FlatList, Platform, StyleSheet, View } from 'react-native';
 import ScreenContainer from '../../components/screen-container';
 import screenNames from '../../constants/screen-names';
 import {
@@ -70,12 +70,12 @@ const Search = ({ navigation }) => {
 
         // matches with: albums: <string>
         albums: musicContext.musicInfo?.albums?.filter(x =>
-          x.toLowerCase().includes(searchedTerm.toLowerCase()),
+          x.name.toLowerCase().includes(searchedTerm.toLowerCase()),
         ),
 
         // matches with: artists: <string>
         artists: musicContext.musicInfo?.artists?.filter(x =>
-          x.toLowerCase().includes(searchedTerm.toLowerCase()),
+          x.name.toLowerCase().includes(searchedTerm.toLowerCase()),
         ),
 
         // matches with: folders { name, path }
@@ -103,286 +103,467 @@ const Search = ({ navigation }) => {
       (musicData?.artists?.length || 0) +
       (musicData?.folders?.length || 0);
 
+    const renderList = (type, index) => {
+      if (!musicData || !musicData[type]?.length) return null;
+
+      // let description, left, right;
+
+      const renderDescription = data => {
+        switch (type) {
+          case accordionIds.TRACKS:
+            return (
+              <Text style={styles.trackDescText}>
+                <Icon
+                  name={'clock-time-five-outline'}
+                  size={wp(3.2)}
+                  color={colors.lightGrey}
+                />
+                <Text style={styles.trackSubtitleText}>
+                  {DateTimeUtils.msToTime(data.duration)}
+                </Text>
+                {data.artist && (
+                  <>
+                    <Icon
+                      name={'dot-single'}
+                      type={'Entypo'}
+                      size={wp(3.2)}
+                      color={colors.lightGrey}
+                    />
+                    <Icon
+                      name={'account-music'}
+                      size={wp(3.2)}
+                      color={colors.lightGrey}
+                    />
+                    <Text style={styles.trackSubtitleText}>{data.artist}</Text>
+                  </>
+                )}
+                <Icon
+                  name={'dot-single'}
+                  type={'Entypo'}
+                  size={wp(3.2)}
+                  color={colors.lightGrey}
+                />
+                <Icon
+                  name={'folder-music'}
+                  size={wp(3.2)}
+                  color={colors.lightGrey}
+                />
+                <Text style={styles.trackSubtitleText}>{data.folder.name}</Text>
+              </Text>
+            );
+
+          case accordionIds.ALBUMS:
+          case accordionIds.ARTISTS:
+          case accordionIds.FOLDERS:
+            return (
+              <Text style={styles.trackDescText}>
+                <Icon name={'music'} size={wp(3.2)} color={colors.lightGrey} />
+                <Text style={styles.trackSubtitleText}>{data.trackCount}</Text>
+              </Text>
+            );
+
+          default:
+            throw new Error(`Invalid type: ${type}`);
+        }
+      };
+
+      const renderLeftComponent = (data, props) => {
+        let iconName;
+        switch (type) {
+          case accordionIds.TRACKS:
+            if (data.coverExists)
+              return (
+                <Avatar.Image
+                  size={hp(6)}
+                  source={{ uri: data.coverFilePath }}
+                />
+              );
+            else iconName = 'music';
+            break;
+          case accordionIds.ALBUMS:
+            iconName = 'disc';
+            break;
+          case accordionIds.ARTISTS:
+            iconName = 'account-music-outline';
+            break;
+          case accordionIds.FOLDERS:
+            iconName = 'folder-music-outline';
+            break;
+          default:
+            new Error(`Invalid type: ${type}`);
+        }
+
+        return (
+          <Avatar.Icon size={hp(6)} icon={iconName} style={styles.musicIcon} />
+        );
+      };
+
+      const renderRightComponent = (data, props, itemIndex) => {
+        switch (type) {
+          case accordionIds.TRACKS:
+            return (
+              <Menu
+                {...props}
+                visible={
+                  showMoreOptionFor &&
+                  showMoreOptionFor.type === type &&
+                  showMoreOptionFor.index === itemIndex
+                }
+                onDismiss={setShowMoreOptionFor}
+                anchor={
+                  <IconButton
+                    {...props}
+                    icon="dots-vertical"
+                    onPress={setShowMoreOptionFor.bind(this, {
+                      type,
+                      index: itemIndex,
+                    })}
+                  />
+                }>
+                <Menu.Item
+                  icon="skip-next-outline"
+                  title={labels.playNext}
+                  onPress={() => {
+                    alert(JSON.stringify(props));
+                    setShowMoreOptionFor(null);
+                  }}
+                />
+                <Menu.Item
+                  icon="playlist-plus"
+                  title={labels.addToPlaylist}
+                  onPress={() => {
+                    setShowMoreOptionFor(null);
+                    alert(JSON.stringify(props));
+                  }}
+                />
+                <Menu.Item
+                  icon="table-column-plus-after"
+                  title={labels.addToQueue}
+                  onPress={() => {
+                    // alert(JSON.stringify(props));
+                    setShowMoreOptionFor(null);
+                    setShowInfoInSnackBar({
+                      message: labels.addedToQueue,
+                      actions: {
+                        label: labels.dismiss,
+                        onPress: setShowInfoInSnackBar.bind(this, null),
+                      },
+                    });
+                  }}
+                />
+                <Menu.Item
+                  icon="information-variant"
+                  title={labels.showInfo}
+                  onPress={() => {
+                    alert(JSON.stringify(props));
+                    setShowMoreOptionFor(null);
+                  }}
+                />
+              </Menu>
+            );
+
+          case accordionIds.ALBUMS:
+            return (
+              <Menu
+                {...props}
+                visible={
+                  showMoreOptionFor &&
+                  showMoreOptionFor.type === type &&
+                  showMoreOptionFor.index === itemIndex
+                }
+                onDismiss={setShowMoreOptionFor}
+                anchor={
+                  <IconButton
+                    {...props}
+                    icon="dots-vertical"
+                    onPress={setShowMoreOptionFor.bind(this, {
+                      type,
+                      index: itemIndex,
+                    })}
+                  />
+                }>
+                <Menu.Item
+                  icon="skip-next-outline"
+                  title={labels.playAllNext}
+                  onPress={() => {
+                    alert(JSON.stringify(props));
+                    setShowMoreOptionFor(null);
+                  }}
+                />
+                <Menu.Item
+                  icon="playlist-plus"
+                  title={labels.addAllToPlaylist}
+                  onPress={() => {
+                    setShowMoreOptionFor(null);
+                    alert(JSON.stringify(props));
+                  }}
+                />
+                <Menu.Item
+                  icon="table-column-plus-after"
+                  title={labels.addAllToQueue}
+                  onPress={() => {
+                    // alert(JSON.stringify(props));
+                    setShowMoreOptionFor(null);
+                    setShowInfoInSnackBar({
+                      message: labels.addedToQueue,
+                      actions: {
+                        label: labels.dismiss,
+                        onPress: setShowInfoInSnackBar.bind(this, null),
+                      },
+                    });
+                  }}
+                />
+                <Menu.Item
+                  icon="information-variant"
+                  title={labels.showInfo}
+                  onPress={() => {
+                    alert(JSON.stringify(props));
+                    setShowMoreOptionFor(null);
+                  }}
+                />
+              </Menu>
+            );
+
+          case accordionIds.ARTISTS:
+            return (
+              <Menu
+                {...props}
+                visible={
+                  showMoreOptionFor &&
+                  showMoreOptionFor.type === type &&
+                  showMoreOptionFor.index === itemIndex
+                }
+                onDismiss={setShowMoreOptionFor}
+                anchor={
+                  <IconButton
+                    {...props}
+                    icon="dots-vertical"
+                    onPress={setShowMoreOptionFor.bind(this, {
+                      type,
+                      index: itemIndex,
+                    })}
+                  />
+                }>
+                <Menu.Item
+                  icon="skip-next-outline"
+                  title={labels.playAllNext}
+                  onPress={() => {
+                    alert(JSON.stringify(props));
+                    setShowMoreOptionFor(null);
+                  }}
+                />
+                <Menu.Item
+                  icon="playlist-plus"
+                  title={labels.addAllToPlaylist}
+                  onPress={() => {
+                    setShowMoreOptionFor(null);
+                    alert(JSON.stringify(props));
+                  }}
+                />
+                <Menu.Item
+                  icon="table-column-plus-after"
+                  title={labels.addAllToQueue}
+                  onPress={() => {
+                    // alert(JSON.stringify(props));
+                    setShowMoreOptionFor(null);
+                    setShowInfoInSnackBar({
+                      message: labels.addedToQueue,
+                      actions: {
+                        label: labels.dismiss,
+                        onPress: setShowInfoInSnackBar.bind(this, null),
+                      },
+                    });
+                  }}
+                />
+                <Menu.Item
+                  icon="information-variant"
+                  title={labels.showInfo}
+                  onPress={() => {
+                    alert(JSON.stringify(props));
+                    setShowMoreOptionFor(null);
+                  }}
+                />
+              </Menu>
+            );
+
+          case accordionIds.FOLDERS:
+            return (
+              <Menu
+                {...props}
+                visible={
+                  showMoreOptionFor &&
+                  showMoreOptionFor.type === type &&
+                  showMoreOptionFor.index === itemIndex
+                }
+                onDismiss={setShowMoreOptionFor}
+                anchor={
+                  <IconButton
+                    {...props}
+                    icon="dots-vertical"
+                    onPress={setShowMoreOptionFor.bind(this, {
+                      type,
+                      index: itemIndex,
+                    })}
+                  />
+                }>
+                <Menu.Item
+                  icon="skip-next-outline"
+                  title={labels.playAllNext}
+                  onPress={() => {
+                    alert(JSON.stringify(props));
+                    setShowMoreOptionFor(null);
+                  }}
+                />
+                <Menu.Item
+                  icon="playlist-plus"
+                  title={labels.addAllToPlaylist}
+                  onPress={() => {
+                    setShowMoreOptionFor(null);
+                    alert(JSON.stringify(props));
+                  }}
+                />
+                <Menu.Item
+                  icon="table-column-plus-after"
+                  title={labels.addAllToQueue}
+                  onPress={() => {
+                    // alert(JSON.stringify(props));
+                    setShowMoreOptionFor(null);
+                    setShowInfoInSnackBar({
+                      message: labels.addedToQueue,
+                      actions: {
+                        label: labels.dismiss,
+                        onPress: setShowInfoInSnackBar.bind(this, null),
+                      },
+                    });
+                  }}
+                />
+                <Menu.Item
+                  icon="information-variant"
+                  title={labels.showInfo}
+                  onPress={() => {
+                    alert(JSON.stringify(props));
+                    setShowMoreOptionFor(null);
+                  }}
+                />
+              </Menu>
+            );
+
+          default:
+            new Error(`Invalid type: ${type}`);
+        }
+      };
+
+      const renderAccordionIcon = () => {
+        switch (type) {
+          case accordionIds.TRACKS:
+            return 'music';
+          case accordionIds.ALBUMS:
+            return 'disc';
+          case accordionIds.ARTISTS:
+            return 'account-music';
+          case accordionIds.FOLDERS:
+            return 'folder-music';
+          default:
+            new Error(`Invalid type: ${type}`);
+        }
+      };
+
+      const getTitleText = data => {
+        switch (type) {
+          case accordionIds.TRACKS:
+            return data.title;
+          case accordionIds.ALBUMS:
+          case accordionIds.ARTISTS:
+          case accordionIds.FOLDERS:
+            return data.name;
+          default:
+            new Error(`Invalid type: ${type}`);
+        }
+      };
+
+      return (
+        <List.Accordion
+          key={index}
+          id={type}
+          expanded={isAccordionExpanded(type)}
+          onPress={toggleAccordionExpansion.bind(this, type)}
+          title={`${type} (${musicData[type].length})`}
+          titleStyle={styles.accordionTitleText}
+          left={props => <List.Icon {...props} icon={renderAccordionIcon()} />}>
+          <FlatList
+            contentContainerStyle={styles.flatList}
+            data={musicData[type]}
+            keyExtractor={(_, index) => index.toString()}
+            renderItem={({ item, index: itemIndex }) => (
+              <>
+                <List.Item
+                  onPress={() => {
+                    // TODO
+                    //  - tracks: insert current track in the stack (at the top) & play it
+                    //  - albums|artists|folders: show album tracks
+                    Alert.alert(`${type} Info`, JSON.stringify(item));
+                  }}
+                  titleEllipsizeMode={'tail'}
+                  titleNumberOfLines={1}
+                  titleStyle={styles.listItemText}
+                  title={getTitleText(item)}
+                  descriptionEllipsizeMode={'tail'}
+                  descriptionNumberOfLines={2}
+                  description={renderDescription.bind(this, item)}
+                  left={props => renderLeftComponent(item, props)}
+                  right={props => renderRightComponent(item, props, itemIndex)}
+                />
+                {index === musicData[type].length - 1 ? (
+                  <View style={styles.listItemEndSmallBar} />
+                ) : (
+                  <Divider inset />
+                )}
+              </>
+            )}
+          />
+        </List.Accordion>
+      );
+    };
+
+    const renderCount = () => (
+      <View style={styles.resultCountContainer}>
+        {resultCount ? (
+          <>
+            <Icon
+              name={'text-search'}
+              size={wp(3.5)}
+              color={colors.lightGrey}
+              style={styles.resultIcon}
+            />
+            <Text style={styles.resultCountText}>
+              {`${resultCount} results found`}
+            </Text>
+          </>
+        ) : (
+          <>
+            <Icon
+              name={'circle-with-cross'}
+              type={'Entypo'}
+              size={wp(3.5)}
+              color={colors.red}
+              style={styles.resultIcon}
+            />
+            <Text style={styles.errorText}>No results found!</Text>
+          </>
+        )}
+      </View>
+    );
+
     return (
       <View>
         <View>
-          <View style={styles.resultCountContainer}>
-            {resultCount ? (
-              <>
-                <Icon
-                  name={'text-search'}
-                  size={wp(3.5)}
-                  color={colors.lightGrey}
-                  style={styles.resultIcon}
-                />
-                <Text style={styles.resultCountText}>
-                  {`${resultCount} results found`}
-                </Text>
-              </>
-            ) : (
-              <>
-                <Icon
-                  name={'circle-with-cross'}
-                  type={'Entypo'}
-                  size={wp(3.5)}
-                  color={colors.red}
-                  style={styles.resultIcon}
-                />
-                <Text style={styles.errorText}>No results found!</Text>
-              </>
-            )}
-          </View>
-          {!!musicData?.tracks?.length && (
-            <List.Accordion
-              id={accordionIds.TRACKS}
-              expanded={isAccordionExpanded(accordionIds.TRACKS)}
-              onPress={toggleAccordionExpansion.bind(this, accordionIds.TRACKS)}
-              title={`${accordionIds.TRACKS} (${musicData.tracks.length})`}
-              titleStyle={styles.accordionTitleText}
-              left={props => <List.Icon {...props} icon="music" />}>
-              <FlatList
-                contentContainerStyle={styles.flatList}
-                data={musicData.tracks}
-                keyExtractor={(_, index) => index.toString()}
-                renderItem={({ item: track, index }) => (
-                  <>
-                    <List.Item
-                      onPress={() => {
-                        // TODO insert current track in the stack (at the top) & play it
-                        alert(`Selected: ${JSON.stringify(track)}`);
-                      }}
-                      titleEllipsizeMode={'tail'}
-                      titleNumberOfLines={1}
-                      titleStyle={styles.listItemText}
-                      title={track.title}
-                      descriptionEllipsizeMode={'tail'}
-                      descriptionNumberOfLines={2}
-                      description={
-                        <Text style={styles.trackDescText}>
-                          <Icon
-                            name={'clock-time-five-outline'}
-                            size={wp(3.2)}
-                            color={colors.lightGrey}
-                          />
-                          <Text style={styles.trackSubtitleText}>
-                            {DateTimeUtils.msToTime(track.duration)}
-                          </Text>
-                          {track.artist && (
-                            <>
-                              <Icon
-                                name={'dot-single'}
-                                type={'Entypo'}
-                                size={wp(3.2)}
-                                color={colors.lightGrey}
-                              />
-                              <Icon
-                                name={'account-music'}
-                                size={wp(3.2)}
-                                color={colors.lightGrey}
-                              />
-                              <Text style={styles.trackSubtitleText}>
-                                {track.artist}
-                              </Text>
-                            </>
-                          )}
-                          <Icon
-                            name={'dot-single'}
-                            type={'Entypo'}
-                            size={wp(3.2)}
-                            color={colors.lightGrey}
-                          />
-                          <Icon
-                            name={'folder-music'}
-                            size={wp(3.2)}
-                            color={colors.lightGrey}
-                          />
-                          <Text style={styles.trackSubtitleText}>
-                            {track.folder.name}
-                          </Text>
-                        </Text>
-                      }
-                      left={props =>
-                        track.coverExists ? (
-                          <Avatar.Image
-                            size={hp(6)}
-                            source={{ uri: track.coverFilePath }}
-                          />
-                        ) : (
-                          <Avatar.Icon
-                            size={hp(6)}
-                            icon="music"
-                            style={styles.musicIcon}
-                          />
-                        )
-                      }
-                      right={props => (
-                        <Menu
-                          {...props}
-                          visible={
-                            showMoreOptionFor &&
-                            showMoreOptionFor.type === accordionIds.TRACKS &&
-                            showMoreOptionFor.index === index
-                          }
-                          onDismiss={setShowMoreOptionFor}
-                          anchor={
-                            <IconButton
-                              {...props}
-                              icon="dots-vertical"
-                              onPress={setShowMoreOptionFor.bind(this, {
-                                type: accordionIds.TRACKS,
-                                index,
-                              })}
-                            />
-                          }>
-                          <Menu.Item
-                            icon="skip-next-outline"
-                            title={labels.playNext}
-                            onPress={() => {
-                              alert(JSON.stringify(props));
-                              setShowMoreOptionFor(null);
-                            }}
-                          />
-                          <Menu.Item
-                            icon="playlist-plus"
-                            title={labels.addToPlaylist}
-                            onPress={() => {
-                              setShowMoreOptionFor(null);
-                              alert(JSON.stringify(props));
-                            }}
-                          />
-                          <Menu.Item
-                            icon="table-column-plus-after"
-                            title={labels.addToQueue}
-                            onPress={() => {
-                              // alert(JSON.stringify(props));
-                              setShowMoreOptionFor(null);
-                              setShowInfoInSnackBar({
-                                message: labels.addedToQueue,
-                                actions: {
-                                  label: labels.dismiss,
-                                  onPress: setShowInfoInSnackBar.bind(
-                                    this,
-                                    null,
-                                  ),
-                                },
-                              });
-                            }}
-                          />
-                          <Menu.Item
-                            icon="information-variant"
-                            title={labels.songInfo}
-                            onPress={() => {
-                              alert(JSON.stringify(props));
-                              setShowMoreOptionFor(null);
-                            }}
-                          />
-                        </Menu>
-                      )}
-                    />
-                    {index === musicData.tracks.length - 1 ? (
-                      <View style={styles.listItemEndSmallBar} />
-                    ) : (
-                      <Divider inset />
-                    )}
-                  </>
-                )}
-              />
-            </List.Accordion>
-          )}
-
-          {!!musicData?.albums?.length && (
-            <List.Accordion
-              id={accordionIds.ALBUMS}
-              expanded={isAccordionExpanded(accordionIds.ALBUMS)}
-              onPress={toggleAccordionExpansion.bind(this, accordionIds.ALBUMS)}
-              title={`${accordionIds.ALBUMS} (${musicData.albums.length})`}
-              titleStyle={styles.accordionTitleText}
-              left={props => <List.Icon {...props} icon="disc" />}>
-              <FlatList
-                data={musicData.albums}
-                keyExtractor={(_, index) => index.toString()}
-                renderItem={({ item: album, index }) => (
-                  <>
-                    <List.Item
-                      style={{
-                        marginBottom: hp(1),
-                        backgroundColor: colors.lightGrey,
-                        borderRadius: 10,
-                        flexWrap: 'wrap',
-                      }}
-                      titleStyle={styles.text}
-                      title={album}
-                    />
-                    {index === musicData.albums.length - 1 ? (
-                      <View style={styles.listItemEndSmallBar} />
-                    ) : (
-                      <Divider inset />
-                    )}
-                  </>
-                )}
-              />
-            </List.Accordion>
-          )}
-
-          {!!musicData?.artists?.length && (
-            <List.Accordion
-              id={accordionIds.ARTISTS}
-              expanded={isAccordionExpanded(accordionIds.ARTISTS)}
-              onPress={toggleAccordionExpansion.bind(
-                this,
-                accordionIds.ARTISTS,
-              )}
-              title={`Artists (${musicData.artists.length})`}
-              left={props => <List.Icon {...props} icon="account-music" />}>
-              <FlatList
-                data={musicData.artists}
-                keyExtractor={(_, index) => index.toString()}
-                renderItem={({ item: artist }) => (
-                  <List.Item
-                    style={{
-                      marginBottom: hp(1),
-                      backgroundColor: colors.lightGrey,
-                      borderRadius: 10,
-                      flexWrap: 'wrap',
-                    }}
-                    titleStyle={styles.text}
-                    title={artist}
-                  />
-                )}
-              />
-            </List.Accordion>
-          )}
-
-          {!!musicData?.folders?.length && (
-            <List.Accordion
-              id={accordionIds.FOLDERS}
-              expanded={isAccordionExpanded(accordionIds.FOLDERS)}
-              onPress={toggleAccordionExpansion.bind(
-                this,
-                accordionIds.FOLDERS,
-              )}
-              title={`${accordionIds.FOLDERS} (${musicData.folders.length})`}
-              titleStyle={styles.accordionTitleText}
-              left={props => <List.Icon {...props} icon="folder-music" />}>
-              <FlatList
-                data={musicData.folders}
-                keyExtractor={(_, index) => index.toString()}
-                renderItem={({ item: folder }) => (
-                  <List.Item
-                    style={{
-                      marginBottom: hp(1),
-                      backgroundColor: colors.lightGrey,
-                      borderRadius: 10,
-                      flexWrap: 'wrap',
-                    }}
-                    titleStyle={styles.text}
-                    title={folder.name}
-                    description={folder.path}
-                  />
-                )}
-              />
-            </List.Accordion>
-          )}
+          {renderCount()}
+          {[
+            accordionIds.TRACKS,
+            accordionIds.ALBUMS,
+            accordionIds.ARTISTS,
+            accordionIds.FOLDERS,
+          ].map(renderList)}
         </View>
       </View>
     );
