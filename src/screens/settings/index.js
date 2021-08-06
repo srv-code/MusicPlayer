@@ -2,7 +2,7 @@ import React, { useContext, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import ScreenContainer from '../../components/screen-container';
 import screenNames from '../../constants/screen-names';
-import { Searchbar, Text } from 'react-native-paper';
+import { Searchbar, Switch, ToggleButton, Text } from 'react-native-paper';
 import Icon from '../../components/icon';
 import {
   heightPercentageToDP as hp,
@@ -10,6 +10,7 @@ import {
 } from 'react-native-responsive-screen';
 import { PreferencesContext } from '../../context/preferences';
 import { useBackHandler } from '@react-native-community/hooks';
+import labels from '../../constants/labels';
 
 const Settings = ({ navigation }) => {
   const prefInfo = useContext(PreferencesContext);
@@ -57,8 +58,30 @@ const Settings = ({ navigation }) => {
         style={{
           marginVertical: hp(2),
         }}>
-        <Text>{`Preferences Info:
-${JSON.stringify(prefInfo)}`}</Text>
+        <Text>
+          {`Preferences Info:
+${JSON.stringify(prefInfo)}`}
+        </Text>
+
+        {/*<Switch*/}
+        {/*  value={prefInfo.enabledDarkTheme}*/}
+        {/*  onValueChange={prefInfo.toggleDarkTheme}*/}
+        {/*/>*/}
+
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+          }}>
+          <Text style={{ fontSize: wp(4.5) }}>Theme</Text>
+          <ToggleButton.Row
+            onValueChange={prefInfo.toggleDarkTheme}
+            value={prefInfo.enabledDarkTheme}>
+            <ToggleButton icon="white-balance-sunny" value={false} />
+            <ToggleButton icon="moon-waning-crescent" value={true} />
+          </ToggleButton.Row>
+        </View>
       </View>
     </ScreenContainer>
   );
