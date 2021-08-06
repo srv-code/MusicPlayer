@@ -12,6 +12,7 @@ import {
   Divider,
   Appbar,
   Menu,
+  Snackbar,
 } from 'react-native-paper';
 import Icon from '../../components/icon';
 import {
@@ -26,6 +27,9 @@ import labels from '../../constants/labels';
 
 // TODO
 //  - Save the searched term in async-storage (avoid dups)
+//  - Focus on the search-bar when the screen gets focus
+//  - Fix the snack-bar
+//  - Make a common renderer for the accordions
 
 const accordionIds = {
   TRACKS: 'tracks',
@@ -43,8 +47,14 @@ const Search = ({ navigation }) => {
   const [musicData, setMusicData] = useState(null);
   const [expandedAccordionIds, setExpandedAccordionIds] = useState([]);
   const [showMoreOptionFor, setShowMoreOptionFor] = useState(null);
+  const [showInfoInSnackBar, setShowInfoInSnackBar] = useState(null);
 
-  console.log('[Info]', { musicData, searchedTerm, previousSearchedTerms });
+  console.log('[Info]', {
+    musicData,
+    searchedTerm,
+    previousSearchedTerms,
+    showInfoInSnackBar,
+  });
 
   useEffect(() => {
     setMusicData(musicContext.musicInfo);
@@ -96,25 +106,18 @@ const Search = ({ navigation }) => {
     return (
       <View>
         <View>
-          <View
-            style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              marginBottom: hp(1),
-            }}>
+          <View style={styles.resultCountContainer}>
             {resultCount ? (
               <>
                 <Icon
                   name={'text-search'}
                   size={wp(3.5)}
                   color={colors.lightGrey}
-                  style={{ marginRight: wp(0.5) }}
+                  style={styles.resultIcon}
                 />
-                <Text
-                  style={{
-                    fontSize: wp(3.5),
-                    color: colors.lightGrey,
-                  }}>{`${resultCount} results found`}</Text>
+                <Text style={styles.resultCountText}>
+                  {`${resultCount} results found`}
+                </Text>
               </>
             ) : (
               <>
@@ -123,7 +126,7 @@ const Search = ({ navigation }) => {
                   type={'Entypo'}
                   size={wp(3.5)}
                   color={colors.red}
-                  style={{ marginRight: wp(0.5) }}
+                  style={styles.resultIcon}
                 />
                 <Text style={styles.errorText}>No results found!</Text>
               </>
@@ -136,62 +139,32 @@ const Search = ({ navigation }) => {
               onPress={toggleAccordionExpansion.bind(this, accordionIds.TRACKS)}
               title={`${accordionIds.TRACKS} (${musicData.tracks.length})`}
               titleStyle={styles.accordionTitleText}
-              // style={{
-              //   borderWidth: 1,
-              //   borderColor: colors.lightGrey1,
-              //   elevation: 1,
-              //   borderRadius: 5,
-              //   marginVertical: hp(0.5),
-              // }}
               left={props => <List.Icon {...props} icon="music" />}>
               <FlatList
-                contentContainerStyle={{ marginLeft: wp(-9) }}
+                contentContainerStyle={styles.flatList}
                 data={musicData.tracks}
                 keyExtractor={(_, index) => index.toString()}
                 renderItem={({ item: track, index }) => (
                   <>
                     <List.Item
-                      style={
-                        {
-                          // marginBottom: hp(1),
-                          // backgroundColor: colors.lightGrey,
-                          // borderRadius: 10,
-                          // flexWrap: 'wrap',
-                          // alignItems: 'flex-start',
-                        }
-                      }
                       onPress={() => {
+                        // TODO insert current track in the stack (at the top) & play it
                         alert(`Selected: ${JSON.stringify(track)}`);
                       }}
                       titleEllipsizeMode={'tail'}
                       titleNumberOfLines={1}
-                      titleStyle={{
-                        fontSize: wp(3.5),
-                        marginBottom: hp(0.3),
-                        // justifyContent: 'flex-start',
-                        // alignSelf: 'flex-start',
-                        // backgroundColor: 'red'
-                      }}
+                      titleStyle={styles.listItemText}
                       title={track.title}
                       descriptionEllipsizeMode={'tail'}
                       descriptionNumberOfLines={2}
                       description={
-                        <Text
-                          style={{
-                            flexDirection: 'row',
-                            alignItems: 'center',
-                          }}>
+                        <Text style={styles.trackDescText}>
                           <Icon
                             name={'clock-time-five-outline'}
                             size={wp(3.2)}
                             color={colors.lightGrey}
                           />
-                          <Text
-                            style={{
-                              fontSize: wp(3.2),
-                              color: colors.lightGrey,
-                              marginLeft: wp(0.2),
-                            }}>
+                          <Text style={styles.trackSubtitleText}>
                             {DateTimeUtils.msToTime(track.duration)}
                           </Text>
                           {track.artist && (
@@ -207,12 +180,7 @@ const Search = ({ navigation }) => {
                                 size={wp(3.2)}
                                 color={colors.lightGrey}
                               />
-                              <Text
-                                style={{
-                                  fontSize: wp(3.2),
-                                  color: colors.lightGrey,
-                                  marginLeft: wp(0.2),
-                                }}>
+                              <Text style={styles.trackSubtitleText}>
                                 {track.artist}
                               </Text>
                             </>
@@ -228,12 +196,7 @@ const Search = ({ navigation }) => {
                             size={wp(3.2)}
                             color={colors.lightGrey}
                           />
-                          <Text
-                            style={{
-                              fontSize: wp(3.2),
-                              color: colors.lightGrey,
-                              marginLeft: wp(0.2),
-                            }}>
+                          <Text style={styles.trackSubtitleText}>
                             {track.folder.name}
                           </Text>
                         </Text>
@@ -248,7 +211,7 @@ const Search = ({ navigation }) => {
                           <Avatar.Icon
                             size={hp(6)}
                             icon="music"
-                            style={{ backgroundColor: colors.lightPurple }}
+                            style={styles.musicIcon}
                           />
                         )
                       }
@@ -256,8 +219,9 @@ const Search = ({ navigation }) => {
                         <Menu
                           {...props}
                           visible={
-                            showMoreOptionFor?.type === accordionIds.TRACKS &&
-                            showMoreOptionFor?.index === index
+                            showMoreOptionFor &&
+                            showMoreOptionFor.type === accordionIds.TRACKS &&
+                            showMoreOptionFor.index === index
                           }
                           onDismiss={setShowMoreOptionFor}
                           anchor={
@@ -282,16 +246,26 @@ const Search = ({ navigation }) => {
                             icon="playlist-plus"
                             title={labels.addToPlaylist}
                             onPress={() => {
-                              alert(JSON.stringify(props));
                               setShowMoreOptionFor(null);
+                              alert(JSON.stringify(props));
                             }}
                           />
                           <Menu.Item
                             icon="table-column-plus-after"
                             title={labels.addToQueue}
                             onPress={() => {
-                              alert(JSON.stringify(props));
+                              // alert(JSON.stringify(props));
                               setShowMoreOptionFor(null);
+                              setShowInfoInSnackBar({
+                                message: labels.addedToQueue,
+                                actions: {
+                                  label: labels.dismiss,
+                                  onPress: setShowInfoInSnackBar.bind(
+                                    this,
+                                    null,
+                                  ),
+                                },
+                              });
                             }}
                           />
                           <Menu.Item
@@ -305,7 +279,11 @@ const Search = ({ navigation }) => {
                         </Menu>
                       )}
                     />
-                    <Divider inset />
+                    {index === musicData.tracks.length - 1 ? (
+                      <View style={styles.listItemEndSmallBar} />
+                    ) : (
+                      <Divider inset />
+                    )}
                   </>
                 )}
               />
@@ -323,17 +301,24 @@ const Search = ({ navigation }) => {
               <FlatList
                 data={musicData.albums}
                 keyExtractor={(_, index) => index.toString()}
-                renderItem={({ item: album }) => (
-                  <List.Item
-                    style={{
-                      marginBottom: hp(1),
-                      backgroundColor: colors.lightGrey,
-                      borderRadius: 10,
-                      flexWrap: 'wrap',
-                    }}
-                    titleStyle={styles.text}
-                    title={album}
-                  />
+                renderItem={({ item: album, index }) => (
+                  <>
+                    <List.Item
+                      style={{
+                        marginBottom: hp(1),
+                        backgroundColor: colors.lightGrey,
+                        borderRadius: 10,
+                        flexWrap: 'wrap',
+                      }}
+                      titleStyle={styles.text}
+                      title={album}
+                    />
+                    {index === musicData.albums.length - 1 ? (
+                      <View style={styles.listItemEndSmallBar} />
+                    ) : (
+                      <Divider inset />
+                    )}
+                  </>
                 )}
               />
             </List.Accordion>
@@ -404,65 +389,64 @@ const Search = ({ navigation }) => {
   };
 
   return (
-    <ScreenContainer
-      showHeader
-      title={screenNames.search}
-      iconName="text-search"
-      onBackPress={navigation.goBack}
-      actionIcons={[
-        {
-          name: 'arrow-expand',
-          disabled: !musicData || expandedAccordionIds.length === 4,
-          onPress: setExpandedAccordionIds.bind(this, [
-            accordionIds.TRACKS,
-            accordionIds.ALBUMS,
-            accordionIds.ARTISTS,
-            accordionIds.FOLDERS,
-          ]),
-        },
-        {
-          name: 'arrow-collapse',
-          disabled: !musicData || !expandedAccordionIds.length,
-          onPress: setExpandedAccordionIds.bind(this, []),
-        },
-      ]}>
-      <Searchbar
-        placeholder="Search within music"
-        onChangeText={setSearchedTerm}
-        value={searchedTerm}
-        style={{
-          marginTop: hp(2),
+    <>
+      <ScreenContainer
+        showHeader
+        title={screenNames.search}
+        iconName="text-search"
+        onBackPress={navigation.goBack}
+        actionIcons={[
+          {
+            name: 'arrow-expand',
+            disabled: !musicData || expandedAccordionIds.length === 4,
+            onPress: setExpandedAccordionIds.bind(this, [
+              accordionIds.TRACKS,
+              accordionIds.ALBUMS,
+              accordionIds.ARTISTS,
+              accordionIds.FOLDERS,
+            ]),
+          },
+          {
+            name: 'arrow-collapse',
+            disabled: !musicData || !expandedAccordionIds.length,
+            onPress: setExpandedAccordionIds.bind(this, []),
+          },
+        ]}>
+        <Searchbar
+          placeholder="Search within music"
+          onChangeText={setSearchedTerm}
+          value={searchedTerm}
+          style={styles.searchBar}
+        />
+
+        {!previousSearchedTerms.length && !searchedTerm && (
+          <View style={styles.iconContainer}>
+            <Icon name="text-search" size={hp(20)} />
+            <Text style={styles.screenTitleText}>{labels.searchMusic}</Text>
+          </View>
+        )}
+
+        <View style={styles.dataContainer}>{musicData && renderData()}</View>
+      </ScreenContainer>
+
+      <Snackbar
+        visible={Boolean(showInfoInSnackBar)}
+        duration={showInfoInSnackBar?.duration ?? 1500}
+        onDismiss={() => {
+          if (showInfoInSnackBar.onDismiss) showInfoInSnackBar.onDismiss();
+          setShowInfoInSnackBar(null);
         }}
-      />
-
-      {!previousSearchedTerms.length && !searchedTerm && (
-        <View style={styles.iconContainer}>
-          <Icon name="text-search" size={hp(20)} />
-          <Text style={{ fontSize: wp(7) }}>Search Music</Text>
-        </View>
-      )}
-
-      {/*<Text>*/}
-      {/*  {JSON.stringify({*/}
-      {/*    DocumentDirectoryPath: FileSystem.DocumentDirectoryPath,*/}
-      {/*    TemporaryDirectoryPath: FileSystem.TemporaryDirectoryPath,*/}
-      {/*    LibraryDirectoryPath: FileSystem.LibraryDirectoryPath,*/}
-      {/*    ExternalDirectoryPath: FileSystem.ExternalDirectoryPath,*/}
-      {/*    ExternalStorageDirectoryPath: FileSystem.ExternalStorageDirectoryPath,*/}
-      {/*  })}*/}
-      {/*</Text>*/}
-
-      <View
-        style={{
-          marginVertical: hp(2),
-        }}>
-        {musicData && renderData()}
-      </View>
-    </ScreenContainer>
+        action={showInfoInSnackBar?.actions}>
+        {showInfoInSnackBar?.message}
+      </Snackbar>
+    </>
   );
 };
 
 const styles = StyleSheet.create({
+  searchBar: {
+    marginTop: hp(2),
+  },
   iconContainer: {
     alignItems: 'center',
   },
@@ -484,6 +468,52 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-start',
   },
   divider: {
+    marginVertical: hp(2),
+  },
+  resultCountContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: hp(1),
+  },
+  resultIcon: {
+    marginRight: wp(0.5),
+  },
+  resultCountText: {
+    fontSize: wp(3.5),
+    color: colors.lightGrey,
+  },
+  flatList: {
+    marginLeft: wp(-9),
+    paddingBottom: hp(2),
+  },
+  listItemText: {
+    fontSize: wp(3.5),
+    marginBottom: hp(0.3),
+  },
+  trackDescText: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  trackSubtitleText: {
+    fontSize: wp(3.2),
+    color: colors.lightGrey,
+    marginLeft: wp(0.2),
+  },
+  musicIcon: {
+    backgroundColor: colors.lightPurple,
+  },
+  listItemEndSmallBar: {
+    paddingVertical: hp(0.3),
+    width: wp(12),
+    backgroundColor: colors.black,
+    opacity: 0.1,
+    borderRadius: 10,
+    alignSelf: 'center',
+  },
+  screenTitleText: {
+    fontSize: wp(7),
+  },
+  dataContainer: {
     marginVertical: hp(2),
   },
 });

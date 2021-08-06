@@ -43,7 +43,7 @@ const Splash = ({ setShow, musicContext, preferencesContext }) => {
   });
 
   const stripTracks = data => {
-    // ----- sample track info ------
+    /* sample track info */
     // duration: "229175"
     // title: " baby I Like It -enrique ft pitbull"
     // genre: null
@@ -59,18 +59,40 @@ const Splash = ({ setShow, musicContext, preferencesContext }) => {
       folders = [];
 
     data.forEach(track => {
-      if (track.album && !albums.includes(track.album))
-        albums.push(track.album);
+      if (track.album && !albums.some(x => x.name === track.album))
+        albums.push({ name: track.album, trackCount: 0 });
 
-      if (track.artist && !artists.includes(track.artist))
-        artists.push(track.artist);
+      if (track.artist && !artists.some(x => x.name === track.artist))
+        artists.push({ name: track.artist, trackCount: 0 });
 
       if (
         folders.every(
           f => f.name !== track.folder.name && f.path !== track.folder.path,
         )
       )
-        folders.push(track.folder);
+        folders.push({ ...track.folder, trackCount: 0 });
+    });
+
+    /* adding additional summaries */
+    data.forEach(track => {
+      for (const album of albums)
+        if (album.name === track.album) {
+          album.trackCount++;
+          break;
+        }
+      for (const artist of artists)
+        if (artist.name === track.artist) {
+          artist.trackCount++;
+          break;
+        }
+      for (const folder of folders)
+        if (
+          folder.name === track.folder.name &&
+          folder.path === track.folder.path
+        ) {
+          folder.trackCount++;
+          break;
+        }
     });
 
     return { tracks, albums, artists, folders };

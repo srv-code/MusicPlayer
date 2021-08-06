@@ -1,8 +1,8 @@
 import React, { useContext } from 'react';
 import Colors from 'react-native/Libraries/NewAppScreen/components/Colors';
 import { PreferencesContext } from '../../context/preferences';
-import { StyleSheet, SafeAreaView, ScrollView } from 'react-native';
-import { Appbar } from 'react-native-paper';
+import { StyleSheet, SafeAreaView, ScrollView, View } from 'react-native';
+import { Appbar, Text } from "react-native-paper";
 import {
   heightPercentageToDP as hp,
   widthPercentageToDP as wp,
@@ -18,6 +18,7 @@ const ScreenContainer = ({
   actionIcons,
   iconName,
   style,
+  noScrollView,
   children,
 }) => {
   const { enabledDarkTheme } = useContext(PreferencesContext);
@@ -51,12 +52,29 @@ const ScreenContainer = ({
         </Appbar.Header>
       )}
 
-      <ScrollView
-        contentInsetAdjustmentBehavior="automatic"
-        style={styles.scrollView}
-        contentContainerStyle={[styles.scrollViewContent, style]}>
-        {children}
-      </ScrollView>
+      {noScrollView ? (
+        <View
+          style={[
+            styles.scrollView,
+            styles.scrollViewContent,
+            style,
+            {
+              // backgroundColor: 'red',
+              // borderWidth: 1,
+              // borderColor: 'blue',
+            },
+          ]}>
+          {children}
+          <Text>End</Text>
+        </View>
+      ) : (
+        <ScrollView
+          contentInsetAdjustmentBehavior="automatic"
+          style={styles.scrollView}
+          contentContainerStyle={[styles.scrollViewContent, style]}>
+          {children}
+        </ScrollView>
+      )}
     </SafeAreaView>
   );
 };

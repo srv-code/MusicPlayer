@@ -69,12 +69,12 @@ const Info = ({ navigation }) => {
 
         // matches with: albums: <string>
         albums: musicContext.musicInfo?.albums?.filter(x =>
-          x.toLowerCase().includes(searchedTerm.toLowerCase()),
+          x.name.toLowerCase().includes(searchedTerm.toLowerCase()),
         ),
 
         // matches with: artists: <string>
         artists: musicContext.musicInfo?.artists?.filter(x =>
-          x.toLowerCase().includes(searchedTerm.toLowerCase()),
+          x.name.toLowerCase().includes(searchedTerm.toLowerCase()),
         ),
 
         // matches with: folders { name, path }
@@ -152,24 +152,20 @@ const Info = ({ navigation }) => {
                 renderItem={({ item: track }) => (
                   <View
                     style={{
-                      flexDirection: 'row',
+                      // flexDirection: 'row',
                       marginBottom: hp(1),
                       backgroundColor: colors.lightGrey,
                       paddingVertical: hp(1),
                       borderRadius: 10,
-                      flexWrap: 'wrap',
+                      // flexWrap: 'wrap',
                       paddingHorizontal: wp(2),
                     }}>
-                    <Text>
-                      {`title: ${track.title}
-id: ${track.id}
-duration: ${track.duration}
-genre: ${track.genre}
-fileName: ${track.fileName}
-album: ${track.album}
-author: ${track.author}
-path: ${track.path}`}
-                    </Text>
+                    {Object.keys(track).map((key, index) => (
+                      <Text>
+                        <Text style={{ color: 'blue' }}>{key}: </Text>
+                        <Text>{JSON.stringify(track[key])}</Text>
+                      </Text>
+                    ))}
                   </View>
                 )}
               />
@@ -190,16 +186,35 @@ path: ${track.path}`}
                 data={musicData.albums}
                 keyExtractor={(_, index) => index.toString()}
                 renderItem={({ item: album }) => (
-                  <List.Item
+                  <View
                     style={{
+                      // flexDirection: 'row',
                       marginBottom: hp(1),
                       backgroundColor: colors.lightGrey,
+                      paddingVertical: hp(1),
                       borderRadius: 10,
-                      flexWrap: 'wrap',
-                    }}
-                    titleStyle={styles.text}
-                    title={album}
-                  />
+                      // flexWrap: 'wrap',
+                      paddingHorizontal: wp(2),
+                    }}>
+                    {Object.keys(album).map((key, index) => (
+                      <Text>
+                        <Text style={{ color: 'blue' }}>{key}: </Text>
+                        <Text>{JSON.stringify(album[key])}</Text>
+                      </Text>
+                    ))}
+                  </View>
+
+                  /////////////////
+                  // <List.Item
+                  //   style={{
+                  //     marginBottom: hp(1),
+                  //     backgroundColor: colors.lightGrey,
+                  //     borderRadius: 10,
+                  //     flexWrap: 'wrap',
+                  //   }}
+                  //   titleStyle={styles.text}
+                  //   title={album}
+                  // />
                 )}
               />
             ) : (
@@ -218,16 +233,35 @@ path: ${track.path}`}
                 data={musicData.artists}
                 keyExtractor={(_, index) => index.toString()}
                 renderItem={({ item: artist }) => (
-                  <List.Item
+                  <View
                     style={{
+                      // flexDirection: 'row',
                       marginBottom: hp(1),
                       backgroundColor: colors.lightGrey,
+                      paddingVertical: hp(1),
                       borderRadius: 10,
-                      flexWrap: 'wrap',
-                    }}
-                    titleStyle={styles.text}
-                    title={artist}
-                  />
+                      // flexWrap: 'wrap',
+                      paddingHorizontal: wp(2),
+                    }}>
+                    {Object.keys(artist).map((key, index) => (
+                      <Text>
+                        <Text style={{ color: 'blue' }}>{key}: </Text>
+                        <Text>{JSON.stringify(artist[key])}</Text>
+                      </Text>
+                    ))}
+                  </View>
+
+                  ///////
+                  // <List.Item
+                  //   style={{
+                  //     marginBottom: hp(1),
+                  //     backgroundColor: colors.lightGrey,
+                  //     borderRadius: 10,
+                  //     flexWrap: 'wrap',
+                  //   }}
+                  //   titleStyle={styles.text}
+                  //   title={artist}
+                  // />
                 )}
               />
             ) : (
@@ -249,17 +283,36 @@ path: ${track.path}`}
                 data={musicData.folders}
                 keyExtractor={(_, index) => index.toString()}
                 renderItem={({ item: folder }) => (
-                  <List.Item
+                  <View
                     style={{
+                      // flexDirection: 'row',
                       marginBottom: hp(1),
                       backgroundColor: colors.lightGrey,
+                      paddingVertical: hp(1),
                       borderRadius: 10,
-                      flexWrap: 'wrap',
-                    }}
-                    titleStyle={styles.text}
-                    title={folder.name}
-                    description={folder.path}
-                  />
+                      // flexWrap: 'wrap',
+                      paddingHorizontal: wp(2),
+                    }}>
+                    {Object.keys(folder).map((key, index) => (
+                      <Text>
+                        <Text style={{ color: 'blue' }}>{key}: </Text>
+                        <Text>{JSON.stringify(folder[key])}</Text>
+                      </Text>
+                    ))}
+                  </View>
+
+                  ///////////
+                  // <List.Item
+                  //   style={{
+                  //     marginBottom: hp(1),
+                  //     backgroundColor: colors.lightGrey,
+                  //     borderRadius: 10,
+                  //     flexWrap: 'wrap',
+                  //   }}
+                  //   titleStyle={styles.text}
+                  //   title={folder.name}
+                  //   description={folder.path}
+                  // />
                 )}
               />
             ) : (
