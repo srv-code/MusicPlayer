@@ -2,7 +2,15 @@ import React, { useContext, useEffect, useState } from 'react';
 import { FlatList, StyleSheet, View } from 'react-native';
 import ScreenContainer from '../../components/screen-container';
 import screenNames from '../../constants/screen-names';
-import { List, Searchbar, Card, Avatar, Text } from 'react-native-paper';
+import {
+  List,
+  Searchbar,
+  Card,
+  Avatar,
+  Text,
+  IconButton,
+  Divider,
+} from 'react-native-paper';
 import Icon from '../../components/icon';
 import {
   heightPercentageToDP as hp,
@@ -133,114 +141,106 @@ const Search = ({ navigation }) => {
               // }}
               left={props => <List.Icon {...props} icon="music" />}>
               <FlatList
-                contentContainerStyle={{ marginLeft: wp(-8) }}
+                contentContainerStyle={{ marginLeft: wp(-9) }}
                 data={musicData.tracks}
                 keyExtractor={(_, index) => index.toString()}
                 renderItem={({ item: track }) => (
-                  // <List.Item
-                  //   style={{
-                  //     marginBottom: hp(1),
-                  //     backgroundColor: colors.lightGrey,
-                  //     borderRadius: 10,
-                  //     flexWrap: 'wrap',
-                  //   }}
-                  //   titleStyle={styles.text}
-                  //   title={track.title}
-                  // />
-
-                  <Card.Title
-                    style={
-                      {
-                        // borderWidth: 1,
-                        // elevation: 1,
-                        // marginBottom: hp(1),
-                        // borderRadius: 5,
-                        // marginLeft: wp(-10),
-                        // backgroundColor: enabledDarkTheme
-                        //   ? null
-                        //   : colors.darkGreen,
+                  <>
+                    <List.Item
+                      // style={{
+                      //   marginBottom: hp(1),
+                      //   backgroundColor: colors.lightGrey,
+                      //   borderRadius: 10,
+                      //   flexWrap: 'wrap',
+                      // }}
+                      titleStyle={styles.text}
+                      title={track.title}
+                      description={
+                        <View
+                          style={{
+                            flexDirection: 'row',
+                            alignItems: 'center',
+                          }}>
+                          <Icon
+                            name={'clock-time-five-outline'}
+                            size={wp(3.2)}
+                            color={colors.lightGrey}
+                          />
+                          <Text
+                            style={{
+                              fontSize: wp(3.2),
+                              color: colors.lightGrey,
+                              marginLeft: wp(0.2),
+                            }}>
+                            {DateTimeUtils.msToTime(track.duration)}
+                          </Text>
+                          <Icon
+                            name={'dot-single'}
+                            type={'Entypo'}
+                            size={wp(3.2)}
+                            color={colors.lightGrey}
+                          />
+                          <Icon
+                            name={'account-music'}
+                            size={wp(3.2)}
+                            color={colors.lightGrey}
+                          />
+                          <Text
+                            style={{
+                              fontSize: wp(3.2),
+                              color: colors.lightGrey,
+                              marginLeft: wp(0.2),
+                            }}>
+                            {track.artist}
+                          </Text>
+                          <Icon
+                            name={'dot-single'}
+                            type={'Entypo'}
+                            size={wp(3.2)}
+                            color={colors.lightGrey}
+                          />
+                          <Icon
+                            name={'folder-music'}
+                            size={wp(3.2)}
+                            color={colors.lightGrey}
+                          />
+                          <Text
+                            style={{
+                              fontSize: wp(3.2),
+                              color: colors.lightGrey,
+                              marginLeft: wp(0.2),
+                            }}>
+                            {track.folder.name}
+                          </Text>
+                        </View>
                       }
-                    }
-                    title={track.title}
-                    subtitle={
-                      <View
-                        style={{
-                          flexDirection: 'row',
-                          alignItems: 'center',
-                        }}>
-                        <Icon
-                          name={'clock-time-five-outline'}
-                          size={wp(3.2)}
-                          color={colors.lightGrey}
-                        />
-                        <Text
-                          style={{
-                            fontSize: wp(3.2),
-                            color: colors.lightGrey,
-                            marginLeft: wp(0.2),
-                          }}>
-                          {DateTimeUtils.msToTime(track.duration)}
-                        </Text>
-                        <Icon
-                          name={'dot-single'}
-                          type={'Entypo'}
-                          size={wp(3.2)}
-                          color={colors.lightGrey}
-                        />
-                        <Icon
-                          name={'account-music'}
-                          size={wp(3.2)}
-                          color={colors.lightGrey}
-                        />
-                        <Text
-                          style={{
-                            fontSize: wp(3.2),
-                            color: colors.lightGrey,
-                            marginLeft: wp(0.2),
-                          }}>
-                          {track.artist}
-                        </Text>
-                        <Icon
-                          name={'dot-single'}
-                          type={'Entypo'}
-                          size={wp(3.2)}
-                          color={colors.lightGrey}
-                        />
-                        <Icon
-                          name={'folder-music'}
-                          size={wp(3.2)}
-                          color={colors.lightGrey}
-                        />
-                        <Text
-                          style={{
-                            fontSize: wp(3.2),
-                            color: colors.lightGrey,
-                            marginLeft: wp(0.2),
-                          }}>
-                          {track.folder.name}
-                        </Text>
-                      </View>
-                    }
-                    left={props =>
-                      track.coverExists ? (
-                        <Avatar.Image
+                      left={props =>
+                        track.coverExists ? (
+                          <Avatar.Image
+                            {...props}
+                            size={hp(6)}
+                            source={{ uri: track.coverFilePath }}
+                          />
+                        ) : (
+                          <Avatar.Icon
+                            size={hp(6)}
+                            icon="music"
+                            style={{
+                              backgroundColor: colors.lightPurple,
+                            }}
+                          />
+                        )
+                      }
+                      right={props => (
+                        <IconButton
                           {...props}
-                          size={hp(6)}
-                          source={{ uri: track.coverFilePath }}
+                          icon="dots-vertical"
+                          onPress={() => {}}
                         />
-                      ) : (
-                        <Avatar.Icon
-                          size={hp(6)}
-                          icon="music"
-                          style={{
-                            backgroundColor: colors.lightPurple,
-                          }}
-                        />
-                      )
-                    }
-                    // left={(props) => <Avatar.Icon {...props} icon="folder" />}
-                    // right={(props) => <IconButton {...props} icon="more-vert" onPress={() => {}} />}
-                  />
+                      )}
+                    />
+                    <Divider inset />
+                  </>
                 )}
               />
             </List.Accordion>
