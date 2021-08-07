@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import { Alert, FlatList, Platform, StyleSheet, View } from 'react-native';
 import ScreenContainer from '../../components/screen-container';
 import screenNames from '../../constants/screen-names';
@@ -24,12 +24,10 @@ import colors from '../../constants/colors';
 import DateTimeUtils from '../../utils/datetime';
 import { PreferencesContext } from '../../context/preferences';
 import labels from '../../constants/labels';
+import { useIsFocused } from '@react-navigation/native';
 
 // TODO
-//  - Save the searched term in async-storage (avoid dups)
-//  - Focus on the search-bar when the screen gets focus
-//  - Fix the snack-bar
-//  - Make a common renderer for the accordions
+//  - Save the searched term in async-storage (avoid duplicates)
 
 const accordionIds = {
   TRACKS: 'tracks',
@@ -48,13 +46,21 @@ const Search = ({ navigation }) => {
   const [expandedAccordionIds, setExpandedAccordionIds] = useState([]);
   const [showMoreOptionFor, setShowMoreOptionFor] = useState(null);
   const [showInfoInSnackBar, setShowInfoInSnackBar] = useState(null);
+  const searchBar = useRef(null);
 
-  console.log('[Info]', {
+  console.log('[Search]', {
     musicData,
     searchedTerm,
     previousSearchedTerms,
     showInfoInSnackBar,
+    searchBar,
   });
+
+  const isFocused = useIsFocused();
+
+  useEffect(() => {
+    searchBar.current?.focus();
+  }, [isFocused]);
 
   useEffect(() => {
     setMusicData(musicContext.musicInfo);
@@ -594,6 +600,7 @@ const Search = ({ navigation }) => {
           },
         ]}>
         <Searchbar
+          ref={searchBar}
           placeholder="Search within music"
           onChangeText={setSearchedTerm}
           value={searchedTerm}

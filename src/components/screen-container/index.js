@@ -2,7 +2,7 @@ import React, { useContext } from 'react';
 import Colors from 'react-native/Libraries/NewAppScreen/components/Colors';
 import { PreferencesContext } from '../../context/preferences';
 import { StyleSheet, SafeAreaView, ScrollView, View } from 'react-native';
-import { Appbar, Text } from "react-native-paper";
+import { Appbar, Text } from 'react-native-paper';
 import {
   heightPercentageToDP as hp,
   widthPercentageToDP as wp,
@@ -69,6 +69,8 @@ const ScreenContainer = ({
         </View>
       ) : (
         <ScrollView
+          keyboardDismissMode={'on-drag'} /* experimental */
+          keyboardShouldPersistTaps={'handled'} /* experimental */
           contentInsetAdjustmentBehavior="automatic"
           style={styles.scrollView}
           contentContainerStyle={[styles.scrollViewContent, style]}>
