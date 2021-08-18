@@ -60,29 +60,29 @@ const Splash = ({ setShow, musicContext, preferencesContext }) => {
 
     data.forEach(track => {
       if (track.album && !albums.some(x => x.name === track.album))
-        albums.push({ name: track.album, trackCount: 0 });
+        albums.push({ name: track.album, trackIds: [] });
 
       if (track.artist && !artists.some(x => x.name === track.artist))
-        artists.push({ name: track.artist, trackCount: 0 });
+        artists.push({ name: track.artist, trackIds: [] });
 
       if (
         folders.every(
           f => f.name !== track.folder.name && f.path !== track.folder.path,
         )
       )
-        folders.push({ ...track.folder, trackCount: 0 });
+        folders.push({ ...track.folder, trackIds: [] });
     });
 
     /* adding additional summaries */
     data.forEach(track => {
       for (const album of albums)
         if (album.name === track.album) {
-          album.trackCount++;
+          album.trackIds.push(track.id);
           break;
         }
       for (const artist of artists)
         if (artist.name === track.artist) {
-          artist.trackCount++;
+          artist.trackIds.push(track.id);
           break;
         }
       for (const folder of folders)
@@ -90,7 +90,7 @@ const Splash = ({ setShow, musicContext, preferencesContext }) => {
           folder.name === track.folder.name &&
           folder.path === track.folder.path
         ) {
-          folder.trackCount++;
+          folder.trackIds.push(track.id);
           break;
         }
     });

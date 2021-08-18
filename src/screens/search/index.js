@@ -1,18 +1,26 @@
 import React, { useContext, useEffect, useRef, useState } from 'react';
-import { Alert, FlatList, Platform, StyleSheet, View } from 'react-native';
+import { useIsFocused } from '@react-navigation/native';
+import {
+  Alert,
+  FlatList,
+  Image,
+  Keyboard,
+  StyleSheet,
+  View,
+} from 'react-native';
 import ScreenContainer from '../../components/screen-container';
 import screenNames from '../../constants/screen-names';
 import {
   List,
   Searchbar,
-  Card,
   Avatar,
   Text,
   IconButton,
   Divider,
-  Appbar,
   Menu,
   Snackbar,
+  DataTable,
+  Button,
 } from 'react-native-paper';
 import Icon from '../../components/icon';
 import {
@@ -24,10 +32,15 @@ import colors from '../../constants/colors';
 import DateTimeUtils from '../../utils/datetime';
 import { PreferencesContext } from '../../context/preferences';
 import labels from '../../constants/labels';
-import { useIsFocused } from '@react-navigation/native';
+import Modal from 'react-native-modal';
+import Animated from 'react-native-reanimated';
+import BottomSheet from 'reanimated-bottom-sheet';
 
 // TODO
 //  - Save the searched term in async-storage (avoid duplicates)
+//  - Add modal to show any info
+//  - Fix bug: 'Synthetic reuse' on context menu press
+//  - Show the info in another screen
 
 const accordionIds = {
   TRACKS: 'tracks',
@@ -46,7 +59,9 @@ const Search = ({ navigation }) => {
   const [expandedAccordionIds, setExpandedAccordionIds] = useState([]);
   const [showMoreOptionFor, setShowMoreOptionFor] = useState(null);
   const [showInfoInSnackBar, setShowInfoInSnackBar] = useState(null);
+  const [infoModalData, setInfoModalData] = useState(null);
   const searchBar = useRef(null);
+  const sheetRef = React.useRef(null);
 
   console.log('[Search]', {
     musicData,
@@ -59,7 +74,8 @@ const Search = ({ navigation }) => {
   const isFocused = useIsFocused();
 
   useEffect(() => {
-    searchBar.current?.focus();
+    if (isFocused) searchBar.current?.focus();
+    else Keyboard.dismiss();
   }, [isFocused]);
 
   useEffect(() => {
@@ -164,7 +180,9 @@ const Search = ({ navigation }) => {
             return (
               <Text style={styles.trackDescText}>
                 <Icon name={'music'} size={wp(3.2)} color={colors.lightGrey} />
-                <Text style={styles.trackSubtitleText}>{data.trackCount}</Text>
+                <Text style={styles.trackSubtitleText}>
+                  {data.trackIds.length}
+                </Text>
               </Text>
             );
 
@@ -261,7 +279,8 @@ const Search = ({ navigation }) => {
                   icon="information-variant"
                   title={labels.showInfo}
                   onPress={() => {
-                    alert(JSON.stringify(props));
+                    // alert(JSON.stringify(props));
+                    setInfoModalData({ type, data });
                     setShowMoreOptionFor(null);
                   }}
                 />
@@ -323,7 +342,8 @@ const Search = ({ navigation }) => {
                   icon="information-variant"
                   title={labels.showInfo}
                   onPress={() => {
-                    alert(JSON.stringify(props));
+                    // alert(JSON.stringify(props));
+                    setInfoModalData({ type, data });
                     setShowMoreOptionFor(null);
                   }}
                 />
@@ -385,7 +405,8 @@ const Search = ({ navigation }) => {
                   icon="information-variant"
                   title={labels.showInfo}
                   onPress={() => {
-                    alert(JSON.stringify(props));
+                    // alert(JSON.stringify(props));
+                    setInfoModalData({ type, data });
                     setShowMoreOptionFor(null);
                   }}
                 />
@@ -447,7 +468,8 @@ const Search = ({ navigation }) => {
                   icon="information-variant"
                   title={labels.showInfo}
                   onPress={() => {
-                    alert(JSON.stringify(props));
+                    // alert(JSON.stringify(props));
+                    setInfoModalData({ type, data });
                     setShowMoreOptionFor(null);
                   }}
                 />
@@ -575,6 +597,90 @@ const Search = ({ navigation }) => {
     );
   };
 
+  const renderInfoModalContent = () => {
+    console.log('[Search]', { infoModalData });
+
+    // if (!infoModalData) return null;
+
+    switch (infoModalData?.type) {
+      case undefined:
+        return null;
+
+      case accordionIds.TRACKS:
+        return (
+          <View
+            style={{
+              alignItems: 'center',
+              justifyContent: 'center',
+              marginTop: hp(1),
+            }}>
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+              }}>
+              <Icon
+                name={'music'}
+                size={wp(6)}
+                color={colors.lightPurple}
+                style={{ marginRight: wp(1) }}
+              />
+              <Text
+                style={{
+                  fontSize: wp(6),
+                }}>
+                {labels.trackInformation}
+              </Text>
+            </View>
+
+            <Image
+              // size={hp(12)}
+              style={{
+                height: hp(20),
+                width: hp(20),
+                borderRadius: 10,
+                marginTop: hp(1),
+                // marginBottom: hp(0.7),
+              }}
+              resizeMode={'contain'}
+              source={{ uri: infoModalData.data.coverFilePath }}
+            />
+
+            <DataTable>
+              <DataTable.Row>
+                <DataTable.Cell>
+                  <Text style={{ fontSize: wp(3), fontWeight: 'bold' }}>
+                    {labels.duration}
+                  </Text>
+                </DataTable.Cell>
+                <DataTable.Cell>
+                  <Text style={{ fontSize: wp(3) }}>
+                    {
+                      DateTimeUtils.msToTimeComponents(
+                        infoModalData.data.duration,
+                      ).string
+                    }
+                  </Text>
+                </DataTable.Cell>
+              </DataTable.Row>
+            </DataTable>
+          </View>
+        );
+
+      case accordionIds.ARTISTS:
+        return null;
+
+      case accordionIds.ALBUMS:
+        return null;
+
+      case accordionIds.FOLDERS:
+        return null;
+
+      default:
+        throw new Error(`Invalid type: ${infoModalData.type}`);
+    }
+  };
+
   return (
     <>
       <ScreenContainer
@@ -607,6 +713,13 @@ const Search = ({ navigation }) => {
           style={styles.searchBar}
         />
 
+        <Text
+          onPress={() => {
+            sheetRef.current.snapTo(0);
+          }}>
+          Show bottom sheet
+        </Text>
+
         {!previousSearchedTerms.length && !searchedTerm && (
           <View style={styles.iconContainer}>
             <Icon name="text-search" size={hp(20)} />
@@ -614,7 +727,23 @@ const Search = ({ navigation }) => {
           </View>
         )}
 
-        <View style={styles.dataContainer}>{musicData && renderData()}</View>
+        {musicData && <View style={styles.dataContainer}>{renderData()}</View>}
+
+        <BottomSheet
+          ref={sheetRef}
+          snapPoints={[450, 300, 0]}
+          borderRadius={10}
+          renderContent={
+            <View
+              style={{
+                backgroundColor: 'white',
+                padding: 16,
+                height: 450,
+              }}>
+              <Text>Swipe down to close</Text>
+            </View>
+          }
+        />
       </ScreenContainer>
 
       <Snackbar
@@ -627,6 +756,31 @@ const Search = ({ navigation }) => {
         action={showInfoInSnackBar?.actions}>
         {showInfoInSnackBar?.message}
       </Snackbar>
+
+      <Modal
+        testID={'modal1'}
+        backdropOpacity={0.5}
+        isVisible={Boolean(infoModalData)}
+        onBackdropPress={setInfoModalData.bind(this, null)}
+        onBackButtonPress={setInfoModalData.bind(this, null)}
+        style={styles.modalStyle}>
+        <View style={styles.modalViewStyle}>
+          <View style={styles.listItemEndSmallBar} />
+          {renderInfoModalContent()}
+          <Button
+            icon="check"
+            mode="contained"
+            // color={'green'}
+            style={{
+              marginTop: hp(2),
+              paddingVertical: hp(0.4),
+            }}
+            uppercase={false}
+            onPress={setInfoModalData.bind(this, null)}>
+            {labels.OK}
+          </Button>
+        </View>
+      </Modal>
     </>
   );
 };
@@ -703,6 +857,35 @@ const styles = StyleSheet.create({
   },
   dataContainer: {
     marginVertical: hp(2),
+  },
+  modalStyle: {
+    // position: 'absolute',
+    // bottom: 0,
+    // left: 0,
+    // justifyContent: 'center',
+    // flex:1,
+    margin: 0,
+    justifyContent: 'center',
+    alignItems: 'flex-end',
+    // marginBottom: hp(-1.8),
+    // borderWidth: 1,
+    flex: 1,
+    // borderColor: 'yellow',
+    flexDirection: 'row',
+  },
+  modalViewStyle: {
+    // display: 'none',
+
+    flex: 0.98,
+    backgroundColor: colors.white1,
+    // width: wp(98),
+    elevation: 1,
+    // borderRadius: 5,
+    borderTopLeftRadius: 10,
+    borderTopRightRadius: 10,
+    paddingHorizontal: wp(3),
+    paddingTop: hp(2),
+    paddingBottom: hp(1),
   },
 });
 
