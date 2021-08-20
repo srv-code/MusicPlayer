@@ -11,6 +11,22 @@ const Tracks = ({ navigation }) => {
     <ScreenContainer>
       <View style={styles.container}>
         <Text>Tracks screen</Text>
+        <Text>Tracks screen</Text>
+        <Text>Tracks screen</Text>
+        <Text>Tracks screen</Text>
+        <Text>Tracks screen</Text>
+        <Text>Tracks screen</Text>
+        <Text>Tracks screen</Text>
+        <Text>Tracks screen</Text>
+        <Text>Tracks screen</Text>
+        <Text>Tracks screen</Text>
+        <Text>Tracks screen</Text>
+        <Text>Tracks screen</Text>
+        <Text>Tracks screen</Text>
+        <Text>Tracks screen</Text>
+        <Text>Tracks screen</Text>
+        <Text>Tracks screen</Text>
+        <Text>Tracks screen</Text>
       </View>
     </ScreenContainer>
   );

@@ -3,6 +3,7 @@ import { Text } from 'react-native-paper';
 import { View } from 'react-native';
 import BottomSheet from 'reanimated-bottom-sheet';
 import { heightPercentageToDP as hp } from 'react-native-responsive-screen';
+import { BlurView } from '@react-native-community/blur';
 
 // TODO:
 //  - Show the bottom-sheet in a blur-view
@@ -11,40 +12,46 @@ const Player = () => {
   const bottomSheet = useRef(null);
 
   return (
-    <View
-      style={{
-        backgroundColor: 'pink',
-        // flex: 1,
-        // zIndex: 10,
-        // elevation: 2,
-      }}>
-      <View>
-        <Text onPress={() => bottomSheet.current.snapTo(0)}>snapTo 0</Text>
-        <Text onPress={() => bottomSheet.current.snapTo(1)}>snapTo 1</Text>
-        <Text onPress={() => bottomSheet.current.snapTo(2)}>snapTo 2</Text>
-      </View>
+    <BottomSheet
+      ref={bottomSheet}
+      initialSnap={1}
+      snapPoints={[hp(75), hp(10), 0]}
+      borderRadius={10}
 
-      <BottomSheet
-        ref={bottomSheet}
-        initialSnap={1}
-        snapPoints={[hp(75), hp(10), 0]}
-        borderRadius={10}
-        renderContent={() => (
-          <View
+      onOpenStart={() => console.log('onOpenStart')}
+      onOpenEnd={() => console.log('onOpenEnd')}
+      onCloseStart={() => console.log('onCloseStart')}
+      onCloseEnd={() => console.log('onCloseEnd')}
+
+      renderContent={() => (
+        <View
+          style={{
+            // backgroundColor: 'lightblue',
+            // padding: 16,
+            height: '100%',
+            // width: '98%',
+            // borderWidth: 1,
+            // borderColor: 'blue',
+            elevation: 1,
+          }}>
+          <Text>Above BlurView</Text>
+          <BlurView
             style={{
-              backgroundColor: 'lightgreen',
-              // padding: 16,
-              height: '100%',
-              // width: '98%',
-              // borderWidth: 1,
-              // borderColor: 'blue',
-              elevation: 1,
-            }}>
-            <Text>Swipe down to close</Text>
-          </View>
-        )}
-      />
-    </View>
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              bottom: 0,
+              right: 0,
+            }}
+            blurType="light"
+            blurAmount={10}
+            reducedTransparencyFallbackColor="white">
+            <Text>Inside BlurView</Text>
+          </BlurView>
+          <Text>Below BlurView</Text>
+        </View>
+      )}
+    />
   );
 };
 
