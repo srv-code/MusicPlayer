@@ -20,7 +20,6 @@ import {
   Menu,
   Snackbar,
   DataTable,
-  Button,
 } from 'react-native-paper';
 import Icon from '../../components/icon';
 import {
@@ -32,22 +31,11 @@ import colors from '../../constants/colors';
 import DateTimeUtils from '../../utils/datetime';
 import { PreferencesContext } from '../../context/preferences';
 import labels from '../../constants/labels';
-import Modal from 'react-native-modal';
-import Animated from 'react-native-reanimated';
-import BottomSheet from 'reanimated-bottom-sheet';
+import keys from '../../constants/keys';
 
 // TODO
 //  - Save the searched term in async-storage (avoid duplicates)
-//  - Add modal to show any info
 //  - Fix bug: 'Synthetic reuse' on context menu press
-//  - Show the info in another screen
-
-const accordionIds = {
-  TRACKS: 'tracks',
-  ALBUMS: 'albums',
-  ARTISTS: 'artists',
-  FOLDERS: 'folders',
-};
 
 const Search = ({ navigation }) => {
   const musicContext = useContext(MusicContext);
@@ -56,12 +44,10 @@ const Search = ({ navigation }) => {
   const [searchedTerm, setSearchedTerm] = useState('');
   const [previousSearchedTerms, setPreviousSearchedTerms] = useState([]);
   const [musicData, setMusicData] = useState(null);
-  const [expandedAccordionIds, setExpandedAccordionIds] = useState([]);
+  const [expandedKeys, setExpandedKeys] = useState([]);
   const [showMoreOptionFor, setShowMoreOptionFor] = useState(null);
   const [showInfoInSnackBar, setShowInfoInSnackBar] = useState(null);
-  const [infoModalData, setInfoModalData] = useState(null);
   const searchBar = useRef(null);
-  const sheetRef = React.useRef(null);
 
   console.log('[Search]', {
     musicData,
@@ -110,12 +96,12 @@ const Search = ({ navigation }) => {
     } else setMusicData(null);
   }, [searchedTerm]);
 
-  const isAccordionExpanded = id => expandedAccordionIds.includes(id);
+  const isAccordionExpanded = id => expandedKeys.includes(id);
   const toggleAccordionExpansion = id =>
-    setExpandedAccordionIds(
-      expandedAccordionIds.includes(id)
-        ? expandedAccordionIds.filter(_id => _id !== id)
-        : [...expandedAccordionIds, id],
+    setExpandedKeys(
+      expandedKeys.includes(id)
+        ? expandedKeys.filter(_id => _id !== id)
+        : [...expandedKeys, id],
     );
 
   const renderData = () => {
@@ -132,7 +118,7 @@ const Search = ({ navigation }) => {
 
       const renderDescription = data => {
         switch (type) {
-          case accordionIds.TRACKS:
+          case keys.TRACKS:
             return (
               <Text style={styles.trackDescText}>
                 <Icon
@@ -174,9 +160,9 @@ const Search = ({ navigation }) => {
               </Text>
             );
 
-          case accordionIds.ALBUMS:
-          case accordionIds.ARTISTS:
-          case accordionIds.FOLDERS:
+          case keys.ALBUMS:
+          case keys.ARTISTS:
+          case keys.FOLDERS:
             return (
               <Text style={styles.trackDescText}>
                 <Icon name={'music'} size={wp(3.2)} color={colors.lightGrey} />
@@ -194,7 +180,7 @@ const Search = ({ navigation }) => {
       const renderLeftComponent = (data, props) => {
         let iconName;
         switch (type) {
-          case accordionIds.TRACKS:
+          case keys.TRACKS:
             if (data.coverExists)
               return (
                 <Avatar.Image
@@ -204,13 +190,13 @@ const Search = ({ navigation }) => {
               );
             else iconName = 'music';
             break;
-          case accordionIds.ALBUMS:
+          case keys.ALBUMS:
             iconName = 'disc';
             break;
-          case accordionIds.ARTISTS:
+          case keys.ARTISTS:
             iconName = 'account-music-outline';
             break;
-          case accordionIds.FOLDERS:
+          case keys.FOLDERS:
             iconName = 'folder-music-outline';
             break;
           default:
@@ -224,7 +210,7 @@ const Search = ({ navigation }) => {
 
       const renderRightComponent = (data, props, itemIndex) => {
         switch (type) {
-          case accordionIds.TRACKS:
+          case keys.TRACKS:
             return (
               <Menu
                 {...props}
@@ -280,14 +266,15 @@ const Search = ({ navigation }) => {
                   title={labels.showInfo}
                   onPress={() => {
                     // alert(JSON.stringify(props));
-                    setInfoModalData({ type, data });
+                    navigation.navigate(screenNames.itemInfo, { type, data });
+                    // setInfoModalData({ type, data });
                     setShowMoreOptionFor(null);
                   }}
                 />
               </Menu>
             );
 
-          case accordionIds.ALBUMS:
+          case keys.ALBUMS:
             return (
               <Menu
                 {...props}
@@ -343,14 +330,15 @@ const Search = ({ navigation }) => {
                   title={labels.showInfo}
                   onPress={() => {
                     // alert(JSON.stringify(props));
-                    setInfoModalData({ type, data });
+                    navigation.navigate(screenNames.itemInfo, { type, data });
+                    // setInfoModalData({ type, data });
                     setShowMoreOptionFor(null);
                   }}
                 />
               </Menu>
             );
 
-          case accordionIds.ARTISTS:
+          case keys.ARTISTS:
             return (
               <Menu
                 {...props}
@@ -406,14 +394,15 @@ const Search = ({ navigation }) => {
                   title={labels.showInfo}
                   onPress={() => {
                     // alert(JSON.stringify(props));
-                    setInfoModalData({ type, data });
+                    navigation.navigate(screenNames.itemInfo, { type, data });
+                    // setInfoModalData({ type, data });
                     setShowMoreOptionFor(null);
                   }}
                 />
               </Menu>
             );
 
-          case accordionIds.FOLDERS:
+          case keys.FOLDERS:
             return (
               <Menu
                 {...props}
@@ -469,7 +458,8 @@ const Search = ({ navigation }) => {
                   title={labels.showInfo}
                   onPress={() => {
                     // alert(JSON.stringify(props));
-                    setInfoModalData({ type, data });
+                    navigation.navigate(screenNames.itemInfo, { type, data });
+                    // setInfoModalData({ type, data });
                     setShowMoreOptionFor(null);
                   }}
                 />
@@ -483,13 +473,13 @@ const Search = ({ navigation }) => {
 
       const renderAccordionIcon = () => {
         switch (type) {
-          case accordionIds.TRACKS:
+          case keys.TRACKS:
             return 'music';
-          case accordionIds.ALBUMS:
+          case keys.ALBUMS:
             return 'disc';
-          case accordionIds.ARTISTS:
+          case keys.ARTISTS:
             return 'account-music';
-          case accordionIds.FOLDERS:
+          case keys.FOLDERS:
             return 'folder-music';
           default:
             new Error(`Invalid type: ${type}`);
@@ -498,11 +488,11 @@ const Search = ({ navigation }) => {
 
       const getTitleText = data => {
         switch (type) {
-          case accordionIds.TRACKS:
+          case keys.TRACKS:
             return data.title;
-          case accordionIds.ALBUMS:
-          case accordionIds.ARTISTS:
-          case accordionIds.FOLDERS:
+          case keys.ALBUMS:
+          case keys.ARTISTS:
+          case keys.FOLDERS:
             return data.name;
           default:
             new Error(`Invalid type: ${type}`);
@@ -586,12 +576,9 @@ const Search = ({ navigation }) => {
       <View>
         <View>
           {renderCount()}
-          {[
-            accordionIds.TRACKS,
-            accordionIds.ALBUMS,
-            accordionIds.ARTISTS,
-            accordionIds.FOLDERS,
-          ].map(renderList)}
+          {[keys.TRACKS, keys.ALBUMS, keys.ARTISTS, keys.FOLDERS].map(
+            renderList,
+          )}
         </View>
       </View>
     );
@@ -606,7 +593,7 @@ const Search = ({ navigation }) => {
       case undefined:
         return null;
 
-      case accordionIds.TRACKS:
+      case keys.TRACKS:
         return (
           <View
             style={{
@@ -667,13 +654,13 @@ const Search = ({ navigation }) => {
           </View>
         );
 
-      case accordionIds.ARTISTS:
+      case keys.ARTISTS:
         return null;
 
-      case accordionIds.ALBUMS:
+      case keys.ALBUMS:
         return null;
 
-      case accordionIds.FOLDERS:
+      case keys.FOLDERS:
         return null;
 
       default:
@@ -691,18 +678,18 @@ const Search = ({ navigation }) => {
         actionIcons={[
           {
             name: 'arrow-expand',
-            disabled: !musicData || expandedAccordionIds.length === 4,
-            onPress: setExpandedAccordionIds.bind(this, [
-              accordionIds.TRACKS,
-              accordionIds.ALBUMS,
-              accordionIds.ARTISTS,
-              accordionIds.FOLDERS,
+            disabled: !musicData || expandedKeys.length === 4,
+            onPress: setExpandedKeys.bind(this, [
+              keys.TRACKS,
+              keys.ALBUMS,
+              keys.ARTISTS,
+              keys.FOLDERS,
             ]),
           },
           {
             name: 'arrow-collapse',
-            disabled: !musicData || !expandedAccordionIds.length,
-            onPress: setExpandedAccordionIds.bind(this, []),
+            disabled: !musicData || !expandedKeys.length,
+            onPress: setExpandedKeys.bind(this, []),
           },
         ]}>
         <Searchbar
@@ -729,21 +716,21 @@ const Search = ({ navigation }) => {
 
         {musicData && <View style={styles.dataContainer}>{renderData()}</View>}
 
-        <BottomSheet
-          ref={sheetRef}
-          snapPoints={[450, 300, 0]}
-          borderRadius={10}
-          renderContent={
-            <View
-              style={{
-                backgroundColor: 'white',
-                padding: 16,
-                height: 450,
-              }}>
-              <Text>Swipe down to close</Text>
-            </View>
-          }
-        />
+        {/*<BottomSheet*/}
+        {/*  ref={sheetRef}*/}
+        {/*  snapPoints={[450, 300, 0]}*/}
+        {/*  borderRadius={10}*/}
+        {/*  renderContent={*/}
+        {/*    <View*/}
+        {/*      style={{*/}
+        {/*        backgroundColor: 'white',*/}
+        {/*        padding: 16,*/}
+        {/*        height: 450,*/}
+        {/*      }}>*/}
+        {/*      <Text>Swipe down to close</Text>*/}
+        {/*    </View>*/}
+        {/*  }*/}
+        {/*/>*/}
       </ScreenContainer>
 
       <Snackbar
@@ -757,30 +744,30 @@ const Search = ({ navigation }) => {
         {showInfoInSnackBar?.message}
       </Snackbar>
 
-      <Modal
-        testID={'modal1'}
-        backdropOpacity={0.5}
-        isVisible={Boolean(infoModalData)}
-        onBackdropPress={setInfoModalData.bind(this, null)}
-        onBackButtonPress={setInfoModalData.bind(this, null)}
-        style={styles.modalStyle}>
-        <View style={styles.modalViewStyle}>
-          <View style={styles.listItemEndSmallBar} />
-          {renderInfoModalContent()}
-          <Button
-            icon="check"
-            mode="contained"
-            // color={'green'}
-            style={{
-              marginTop: hp(2),
-              paddingVertical: hp(0.4),
-            }}
-            uppercase={false}
-            onPress={setInfoModalData.bind(this, null)}>
-            {labels.OK}
-          </Button>
-        </View>
-      </Modal>
+      {/*<Modal*/}
+      {/*  testID={'modal1'}*/}
+      {/*  backdropOpacity={0.5}*/}
+      {/*  isVisible={Boolean(infoModalData)}*/}
+      {/*  onBackdropPress={setInfoModalData.bind(this, null)}*/}
+      {/*  onBackButtonPress={setInfoModalData.bind(this, null)}*/}
+      {/*  style={styles.modalStyle}>*/}
+      {/*  <View style={styles.modalViewStyle}>*/}
+      {/*    <View style={styles.listItemEndSmallBar} />*/}
+      {/*    {renderInfoModalContent()}*/}
+      {/*    <Button*/}
+      {/*      icon="check"*/}
+      {/*      mode="contained"*/}
+      {/*      // color={'green'}*/}
+      {/*      style={{*/}
+      {/*        marginTop: hp(2),*/}
+      {/*        paddingVertical: hp(0.4),*/}
+      {/*      }}*/}
+      {/*      uppercase={false}*/}
+      {/*      onPress={setInfoModalData.bind(this, null)}>*/}
+      {/*      {labels.OK}*/}
+      {/*    </Button>*/}
+      {/*  </View>*/}
+      {/*</Modal>*/}
     </>
   );
 };

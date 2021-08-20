@@ -16,7 +16,6 @@ import { SafeAreaProvider } from 'react-native-safe-area-context/src/SafeAreaCon
 import Colors from 'react-native/Libraries/NewAppScreen/components/Colors';
 import colors from './src/constants/colors';
 import Splash from './src/screens/splash';
-import useColorScheme from 'react-native/Libraries/Utilities/useColorScheme';
 
 const App = () => {
   console.log('App loaded');
@@ -67,24 +66,27 @@ const App = () => {
         preferencesContext={preferencesContextValue}
       />
     );
+
   return (
-    <PaperProvider theme={theme}>
-      <PreferencesContext.Provider value={preferencesContextValue}>
-        <MusicContext.Provider value={musicContextValue}>
-          <StatusBar
-            style="auto"
-            animated
-            backgroundColor={
-              enabledDarkTheme ? Colors.darker : colors.darkBlue2
-            }
-            barStyle="light-content"
-          />
-          <SafeAreaProvider>
-            <Navigator theme={theme} />
-          </SafeAreaProvider>
-        </MusicContext.Provider>
-      </PreferencesContext.Provider>
-    </PaperProvider>
+    <>
+      <PaperProvider theme={theme}>
+        <PreferencesContext.Provider value={preferencesContextValue}>
+          <MusicContext.Provider value={musicContextValue}>
+            <StatusBar
+              style="auto"
+              animated
+              backgroundColor={
+                enabledDarkTheme ? Colors.darker : colors.darkBlue2
+              }
+              barStyle="light-content"
+            />
+            <SafeAreaProvider>
+              <Navigator theme={theme} />
+            </SafeAreaProvider>
+          </MusicContext.Provider>
+        </PreferencesContext.Provider>
+      </PaperProvider>
+    </>
   );
 };
 

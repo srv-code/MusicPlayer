@@ -9,6 +9,7 @@ const screenNames = {
   info: 'info',
   about: 'about',
   folders: 'folders',
+  itemInfo: 'item-info',
 };
 
 export default screenNames;

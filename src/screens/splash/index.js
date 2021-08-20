@@ -19,7 +19,7 @@ import {
 import { ActivityIndicator, Text } from 'react-native-paper';
 import { fetchAllMusicTracks } from '../../utils/tracks';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import storageKeys from '../../constants/storage-keys';
+import keys from '../../constants/keys';
 
 const { height } = Dimensions.get('screen');
 const LOGO_HEIGHT = height * 0.28;
@@ -128,9 +128,7 @@ const Splash = ({ setShow, musicContext, preferencesContext }) => {
         errorMessage.title = 'Storage Read Error';
         errorMessage.message = `Failed reading music information from storage`;
 
-        let musicInfo = JSON.parse(
-          await AsyncStorage.getItem(storageKeys.MUSIC_INFO),
-        );
+        let musicInfo = JSON.parse(await AsyncStorage.getItem(keys.MUSIC_INFO));
         // console.log('Splash:', { musicInfo });
 
         if (!musicInfo) {
@@ -145,10 +143,7 @@ const Splash = ({ setShow, musicContext, preferencesContext }) => {
           errorMessage.title = 'Storage Read Error';
           errorMessage.message = `Failed writing music information in storage`;
 
-          await AsyncStorage.setItem(
-            storageKeys.MUSIC_INFO,
-            JSON.stringify(tracks),
-          );
+          await AsyncStorage.setItem(keys.MUSIC_INFO, JSON.stringify(tracks));
 
           musicInfo = tracks;
         }

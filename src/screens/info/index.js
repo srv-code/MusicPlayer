@@ -14,14 +14,7 @@ import { useBackHandler } from '@react-native-community/hooks';
 import { List } from 'react-native-paper';
 import colors from '../../constants/colors';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import storageKeys from '../../constants/storage-keys';
-
-const accordionIds = {
-  TRACKS: 'tracks',
-  ALBUMS: 'albums',
-  ARTISTS: 'artists',
-  FOLDERS: 'folders',
-};
+import keys from '../../constants/keys';
 
 const inProgressKeys = {
   DELETE_MUSIC_CACHE: 'delete-music-cache',
@@ -106,7 +99,7 @@ const Info = ({ navigation }) => {
     const deleteMusicCache = async () => {
       setInProgress(inProgressKeys.DELETE_MUSIC_CACHE);
       musicContext.setMusicInfo(null);
-      AsyncStorage.removeItem(storageKeys.MUSIC_INFO)
+      AsyncStorage.removeItem(keys.MUSIC_INFO)
         .catch(error =>
           Alert.alert(
             'I/O Error',
@@ -139,10 +132,10 @@ const Info = ({ navigation }) => {
           </View>
 
           <List.Accordion
-            id={accordionIds.TRACKS}
-            expanded={isAccordionExpanded(accordionIds.TRACKS)}
-            onPress={toggleAccordionExpansion.bind(this, accordionIds.TRACKS)}
-            title={`${accordionIds.TRACKS} (${musicData?.tracks?.length || 0})`}
+            id={keys.TRACKS}
+            expanded={isAccordionExpanded(keys.TRACKS)}
+            onPress={toggleAccordionExpansion.bind(this, keys.TRACKS)}
+            title={`${keys.TRACKS} (${musicData?.tracks?.length || 0})`}
             titleStyle={styles.accordionTitleText}
             left={props => <List.Icon {...props} icon="music" />}>
             {musicData?.tracks?.length ? (
@@ -175,10 +168,10 @@ const Info = ({ navigation }) => {
           </List.Accordion>
 
           <List.Accordion
-            id={accordionIds.ALBUMS}
-            expanded={isAccordionExpanded(accordionIds.ALBUMS)}
-            onPress={toggleAccordionExpansion.bind(this, accordionIds.ALBUMS)}
-            title={`${accordionIds.ALBUMS} (${musicData?.albums?.length || 0})`}
+            id={keys.ALBUMS}
+            expanded={isAccordionExpanded(keys.ALBUMS)}
+            onPress={toggleAccordionExpansion.bind(this, keys.ALBUMS)}
+            title={`${keys.ALBUMS} (${musicData?.albums?.length || 0})`}
             titleStyle={styles.accordionTitleText}
             left={props => <List.Icon {...props} icon="disc" />}>
             {musicData?.albums?.length ? (
@@ -223,9 +216,9 @@ const Info = ({ navigation }) => {
           </List.Accordion>
 
           <List.Accordion
-            id={accordionIds.ARTISTS}
-            expanded={isAccordionExpanded(accordionIds.ARTISTS)}
-            onPress={toggleAccordionExpansion.bind(this, accordionIds.ARTISTS)}
+            id={keys.ARTISTS}
+            expanded={isAccordionExpanded(keys.ARTISTS)}
+            onPress={toggleAccordionExpansion.bind(this, keys.ARTISTS)}
             title={`Artists (${musicData?.artists?.length || 0})`}
             left={props => <List.Icon {...props} icon="account-music" />}>
             {musicData?.artists?.length ? (
@@ -270,12 +263,10 @@ const Info = ({ navigation }) => {
           </List.Accordion>
 
           <List.Accordion
-            id={accordionIds.FOLDERS}
-            expanded={isAccordionExpanded(accordionIds.FOLDERS)}
-            onPress={toggleAccordionExpansion.bind(this, accordionIds.FOLDERS)}
-            title={`${accordionIds.FOLDERS} (${
-              musicData?.folders?.length || 0
-            })`}
+            id={keys.FOLDERS}
+            expanded={isAccordionExpanded(keys.FOLDERS)}
+            onPress={toggleAccordionExpansion.bind(this, keys.FOLDERS)}
+            title={`${keys.FOLDERS} (${musicData?.folders?.length || 0})`}
             titleStyle={styles.accordionTitleText}
             left={props => <List.Icon {...props} icon="folder-music" />}>
             {musicData?.folders?.length ? (
@@ -362,10 +353,10 @@ const Info = ({ navigation }) => {
           name: 'arrow-expand',
           disabled: !musicData || expandedAccordionIds.length === 4,
           onPress: setExpandedAccordionIds.bind(this, [
-            accordionIds.TRACKS,
-            accordionIds.ALBUMS,
-            accordionIds.ARTISTS,
-            accordionIds.FOLDERS,
+            keys.TRACKS,
+            keys.ALBUMS,
+            keys.ARTISTS,
+            keys.FOLDERS,
           ]),
         },
         {

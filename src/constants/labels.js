@@ -18,6 +18,10 @@ const labels = {
   addAllToQueue: 'Add All To Queue',
   duration: 'Duration',
   trackInformation: 'Track Information',
+  album: 'Album',
+  track: 'Track',
+  artist: 'Artist',
+  folder: 'Folder',
 };
 
 export default labels;
