@@ -10,23 +10,19 @@ const Tracks = ({ navigation }) => {
   return (
     <ScreenContainer>
       <View style={styles.container}>
-        <Text>Tracks screen</Text>
-        <Text>Tracks screen</Text>
-        <Text>Tracks screen</Text>
-        <Text>Tracks screen</Text>
-        <Text>Tracks screen</Text>
-        <Text>Tracks screen</Text>
-        <Text>Tracks screen</Text>
-        <Text>Tracks screen</Text>
-        <Text>Tracks screen</Text>
-        <Text>Tracks screen</Text>
-        <Text>Tracks screen</Text>
-        <Text>Tracks screen</Text>
-        <Text>Tracks screen</Text>
-        <Text>Tracks screen</Text>
-        <Text>Tracks screen</Text>
-        <Text>Tracks screen</Text>
-        <Text>Tracks screen</Text>
+        {Array(50)
+          .fill()
+          .map((_, index) => (
+            <View
+              key={index}
+              style={{
+                backgroundColor: index % 2 ? 'lightblue' : 'lightgreen',
+                padding: 10,
+                marginBottom: 2,
+              }}>
+              <Text>Song {index + 1}</Text>
+            </View>
+          ))}
       </View>
     </ScreenContainer>
   );

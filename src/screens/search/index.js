@@ -36,6 +36,7 @@ import keys from '../../constants/keys';
 // TODO
 //  - Save the searched term in async-storage (avoid duplicates)
 //  - Fix bug: 'Synthetic reuse' on context menu press
+//  - Pressing space also returns search results (trim search term)
 
 const Search = ({ navigation }) => {
   const musicContext = useContext(MusicContext);
@@ -119,6 +120,8 @@ const Search = ({ navigation }) => {
       const renderDescription = data => {
         switch (type) {
           case keys.TRACKS:
+            console.log('data of tracks:', { data });
+
             return (
               <Text style={styles.trackDescText}>
                 <Icon
@@ -584,6 +587,7 @@ const Search = ({ navigation }) => {
     );
   };
 
+  // TODO move to item-info screen
   const renderInfoModalContent = () => {
     console.log('[Search]', { infoModalData });
 

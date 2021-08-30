@@ -7,7 +7,7 @@ import Search from '../../screens/search';
 import Info from '../../screens/info';
 import About from '../../screens/about';
 import ItemInfo from '../../screens/item-info';
-import Player from '../../components/player';
+import Player from '../../screens/player';
 
 const Stacks = () => {
   const TabbedStack = createStackNavigator();

@@ -98,7 +98,7 @@ const Info = ({ navigation }) => {
   const renderData = () => {
     const deleteMusicCache = async () => {
       setInProgress(inProgressKeys.DELETE_MUSIC_CACHE);
-      musicContext.setMusicInfo(null);
+      musicContext.setMusicInfo(values.RESET_MUSIC_DATA);
       AsyncStorage.removeItem(keys.MUSIC_INFO)
         .catch(error =>
           Alert.alert(

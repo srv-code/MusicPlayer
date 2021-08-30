@@ -30,6 +30,9 @@ const requiredPermissions = [
   PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
 ];
 
+// TODO:
+//  - Store the stopped property in musicInfo in async-storage
+
 // const Splash = ({ navigation }) => {
 const Splash = ({ setShow, musicContext, preferencesContext }) => {
   // console.log('Splash loaded', { setShow, musicContext, preferencesContext });
@@ -95,7 +98,7 @@ const Splash = ({ setShow, musicContext, preferencesContext }) => {
         }
     });
 
-    return { tracks, albums, artists, folders };
+    return { tracks, albums, artists, folders, stopped: true };
   };
 
   useEffect(() => {
