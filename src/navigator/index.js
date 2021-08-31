@@ -6,11 +6,11 @@ import { Text } from 'react-native-paper';
 
 const Navigator = ({ theme }) => (
   <>
-    {/*<NavigationContainer theme={theme}>*/}
-    {/*  <Stacks />*/}
-    {/*</NavigationContainer>*/}
+    <NavigationContainer theme={theme}>
+      <Stacks />
+    </NavigationContainer>
 
-    <PlayerBottomSheet />
+    {/*<PlayerBottomSheet />*/}
   </>
 );
 

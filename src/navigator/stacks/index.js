@@ -236,17 +236,80 @@ export const PlayerBottomSheet = () => {
 
 const Stacks = () => {
   const TabbedStack = createStackNavigator();
-  const TabbedStackScreens = () => (
-    <>
-      <TabbedStack.Navigator screenOptions={{ headerShown: false }}>
-        <TabbedStack.Screen name={screenNames.tracks} component={TabbedView} />
-      </TabbedStack.Navigator>
-      {/*<Player />*/}
+  const TabbedStackScreens = () => {
+    const bottomSheet = useRef(null);
+    const [enableContentPanningGesture, setEnableContentPanningGesture] =
+      useState(true);
+    const [enableHandlePanningGesture, setEnableHandlePanningGesture] =
+      useState(true);
 
-      {/*sample bottom-sheet */}
-      {/*<PlayerBottomSheet />*/}
-    </>
-  );
+    const handleSnapPress = useCallback(index => {
+      console.log('handleSnapPress:', { index, bottomSheetRef: bottomSheet });
+      bottomSheet.current?.snapToIndex(index);
+    }, []);
+
+    const handleExpandPress = useCallback(() => {
+      bottomSheet.current?.expand();
+    }, []);
+
+    const handleCollapsePress = useCallback(() => {
+      bottomSheet.current?.collapse();
+    }, []);
+
+    const handleClosePress = useCallback(() => {
+      bottomSheet.current?.close();
+    }, []);
+
+    const snapPoints = useMemo(() => ['25%', '50%', '90%'], []);
+
+    const animationConfigs = useBottomSheetSpringConfigs({
+      damping: 80,
+      overshootClamping: true,
+      restDisplacementThreshold: 0.1,
+      restSpeedThreshold: 0.1,
+      stiffness: 500,
+    });
+
+    const handleSheetChange = useCallback(index => {
+      // eslint-disable-next-line no-console
+      console.log('handleSheetChange', index);
+    }, []);
+
+    const handleSheetAnimate = useCallback(
+      (fromIndex: number, toIndex: number) => {
+        // eslint-disable-next-line no-console
+        console.log('handleSheetAnimate', `from ${fromIndex} to ${toIndex}`);
+      },
+      [],
+    );
+
+    return (
+      <>
+        <TabbedStack.Navigator screenOptions={{ headerShown: false }}>
+          <TabbedStack.Screen
+            name={screenNames.tracks}
+            component={TabbedView}
+          />
+        </TabbedStack.Navigator>
+
+        {/*<Player />*/}
+        <BottomSheet
+          ref={bottomSheet}
+          index={1}
+          snapPoints={snapPoints}
+          animationConfigs={animationConfigs}
+          animateOnMount={true}
+          enableContentPanningGesture={enableContentPanningGesture}
+          enableHandlePanningGesture={enableHandlePanningGesture}
+          // detached={true}
+          enablePanDownToClose={true}
+          onChange={handleSheetChange}
+          onAnimate={handleSheetAnimate}>
+          <BottomSheetNavigator />
+        </BottomSheet>
+      </>
+    );
+  };
 
   const SearchStack = createStackNavigator();
   const SearchStackScreens = () => (
