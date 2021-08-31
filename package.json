@@ -10,6 +10,7 @@
     "lint": "eslint ."
   },
   "dependencies": {
+    "@gorhom/bottom-sheet": "^4.0.0-alpha.30",
     "@react-native-async-storage/async-storage": "^1.15.5",
     "@react-native-community/blur": "^3.6.0",
     "@react-native-community/hooks": "^2.6.0",
@@ -29,7 +30,7 @@
     "react-native-pager-view": "^5.4.0",
     "react-native-paper": "^4.9.1",
     "react-native-permissions": "^3.0.4",
-    "react-native-reanimated": "^2.1.0",
+    "react-native-reanimated": "^2.0.0",
     "react-native-responsive-screen": "^1.4.2",
     "react-native-safe-area-context": "^3.2.0",
     "react-native-screens": "^3.4.0",
@@ -37,8 +38,7 @@
     "react-native-svg-transformer": "^0.14.3",
     "react-native-tab-view": "^3.1.1",
     "react-native-track-player": "^1.2.7",
-    "react-native-vector-icons": "^8.1.0",
-    "reanimated-bottom-sheet": "^1.0.0-alpha.22"
+    "react-native-vector-icons": "^8.1.0"
   },
   "devDependencies": {
     "@babel/core": "^7.12.9",
