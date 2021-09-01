@@ -58,8 +58,6 @@ buck-out/
 # CocoaPods
 /ios/Pods/
 
-# misc 
+# misc
 *.hprof
 
-# helper files
-help/

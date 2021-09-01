@@ -7,7 +7,7 @@ import { MusicContext } from '../../context/music';
 
 const Tracks = ({ navigation }) => {
   const { enabledDarkTheme } = useContext(PreferencesContext);
-  const { bottomSheet, musicInfo } = useContext(MusicContext);
+  const { musicInfo } = useContext(MusicContext);
 
   return (
     <ScreenContainer>
@@ -16,13 +16,6 @@ const Tracks = ({ navigation }) => {
           <View>
             <Text>Bottom-Sheet Controls</Text>
             <View style={{ flexDirection: 'row' }}>
-              {/*<Button*/}
-              {/*  onPress={musicInfo.bottomSheetControls.minimize}*/}
-              {/*  uppercase={false}*/}
-              {/*  mode="outlined"*/}
-              {/*  style={{ alignSelf: 'flex-start' }}>*/}
-              {/*  Minimize*/}
-              {/*</Button>*/}
               <Button
                 onPress={musicInfo.bottomSheetControls.close}
                 uppercase={false}

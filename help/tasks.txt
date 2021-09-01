@@ -1,0 +1,22 @@
+For bottom sheet:
+  References:
+    - React Native Bottom Sheet (https://github.com/gorhom/react-native-bottom-sheet)
+
+  Enhancements:
+    - ✅ Navigation inside
+    - ✅ Cancelling from outside as well as inside too
+    - ✅ Check manual snapping
+    - ✅ Spring animation on expanding and collapsing
+    - ✅ Event should be fired when snapping to any height (including 0)
+    - ❌ Add blur-view in it
+    - ✅ Apply light & dark themes (see example APK: Custom Theme)
+    - ✅ Add the dynamic chevron and see how its shape is getting as the
+        height of the modal is manually changed
+        (see example in APK: Custom Handle Example)
+    - ✅ Add a backdrop when the modal is opened fully (see example APK: Backdrop)
+    - ✅ Hide the navigation header when modal is minimized to '10%'
+    - ✅ Return to the 'currently playing' screen if modal is collapsed to '10%'
+    - ✅ Apply elevation to the modal
+    - ❌ A static search box in playlist screen and a scrolling list below (see example APK: Footer)
+    - ✅ Style the header title inside the modal
+    - ✅ Show other stack screens in the background

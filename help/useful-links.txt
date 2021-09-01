@@ -1,0 +1,9 @@
+
+Package for music file discovery: 
+  - ** react-native-get-music-files (https://www.npmjs.com/package/react-native-get-music-files)
+    Usages - https://codesandbox.io/examples/package/react-native-get-music-files/index.html
+    API - http://www.lib4dev.in/info/cinder92/react-native-get-music-files/79403022
+  - react-native-music-files (https://www.npmjs.com/package/react-native-music-files)
+
+Packages for music player:
+  - react-native-track-player (https://www.npmjs.com/package/react-native-track-player)
