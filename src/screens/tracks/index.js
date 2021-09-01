@@ -7,31 +7,31 @@ import { MusicContext } from '../../context/music';
 
 const Tracks = ({ navigation }) => {
   const { enabledDarkTheme } = useContext(PreferencesContext);
-  const { musicInfo } = useContext(MusicContext);
+  const { playerControls } = useContext(MusicContext);
 
   return (
     <ScreenContainer>
       <View style={styles.container}>
-        {musicInfo.bottomSheetControls && (
+        {playerControls && (
           <View>
-            <Text>Bottom-Sheet Controls</Text>
+            <Text>Player Controls</Text>
             <View style={{ flexDirection: 'row' }}>
               <Button
-                onPress={musicInfo.bottomSheetControls.close}
+                onPress={playerControls.close}
                 uppercase={false}
                 mode="outlined"
                 style={{ alignSelf: 'flex-start' }}>
                 Close
               </Button>
               <Button
-                onPress={musicInfo.bottomSheetControls.expand}
+                onPress={playerControls.expand}
                 uppercase={false}
                 mode="outlined"
                 style={{ alignSelf: 'flex-start' }}>
                 Expand
               </Button>
               <Button
-                onPress={musicInfo.bottomSheetControls.collapse}
+                onPress={playerControls.collapse}
                 uppercase={false}
                 mode="outlined"
                 style={{ alignSelf: 'flex-start' }}>

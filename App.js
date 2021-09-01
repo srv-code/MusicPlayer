@@ -26,12 +26,19 @@ const App = () => {
     // true,
   );
   const [musicInfo, setMusicInfo] = useState(null);
+  const _playerBottomSheet = useRef(null);
+  const [playerControls, setPlayerControls] = useState({});
   const [showSplash, setShowSplash] = useState(true);
-  const bottomSheet = useRef(null);
 
   const musicContextValue = useMemo(() => {
-    return { bottomSheet, musicInfo, setMusicInfo };
-  }, [musicInfo]);
+    return {
+      _playerBottomSheet,
+      playerControls,
+      setPlayerControls,
+      musicInfo,
+      setMusicInfo,
+    };
+  }, [musicInfo, playerControls]);
 
   const preferencesContextValue = useMemo(() => {
     return {

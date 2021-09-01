@@ -26,30 +26,28 @@ const PlayerBottomSheet = ({ navigator: Navigator }) => {
   //   bottomSheet.current?.snapToIndex(index);
   // }, []);
 
+  const { _playerBottomSheet, playerControls, setPlayerControls } =
+    useContext(MusicContext);
+
   const bottomSheetExpandHandler = useCallback(() => {
-    bottomSheet.current?.expand();
+    _playerBottomSheet.current?.expand();
   }, []);
 
   const bottomSheetCollapseHandler = useCallback(() => {
-    bottomSheet.current?.collapse();
+    _playerBottomSheet.current?.collapse();
   }, []);
 
   const bottomSheetCloseHandler = useCallback(() => {
-    bottomSheet.current?.close();
+    _playerBottomSheet.current?.close();
   }, []);
 
-  const { bottomSheet, musicInfo, setMusicInfo } = useContext(MusicContext);
-
   useEffect(() => {
-    if (!musicInfo?.bottomSheetControls) {
-      setMusicInfo(data => ({
-        ...data,
-        bottomSheetControls: {
-          expand: bottomSheetExpandHandler,
-          collapse: bottomSheetCollapseHandler,
-          close: bottomSheetCloseHandler,
-        },
-      }));
+    if (!playerControls.expand) {
+      setPlayerControls({
+        expand: bottomSheetExpandHandler,
+        collapse: bottomSheetCollapseHandler,
+        close: bottomSheetCloseHandler,
+      });
     }
   }, []);
 
@@ -84,7 +82,7 @@ const PlayerBottomSheet = ({ navigator: Navigator }) => {
   return (
     <BottomSheet
       style={styles.bottomSheet}
-      ref={bottomSheet}
+      ref={_playerBottomSheet}
       index={snapIndex}
       snapPoints={snapPoints}
       animationConfigs={animationConfigs}
