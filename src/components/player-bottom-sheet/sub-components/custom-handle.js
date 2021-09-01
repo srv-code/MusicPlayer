@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
 import { StyleSheet, Text } from 'react-native';
 import Animated, {
   Extrapolate,
@@ -7,8 +7,8 @@ import Animated, {
   useDerivedValue,
 } from 'react-native-reanimated';
 import { toRad } from 'react-native-redash';
+import colors from '../../../constants/colors';
 import { transformOrigin } from './transform-origin';
-import colors from '../../constants/colors';
 
 const CustomHandle = ({ style, animatedIndex }) => {
   //#region animations
@@ -94,36 +94,23 @@ const CustomHandle = ({ style, animatedIndex }) => {
       <Animated.View
         style={[rightIndicatorStyle, rightIndicatorAnimatedStyle]}
       />
-      {/*<Text style={styles.title}>{title}</Text>*/}
     </Animated.View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    // elevation: 2,
-
-    // borderBottomWidth: 0,
-    // borderLeftWidth: 0,
-    // borderRightWidth: 0,
-    // borderWidth: 0,
-
     alignContent: 'center',
     alignItems: 'center',
     paddingBottom: 20,
     paddingHorizontal: 16,
-    // borderBottomWidth: 1,
-    // borderBottomColor: 'rgba(0,0,0,0.125)',
     zIndex: 99999,
-    // borderWidth: 1,
-    // marginBottom: 10,
   },
   indicator: {
     marginTop: 10,
     position: 'absolute',
     width: 10,
     height: 4,
-    // backgroundColor: '#999',
     backgroundColor: colors.lightGrey1,
   },
   leftIndicator: {
@@ -134,13 +121,6 @@ const styles = StyleSheet.create({
     borderTopEndRadius: 2,
     borderBottomEndRadius: 2,
   },
-  // title: {
-  //   marginTop: 26,
-  //   fontSize: 20,
-  //   lineHeight: 20,
-  //   textAlign: 'center',
-  //   fontWeight: 'bold',
-  // },
 });
 
 export default CustomHandle;

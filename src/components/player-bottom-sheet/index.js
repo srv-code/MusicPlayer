@@ -1,0 +1,122 @@
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
+import { StyleSheet } from 'react-native';
+import BottomSheet, {
+  BottomSheetBackdrop,
+  useBottomSheetSpringConfigs,
+} from '@gorhom/bottom-sheet';
+import Colors from 'react-native/Libraries/NewAppScreen/components/Colors';
+import { PreferencesContext } from '../../context/preferences';
+import { MusicContext } from '../../context/music';
+import colors from '../../constants/colors';
+import CustomHandle from './sub-components/custom-handle';
+
+const PlayerBottomSheet = ({ navigator: Navigator }) => {
+  const startSnapIndex = 0; // TODO: 0 indicates minimized, to hide pass -1 (when there's no currently playing)
+  const snapPoints = useMemo(() => ['10%', '45%', '92%'], []);
+  const [snapIndex, setSnapIndex] = useState(startSnapIndex);
+
+  // const handleSnapPress = useCallback(index => {
+  //   // console.log('handleSnapPress:', { index, bottomSheet });
+  //   bottomSheet.current?.snapToIndex(index);
+  // }, []);
+
+  const bottomSheetExpandHandler = useCallback(() => {
+    bottomSheet.current?.expand();
+  }, []);
+
+  const bottomSheetCollapseHandler = useCallback(() => {
+    bottomSheet.current?.collapse();
+  }, []);
+
+  const bottomSheetCloseHandler = useCallback(() => {
+    bottomSheet.current?.close();
+  }, []);
+
+  const { bottomSheet, musicInfo, setMusicInfo } = useContext(MusicContext);
+
+  useEffect(() => {
+    if (!musicInfo?.bottomSheetControls) {
+      setMusicInfo(data => ({
+        ...data,
+        bottomSheetControls: {
+          expand: bottomSheetExpandHandler,
+          collapse: bottomSheetCollapseHandler,
+          close: bottomSheetCloseHandler,
+        },
+      }));
+    }
+  }, []);
+
+  const animationConfigs = useBottomSheetSpringConfigs({
+    damping: 80,
+    overshootClamping: true,
+    restDisplacementThreshold: 0.1,
+    restSpeedThreshold: 0.1,
+    stiffness: 500,
+  });
+
+  const handleSheetChange = useCallback(index => {
+    setSnapIndex(index);
+  }, []);
+
+  const handleSheetAnimate = useCallback((fromIndex, toIndex) => {
+    console.log('handleSheetAnimate', `from ${fromIndex} to ${toIndex}`);
+  }, []);
+
+  const renderCustomHandle = useCallback(
+    props => <CustomHandle {...props} />,
+    [],
+  );
+
+  const renderBackdrop = useCallback(
+    props => <BottomSheetBackdrop {...props} pressBehavior={'collapse'} />,
+    [],
+  );
+
+  const { enabledDarkTheme } = useContext(PreferencesContext);
+
+  return (
+    <BottomSheet
+      style={styles.bottomSheet}
+      ref={bottomSheet}
+      index={snapIndex}
+      snapPoints={snapPoints}
+      animationConfigs={animationConfigs}
+      animateOnMount={true}
+      enableContentPanningGesture={true}
+      enableHandlePanningGesture={true}
+      handleComponent={renderCustomHandle}
+      backgroundStyle={{
+        marginTop: 3,
+        backgroundColor: enabledDarkTheme ? Colors.darker : Colors.lighter,
+      }}
+      handleIndicatorStyle={styles.bottomSheetHandleIndicator}
+      keyboardBehavior="interactive"
+      keyboardBlurBehavior="restore"
+      backdropComponent={snapIndex === 2 ? renderBackdrop : null}
+      enablePanDownToClose={true}
+      onChange={handleSheetChange}
+      onAnimate={handleSheetAnimate}>
+      <Navigator snapIndex={snapIndex} enabledDarkTheme={enabledDarkTheme} />
+    </BottomSheet>
+  );
+};
+
+const styles = StyleSheet.create({
+  bottomSheet: {
+    borderTopLeftRadius: 10,
+    borderTopRightRadius: 10,
+    elevation: 2,
+  },
+  bottomSheetHandleIndicator: {
+    backgroundColor: colors.white,
+  },
+});
+
+export default PlayerBottomSheet;
