@@ -22,6 +22,9 @@ const labels = {
   track: 'Track',
   artist: 'Artist',
   folder: 'Folder',
+  currentlyPlaying: 'Currently Playing',
+  currentPlaylist: 'Current Playlist',
+  songInfo: 'Song Info',
 };
 
 export default labels;

@@ -18,7 +18,7 @@ import keys from '../../constants/keys';
 
 const inProgressKeys = {
   DELETE_MUSIC_CACHE: 'delete-music-cache',
-  DELETE_PREFERENCES_CACHE: 'delete-pref-cache',
+  // DELETE_PREFERENCES_CACHE: 'delete-pref-cache',
 };
 
 const Info = ({ navigation }) => {

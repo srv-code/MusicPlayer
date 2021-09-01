@@ -10,6 +10,9 @@ const screenNames = {
   about: 'about',
   folders: 'folders',
   itemInfo: 'item-info',
+  currentlyPlaying: 'currently-playing',
+  currentPlaylist: 'current-playlist',
+  songInfo: 'song-info',
 };
 
 export default screenNames;

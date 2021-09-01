@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useRef, useState } from 'react';
 import { StatusBar } from 'react-native';
 import { PreferencesContext } from './src/context/preferences';
 import { MusicContext } from './src/context/music';
@@ -27,9 +27,10 @@ const App = () => {
   );
   const [musicInfo, setMusicInfo] = useState(null);
   const [showSplash, setShowSplash] = useState(true);
+  const bottomSheet = useRef(null);
 
   const musicContextValue = useMemo(() => {
-    return { musicInfo, setMusicInfo };
+    return { bottomSheet, musicInfo, setMusicInfo };
   }, [musicInfo]);
 
   const preferencesContextValue = useMemo(() => {
