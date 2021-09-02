@@ -1,6 +1,7 @@
 import MusicFiles from '@yajanarao/react-native-get-music-files';
 import FileSystem from 'react-native-fs';
 
+// FIXME: Song album art is not getting generated in Android emulator.
 export const fetchAllMusicTracks = async () => {
   console.log('[fetchAllMusicTracks] invoked');
 

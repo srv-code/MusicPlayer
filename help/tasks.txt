@@ -1,4 +1,4 @@
-For bottom sheet:
+[Player Bottom-Sheet]
   References:
     - React Native Bottom Sheet (https://github.com/gorhom/react-native-bottom-sheet)
 
@@ -20,3 +20,9 @@ For bottom sheet:
     - ❌ A static search box in playlist screen and a scrolling list below (see example APK: Footer)
     - ✅ Style the header title inside the modal
     - ✅ Show other stack screens in the background
+
+
+[Player UI]
+  - Find for a good quality progress bar (may be available inside the react-native-track-player package)
+  - Check how to destroy the TrackPlayer and when to
+      (means after stopping the playback everytime or only once in the app lifecycle)
