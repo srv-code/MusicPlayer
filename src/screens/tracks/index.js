@@ -4,6 +4,7 @@ import ScreenContainer from '../../components/screen-container';
 import { PreferencesContext } from '../../context/preferences';
 import { Button, Text } from 'react-native-paper';
 import { MusicContext } from '../../context/music';
+import globalStyles from '../../styles';
 
 const Tracks = ({ navigation }) => {
   const { enabledDarkTheme } = useContext(PreferencesContext);
@@ -20,21 +21,21 @@ const Tracks = ({ navigation }) => {
                 onPress={playerControls.close}
                 uppercase={false}
                 mode="outlined"
-                style={{ alignSelf: 'flex-start' }}>
+                style={globalStyles.button}>
                 Close
               </Button>
               <Button
                 onPress={playerControls.expand}
                 uppercase={false}
                 mode="outlined"
-                style={{ alignSelf: 'flex-start' }}>
+                style={globalStyles.button}>
                 Expand
               </Button>
               <Button
                 onPress={playerControls.collapse}
                 uppercase={false}
                 mode="outlined"
-                style={{ alignSelf: 'flex-start' }}>
+                style={globalStyles.button}>
                 Collapse
               </Button>
             </View>

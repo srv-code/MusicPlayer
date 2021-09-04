@@ -13,6 +13,7 @@ const screenNames = {
   currentlyPlaying: 'currently-playing',
   currentPlaylist: 'current-playlist',
   songInfo: 'song-info',
+  tabbedView: 'tabbed-view',
 };
 
 export default screenNames;

@@ -49,7 +49,8 @@ const BottomSheetNavigator = ({ snapIndex, enabledDarkTheme }) => {
       <BottomSheetStack.Navigator
         initialRouteName={screenNames.currentlyPlaying}
         screenOptions={screenOptions}
-        headerMode="screen">
+        // headerMode="screen"
+      >
         <BottomSheetStack.Screen
           name={screenNames.currentlyPlaying}
           options={{
@@ -80,7 +81,7 @@ const TabbedStackNavigator = () => {
   return (
     <>
       <TabbedStack.Navigator screenOptions={{ headerShown: false }}>
-        <TabbedStack.Screen name={screenNames.tracks} component={TabbedView} />
+        <TabbedStack.Screen name={screenNames.tabbedView} component={TabbedView} />
       </TabbedStack.Navigator>
 
       <PlayerBottomSheet navigator={BottomSheetNavigator} />
@@ -98,7 +99,7 @@ const SearchStackNavigator = () => (
 
 const RootStack = createStackNavigator();
 const RootStackNavigator = () => (
-  <RootStack.Navigator headerMode="none">
+  <RootStack.Navigator screenOptions={{ headerShown: false }}>
     <RootStack.Screen
       name={screenNames.tracks}
       component={TabbedStackNavigator}

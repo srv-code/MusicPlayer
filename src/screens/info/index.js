@@ -15,6 +15,7 @@ import { List } from 'react-native-paper';
 import colors from '../../constants/colors';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import keys from '../../constants/keys';
+import globalStyles from "../../styles";
 
 const inProgressKeys = {
   DELETE_MUSIC_CACHE: 'delete-music-cache',
@@ -125,7 +126,7 @@ const Info = ({ navigation }) => {
               uppercase={false}
               disabled={!musicData}
               loading={inProgress === inProgressKeys.DELETE_MUSIC_CACHE}
-              style={styles.button}
+              style={globalStyles.button}
               onPress={deleteMusicCache}>
               Delete Cache
             </Button>
@@ -323,7 +324,7 @@ const Info = ({ navigation }) => {
               uppercase={false}
               disabled={!prefData}
               loading={inProgress === inProgressKeys.DELETE_PREFERENCES_CACHE}
-              style={styles.button}
+              style={globalStyles.button}
               onPress={deletePrefCache}>
               Delete Cache
             </Button>
@@ -414,9 +415,6 @@ const styles = StyleSheet.create({
   },
   accordionTitleText: {
     textTransform: 'capitalize',
-  },
-  button: {
-    alignSelf: 'flex-start',
   },
   divider: {
     marginVertical: hp(2),

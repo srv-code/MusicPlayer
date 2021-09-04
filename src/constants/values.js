@@ -4,6 +4,5 @@ const values = {
     albums: [],
     artists: [],
     folders: [],
-    stopped: true,
   },
 };

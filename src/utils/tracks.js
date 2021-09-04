@@ -3,7 +3,7 @@ import FileSystem from 'react-native-fs';
 
 // FIXME: Song album art is not getting generated in Android emulator.
 export const fetchAllMusicTracks = async () => {
-  console.log('[fetchAllMusicTracks] invoked');
+  console.log('fetchAllMusicTracks: invoked');
 
   const tracks = await MusicFiles.getAll({
     id: true, // get id
@@ -49,6 +49,8 @@ export const fetchAllMusicTracks = async () => {
       path: track.path.substr(0, track.path.length - track.fileName.length - 1),
     };
   }
+
+  console.log(`fetchAllMusicTracks: ${JSON.stringify(tracks)}`);
 
   return tracks;
 };

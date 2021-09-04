@@ -3,6 +3,11 @@ import { BottomSheetView } from '@gorhom/bottom-sheet';
 import { Button, Text } from 'react-native-paper';
 import screenNames from '../../constants/screen-names';
 import globalStyles from '../../styles';
+import Player from '../../components/player';
+import {
+  heightPercentageToDP as hp,
+  widthPercentageToDP as wp,
+} from 'react-native-responsive-screen';
 
 const CurrentlyPlaying = ({ navigation, extraData }) => {
   return (
@@ -22,7 +27,9 @@ const CurrentlyPlaying = ({ navigation, extraData }) => {
           Go to Current Playlist
         </Button>
       )}
-      <Text>{extraData.snapIndex}</Text>
+      <Text>{`sheetSnapIndex: ${extraData.snapIndex}`}</Text>
+
+      <Player style={{ borderWidth: 1, marginTop: hp(1) }} />
     </BottomSheetView>
   );
 };
