@@ -1,12 +1,7 @@
 rootProject.name = 'MusicPlayer'
-include ':@react-native-community_blur'
-project(':@react-native-community_blur').projectDir = new File(rootProject.projectDir, '../node_modules/@react-native-community/blur/android')
+
 include ':react-native-fs'
 project(':react-native-fs').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-fs/android')
-include ':react-native-appearance'
-project(':react-native-appearance').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-appearance/android')
-include ':react-native-appearance'
-project(':react-native-appearance').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-appearance/android')
 
 include ':@yajanarao_react-native-get-music-files'
 project(':@yajanarao_react-native-get-music-files').projectDir = new File(rootProject.projectDir, '../node_modules/@yajanarao/react-native-get-music-files/android')
