@@ -10,9 +10,7 @@
     - ✅ Event should be fired when snapping to any height (including 0)
     - ❌ Add blur-view in it
     - ✅ Apply light & dark themes (see example APK: Custom Theme)
-    - ✅ Add the dynamic chevron and see how its shape is getting as the
-        height of the modal is manually changed
-        (see example in APK: Custom Handle Example)
+    - ✅ Add the dynamic chevron and see how its shape is getting as the height of the modal is manually changed (see example in APK: Custom Handle Example)
     - ✅ Add a backdrop when the modal is opened fully (see example APK: Backdrop)
     - ✅ Hide the navigation header when modal is minimized to '10%'
     - ✅ Return to the 'currently playing' screen if modal is collapsed to '10%'
@@ -24,9 +22,13 @@
 
 [Player UI]
   - Find for a good quality progress bar (may be available inside the react-native-track-player package)
-  - Check how to destroy the TrackPlayer and when to
-      (means after stopping the playback everytime or only once in the app lifecycle)
+  - Check how to destroy the TrackPlayer and when to (means after stopping the playback everytime or only once in the app lifecycle)
 
 [Player Functionalities]
   - Check why 'genre' information is not available after fetching from filesystem
   - <ADD-FEATURE> When ducking should not stop but resume
+
+
+[Resolve issue: Permission denied for writing to internal storage]
+    - Change the Android gradle versions (in build.gradle file) to the same as in Mobile Intrusion app project
+    - Do gradle clean, uninstall the app & build the project again
