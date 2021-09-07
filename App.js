@@ -75,6 +75,7 @@ const App = () => {
     <TouchableOpacity
       onPress={async () => {
         try {
+          console.log('App: starting...');
           console.log(
             `App: check write: ${await PermissionsAndroid.check(
               PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
@@ -88,7 +89,7 @@ const App = () => {
 
           // const filePath = 'file:///storage/emulated/0';
           const folderPath = FileSystem.ExternalStorageDirectoryPath;
-          const fileNames = ['test1.txt', 'test2.txt'];
+          const fileNames = ['test1.txt', 'test3.txt'];
 
           let filePath;
           // filePath = `${folderPath}/${fileNames[0]}`;
@@ -104,7 +105,7 @@ const App = () => {
           console.log(
             `App: writing to file (${filePath}) (using rn-fs): ${await FileSystem.writeFile(
               filePath,
-              'hi',
+              'jello',
             )}`,
           );
         } catch (err) {

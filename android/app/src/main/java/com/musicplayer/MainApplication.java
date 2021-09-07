@@ -5,7 +5,6 @@ import android.content.Context;
 import com.facebook.react.PackageList;
 import com.facebook.react.ReactApplication;
 import com.rnfs.RNFSPackage;
-import com.drazail.rnandroidstore.RNAndroidStorePackage;
 import com.zoontek.rnpermissions.RNPermissionsPackage;
 import com.oblador.vectoricons.VectorIconsPackage;
 import com.facebook.react.ReactInstanceManager;
