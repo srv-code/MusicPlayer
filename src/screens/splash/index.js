@@ -42,13 +42,13 @@ const Splash = ({ setShow, setMusicInfo }) => {
     // {
     //   "results": [
     //     {
-    //       "cover": "/storage/emulated/0/Android/data/com.musicplayer/files/album-covers/17e76fc89e0cd9365be832825a81b055",
     //       "id": "31",
     //       "duration": "371487",
     //       "album": "Kabir Singh (Pagalworld.Live)",
-    //       "path": "/storage/emulated/0/Download/Bekhayali - Kabir Singh.mp3",
     //       "artist": "Sachet Tandon (Pagalworld.Live)",
     //       "title": "Bekhayali (Pagalworld.Live)",
+    //       "url": "/storage/emulated/0/Download/Bekhayali - Kabir Singh.mp3",
+    //       "artwork": "/storage/emulated/0/Android/data/com.musicplayer/files/artworks/17e76fc89e0cd9365be832825a81b055",
     //       "folder": { "name": "Download", "path": "/storage/emulated/0/Download" }
     //     }
     //   ],
@@ -96,6 +96,16 @@ const Splash = ({ setShow, setMusicInfo }) => {
           break;
         }
     });
+
+    console.log(
+      `Splash: stripTracks: ${JSON.stringify({
+        data,
+        tracks,
+        albums,
+        artists,
+        folders,
+      })}`,
+    );
 
     return { tracks, albums, artists, folders };
   };

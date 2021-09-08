@@ -184,8 +184,8 @@ const Search = ({ navigation }) => {
         let iconName;
         switch (type) {
           case keys.TRACKS:
-            if (data.cover)
-              return <Avatar.Image size={hp(6)} source={{ uri: data.cover }} />;
+            if (data.artwork)
+              return <Avatar.Image size={hp(6)} source={{ uri: data.artwork }} />;
             else iconName = 'music';
             break;
           case keys.ALBUMS:
@@ -629,7 +629,7 @@ const Search = ({ navigation }) => {
                 // marginBottom: hp(0.7),
               }}
               resizeMode={'contain'}
-              source={{ uri: infoModalData.data.cover }}
+              source={{ uri: infoModalData.data.artwork }}
             />
 
             <DataTable>

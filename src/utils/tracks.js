@@ -3,16 +3,14 @@ import MusicFiles, {
 } from 'react-native-get-music-files-v3dev-test';
 import FileSystem from 'react-native-fs';
 
-export const fetchAllMusicTracks = async (
-  albumCoverFolderName = 'album-covers',
-) => {
+export const fetchAllMusicTracks = async (artworkFolderName = 'artworks') => {
   console.log('fetchAllMusicTracks: invoked');
 
   // const tracks = [];
   const tracks = await MusicFiles.getAll({
     // cover: false,
     cover: true,
-    coverFolder: `${FileSystem.ExternalDirectoryPath}/${albumCoverFolderName}`,
+    coverFolder: `${FileSystem.ExternalDirectoryPath}/${artworkFolderName}`,
     batchSize: 0,
     batchNumber: 0,
     sortBy: MusicSortingOptions.SortBy.Title,
@@ -66,7 +64,15 @@ export const fetchAllMusicTracks = async (
     // track.artist = track.author;
     // delete track.author;
 
-    const pathComponents = track.path.split('/');
+    /* Prop mapping for TrackPlayer */
+    // path -> url
+    track.url = track.path;
+    delete track.path;
+    // cover -> artwork
+    track.artwork = track.cover;
+    delete track.cover;
+
+    const pathComponents = track.url.split('/');
     pathComponents.pop(); // removes the file name
     track.folder = {
       name: pathComponents[pathComponents.length - 1],
