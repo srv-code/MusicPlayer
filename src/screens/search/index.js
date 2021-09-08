@@ -184,13 +184,8 @@ const Search = ({ navigation }) => {
         let iconName;
         switch (type) {
           case keys.TRACKS:
-            if (data.coverExists)
-              return (
-                <Avatar.Image
-                  size={hp(6)}
-                  source={{ uri: data.coverFilePath }}
-                />
-              );
+            if (data.cover)
+              return <Avatar.Image size={hp(6)} source={{ uri: data.cover }} />;
             else iconName = 'music';
             break;
           case keys.ALBUMS:
@@ -634,7 +629,7 @@ const Search = ({ navigation }) => {
                 // marginBottom: hp(0.7),
               }}
               resizeMode={'contain'}
-              source={{ uri: infoModalData.data.coverFilePath }}
+              source={{ uri: infoModalData.data.cover }}
             />
 
             <DataTable>

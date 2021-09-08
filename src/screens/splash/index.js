@@ -31,34 +31,36 @@ const requiredPermissions = [
 ];
 
 // const Splash = ({ navigation }) => {
-const Splash = ({ setShow, musicContext, preferencesContext }) => {
-  // console.log('Splash loaded', { setShow, musicContext, preferencesContext });
-
-  // const musicInfo = useContext(MusicContext);
-  // console.log('Splash', { musicInfo });
-
+const Splash = ({ setShow, setMusicInfo }) => {
   const [loadingInfo, setLoadingInfo] = useState({
     loading: false,
     info: null,
   });
 
   const stripTracks = data => {
-    /* sample track info */
-    // duration: "229175"
-    // title: " baby I Like It -enrique ft pitbull"
-    // genre: null
-    // fileName: "tumblr_l6qv0j8bce1qbjng1o1.mp3"
-    // album: "World Wide Urban Music"
-    // author: "Enrique Iglesias ft. Pitbull"
-    // path: "/storage/emulated/0/Music/Others/tumblr_l6qv0j8bce1qbjng1o1.mp3"
-    // id: "5347"
+    // sample input (value of data)
+    // {
+    //   "results": [
+    //     {
+    //       "cover": "/storage/emulated/0/Android/data/com.musicplayer/files/album-covers/17e76fc89e0cd9365be832825a81b055",
+    //       "id": "31",
+    //       "duration": "371487",
+    //       "album": "Kabir Singh (Pagalworld.Live)",
+    //       "path": "/storage/emulated/0/Download/Bekhayali - Kabir Singh.mp3",
+    //       "artist": "Sachet Tandon (Pagalworld.Live)",
+    //       "title": "Bekhayali (Pagalworld.Live)",
+    //       "folder": { "name": "Download", "path": "/storage/emulated/0/Download" }
+    //     }
+    //   ],
+    //   "length": 13
+    // }
 
-    const tracks = data,
+    const tracks = data.results,
       albums = [],
       artists = [],
       folders = [];
 
-    data.forEach(track => {
+    data.results.forEach(track => {
       if (track.album && !albums.some(x => x.name === track.album))
         albums.push({ name: track.album, trackIds: [] });
 
@@ -74,7 +76,7 @@ const Splash = ({ setShow, musicContext, preferencesContext }) => {
     });
 
     /* adding additional summaries */
-    data.forEach(track => {
+    data.results.forEach(track => {
       for (const album of albums)
         if (album.name === track.album) {
           album.trackIds.push(track.id);
@@ -151,10 +153,10 @@ const Splash = ({ setShow, musicContext, preferencesContext }) => {
         }
 
         // Update stripped data in context
-        musicContext.setMusicInfo(stripTracks(musicInfo));
+        setMusicInfo(stripTracks(musicInfo));
       } catch (err) {
         console.log(
-          `Error: ${error.title}. ${error.message} Reason: ${err.message}`,
+          `Error: ${error.title}. ${error.message}\n${JSON.stringify(err)}`,
         );
         Alert.alert(error.title, `${error.message}\nReason: ${err.message}`, [
           {

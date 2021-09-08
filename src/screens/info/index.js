@@ -103,7 +103,9 @@ const Info = ({ navigation }) => {
       AsyncStorage.removeItem(keys.MUSIC_INFO)
         .catch(error => {
           console.log(
-            `Error: I/O Error: Failed removing music cache: ${error.message}`,
+            `Error: I/O Error: Failed removing music cache: ${JSON.stringify(
+              error,
+            )}`,
           );
           Alert.alert(
             'I/O Error',

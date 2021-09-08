@@ -3,7 +3,6 @@ import MusicFiles, {
 } from 'react-native-get-music-files-v3dev-test';
 import FileSystem from 'react-native-fs';
 
-// FIXME: Song album art is not getting generated in Android emulator.
 export const fetchAllMusicTracks = async (
   albumCoverFolderName = 'album-covers',
 ) => {
@@ -59,22 +58,23 @@ export const fetchAllMusicTracks = async (
   //   ], // for iOs Version
   // });
 
-  // TODO uncomment the below code snippet
-  // for (const track of tracks) {
-  //   track.coverFilePath = `file://${FileSystem.ExternalStorageDirectoryPath}/${track.id}.jpg`;
-  //   track.coverExists = await FileSystem.exists(track.coverFilePath);
-  //
-  //   track.artist = track.author;
-  //   delete track.author;
-  //
-  //   const pathComponents = track.path.split('/');
-  //   track.folder = {
-  //     name: pathComponents[pathComponents.length - 2],
-  //     path: track.path.substr(0, track.path.length - track.fileName.length - 1),
-  //   };
-  // }
+  for (const track of tracks.results) {
+    // track.coverFilePath = `file://${track.cover}`;
+    // track.coverExists = true;
+    // track.coverExists = await FileSystem.exists(track.coverFilePath); // TODO check if required, if not remove the track.coverExists prop
 
-  console.log(`fetchAllMusicTracks: tracks=${JSON.stringify(tracks)}`);
+    // track.artist = track.author;
+    // delete track.author;
+
+    const pathComponents = track.path.split('/');
+    pathComponents.pop(); // removes the file name
+    track.folder = {
+      name: pathComponents[pathComponents.length - 1],
+      path: pathComponents.join('/'),
+    };
+  }
+
+  // console.log(`fetchAllMusicTracks: tracks=${JSON.stringify(tracks)}`);
 
   return tracks;
 };

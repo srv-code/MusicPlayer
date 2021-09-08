@@ -23,6 +23,8 @@ import Colors from 'react-native/Libraries/NewAppScreen/components/Colors';
 import colors from './src/constants/colors';
 import Splash from './src/screens/splash';
 import FileSystem from 'react-native-fs';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import keys from './src/constants/keys';
 
 const App = () => {
   console.log('App loaded');
@@ -126,14 +128,37 @@ const App = () => {
   //   </TouchableOpacity>
   // );
 
+  // return (
+  //   <View>
+  //     <Text
+  //       onPress={async () => {
+  //         console.log(
+  //           `read value: ${JSON.stringify(
+  //             await AsyncStorage.getItem(keys.MUSIC_INFO),
+  //           )}`,
+  //         );
+  //       }}>
+  //       Read using async
+  //     </Text>
+  //
+  //     <Text
+  //       onPress={async () => {
+  //         console.log(
+  //           `written value: ${JSON.stringify(
+  //             await AsyncStorage.setItem(
+  //               keys.MUSIC_INFO,
+  //               JSON.stringify({ name: 'yellow' }),
+  //             ),
+  //           )}`,
+  //         );
+  //       }}>
+  //       Write using async
+  //     </Text>
+  //   </View>
+  // );
+
   if (showSplash)
-    return (
-      <Splash
-        setShow={setShowSplash}
-        musicContext={musicContextValue}
-        preferencesContext={preferencesContextValue}
-      />
-    );
+    return <Splash setShow={setShowSplash} setMusicInfo={setMusicInfo} />;
 
   // return (
   //   <View>
