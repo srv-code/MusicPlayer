@@ -1,11 +1,33 @@
-// import MusicFiles from '@yajanarao/react-native-get-music-files';
-// import FileSystem from 'react-native-fs';
+import MusicFiles, {
+  Constants as MusicSortingOptions,
+} from 'react-native-get-music-files-v3dev-test';
+import FileSystem from 'react-native-fs';
 
 // FIXME: Song album art is not getting generated in Android emulator.
-export const fetchAllMusicTracks = async () => {
+export const fetchAllMusicTracks = async (
+  albumCoverFolderName = 'album-covers',
+) => {
   console.log('fetchAllMusicTracks: invoked');
 
-  const tracks = [];
+  // const tracks = [];
+  const tracks = await MusicFiles.getAll({
+    // cover: false,
+    cover: true,
+    coverFolder: `${FileSystem.ExternalDirectoryPath}/${albumCoverFolderName}`,
+    batchSize: 0,
+    batchNumber: 0,
+    sortBy: MusicSortingOptions.SortBy.Title,
+    sortOrder: MusicSortingOptions.SortOrder.Ascending,
+
+    // cover?: boolean,
+    // coverFolder?: string,
+    // minimumSongDuration?: number,
+    // batchSize?: number,
+    // batchNumber?: number,
+    // sortBy?: string,
+    // sortOrder?: string,
+  });
+
   // const tracks = await MusicFiles.getAll({
   //   id: true, // get id
   //   duration: true, // get duration
@@ -36,7 +58,8 @@ export const fetchAllMusicTracks = async () => {
   //     'duration',
   //   ], // for iOs Version
   // });
-  //
+
+  // TODO uncomment the below code snippet
   // for (const track of tracks) {
   //   track.coverFilePath = `file://${FileSystem.ExternalStorageDirectoryPath}/${track.id}.jpg`;
   //   track.coverExists = await FileSystem.exists(track.coverFilePath);
@@ -51,7 +74,7 @@ export const fetchAllMusicTracks = async () => {
   //   };
   // }
 
-  console.log(`fetchAllMusicTracks: ${JSON.stringify(tracks)}`);
+  console.log(`fetchAllMusicTracks: tracks=${JSON.stringify(tracks)}`);
 
   return tracks;
 };

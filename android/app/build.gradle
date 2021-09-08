@@ -200,9 +200,9 @@ android {
 }
 
 dependencies {
-//     compile project(':@yajanarao/react-native-get-music-files')
+    implementation project(':react-native-fs')
+    // implementation project(':react-native-get-music-files')
 
-//     implementation project(':@yajanarao/react-native-get-music-files')
 
     implementation fileTree(dir: "libs", include: ["*.jar"])
     //noinspection GradleDynamicVersion

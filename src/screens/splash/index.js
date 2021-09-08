@@ -100,7 +100,7 @@ const Splash = ({ setShow, musicContext, preferencesContext }) => {
 
   useEffect(() => {
     setTimeout(async () => {
-      const errorMessage = {};
+      const error = {};
       try {
         // Check Android permissions
         if (Platform.OS === 'android') {
@@ -109,14 +109,16 @@ const Splash = ({ setShow, musicContext, preferencesContext }) => {
             info: 'Checking for app permissions...',
           });
 
-          errorMessage.title = 'Permission Error';
-          errorMessage.message = `Application permission error`;
+          error.title = 'Permission Error';
+          error.message = `Application permission error`;
 
           const response = await PermissionsAndroid.requestMultiple(
             requiredPermissions,
           );
           console.log('Splash: permission response:', response);
-          // TODO should throw error from here in case any of the permission is not PermissionsAndroid.RESULTS.GRANTED
+          for (const perm of Object.keys(response))
+            if (response[perm] !== PermissionsAndroid.RESULTS.GRANTED)
+              throw new Error(`Permission ${perm} denied.`);
         }
 
         // Check for music info from async-storage
@@ -125,23 +127,23 @@ const Splash = ({ setShow, musicContext, preferencesContext }) => {
           info: 'Loading music tracks...',
         });
 
-        errorMessage.title = 'Storage Read Error';
-        errorMessage.message = `Failed reading music information from storage`;
+        error.title = 'Storage Read Error';
+        error.message = `Failed reading music information from storage`;
 
         let musicInfo = JSON.parse(await AsyncStorage.getItem(keys.MUSIC_INFO));
         // console.log('Splash:', { musicInfo });
 
         if (!musicInfo) {
           // Load all music tracks
-          errorMessage.title = 'I/O Error';
-          errorMessage.message = `Failed loading music tracks`;
+          error.title = 'I/O Error';
+          error.message = `Failed loading music tracks`;
 
           const tracks = await fetchAllMusicTracks();
           // console.log('fetchAllMusicTracks:', { tracks });
 
           // Write music tracks to async-storage
-          errorMessage.title = 'Storage Read Error';
-          errorMessage.message = `Failed writing music information in storage`;
+          error.title = 'Storage Read Error';
+          error.message = `Failed writing music information in storage`;
 
           await AsyncStorage.setItem(keys.MUSIC_INFO, JSON.stringify(tracks));
 
@@ -150,23 +152,22 @@ const Splash = ({ setShow, musicContext, preferencesContext }) => {
 
         // Update stripped data in context
         musicContext.setMusicInfo(stripTracks(musicInfo));
-      } catch (error) {
-        Alert.alert(
-          errorMessage.title,
-          `${errorMessage.message}\nReason: ${error.message}`,
-          [
-            {
-              text: 'Exit',
-              onPress: BackHandler.exitApp,
-              style: 'cancel',
-            },
-          ],
+      } catch (err) {
+        console.log(
+          `Error: ${error.title}. ${error.message} Reason: ${err.message}`,
         );
+        Alert.alert(error.title, `${error.message}\nReason: ${err.message}`, [
+          {
+            text: 'Exit',
+            onPress: BackHandler.exitApp,
+            style: 'cancel',
+          },
+        ]);
+        error.caught = true;
+      } finally {
+        setLoadingInfo({ loading: false, info: null });
+        if (!error.caught) setShow(false);
       }
-
-      // finally
-      setLoadingInfo({ loading: false, info: null });
-      setShow(false);
     }, SPLASH_TIMEOUT);
 
     // checkForInitialDataStatus()

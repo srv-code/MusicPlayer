@@ -115,8 +115,8 @@ const Player = ({ style }) => {
           paddingVertical: hp(1),
         }}>
         {/*{`musicInfo: ${JSON.stringify(musicInfo)}`}*/}
-        {/*{`DocumentDirectoryPath: ${FileSystem.DocumentDirectoryPath}*/}
-        {`LibraryDirectoryPath: ${FileSystem.LibraryDirectoryPath}
+        {`DocumentDirectoryPath: ${FileSystem.DocumentDirectoryPath}
+LibraryDirectoryPath: ${FileSystem.LibraryDirectoryPath}
 ExternalDirectoryPath: ${FileSystem.ExternalDirectoryPath}
 ExternalStorageDirectoryPath: ${FileSystem.ExternalStorageDirectoryPath}`}
       </Text>

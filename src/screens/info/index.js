@@ -15,7 +15,7 @@ import { List } from 'react-native-paper';
 import colors from '../../constants/colors';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import keys from '../../constants/keys';
-import globalStyles from "../../styles";
+import globalStyles from '../../styles';
 
 const inProgressKeys = {
   DELETE_MUSIC_CACHE: 'delete-music-cache',
@@ -101,12 +101,15 @@ const Info = ({ navigation }) => {
       setInProgress(inProgressKeys.DELETE_MUSIC_CACHE);
       musicContext.setMusicInfo(values.RESET_MUSIC_DATA);
       AsyncStorage.removeItem(keys.MUSIC_INFO)
-        .catch(error =>
+        .catch(error => {
+          console.log(
+            `Error: I/O Error: Failed removing music cache: ${error.message}`,
+          );
           Alert.alert(
             'I/O Error',
             `Failed removing music cache: ${error.message}`,
-          ),
-        )
+          );
+        })
         .finally(setInProgress);
     };
 

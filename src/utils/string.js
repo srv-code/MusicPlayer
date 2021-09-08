@@ -1,4 +1,5 @@
 export default class StringUtils {
+  // TODO implement this in the search UI
   static getInlineSearchResult = (searchTerm, fullText, caseInsensitive) => {
     if (!searchTerm) throw new Error('`searchTerm` parameter cannot be empty');
     if (!fullText) throw new Error('`fullText` parameter cannot be empty');
