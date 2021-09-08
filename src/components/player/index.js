@@ -11,6 +11,7 @@ import TrackPlayer, {
   State as PlayerState,
   Capability as PlayerCapability,
   Event as PlayerEvent,
+  RepeatMode as PlayerRepeatMode,
   useProgress as usePlayerProgress,
   useTrackPlayerEvents as usePlayerEvents,
 } from 'react-native-track-player';
@@ -29,6 +30,10 @@ const Player = ({ style }) => {
   const trackProgress = usePlayerProgress();
 
   const [volume, setVolume] = useState(0.5); /* default value */
+  const [rate, setRate] = useState(1); /* default value */
+  const [repeatMode, setRepeatMode] = useState(
+    PlayerRepeatMode.Off,
+  ); /* default value */
 
   useEffect(async () => {
     console.log(`[Player] setupPlayer`);
@@ -166,6 +171,23 @@ const Player = ({ style }) => {
       default:
         throw new Error(`Invalid value: ${stateValue}`);
     }
+  };
+
+  const getRepeatModeInfo = value => {
+    switch (value) {
+      case PlayerRepeatMode.Off:
+        return 'Off';
+      case PlayerRepeatMode.Track:
+        return 'Track';
+      case PlayerRepeatMode.Queue:
+        return 'Queue';
+      default:
+        throw new Error(`Invalid value: ${value}`);
+    }
+  };
+
+  const getNextMode = () => {
+    return (repeatMode + 1) % 3;
   };
 
   return (
@@ -323,6 +345,54 @@ const Player = ({ style }) => {
           uppercase={false}
           style={globalStyles.button}
           onPress={async () => {
+            const nextRepeatMode = getNextMode();
+            console.log(
+              `[Player] Setting repeat mode to ${getRepeatModeInfo(
+                nextRepeatMode,
+              )} (${nextRepeatMode})...`,
+            );
+            await TrackPlayer.setRepeatMode(nextRepeatMode);
+            setRepeatMode(nextRepeatMode);
+          }}>
+          Repeat Mode: {getRepeatModeInfo(repeatMode)}
+        </Button>
+
+        <Button
+          mode="outlined"
+          uppercase={false}
+          style={globalStyles.button}
+          disabled={rate === 2}
+          onPress={async () => {
+            if (rate === 2) return;
+            const newRate = +(rate + 0.5).toFixed(1);
+            console.log(`[Player] Setting rate from ${rate} to ${newRate}...`);
+            await TrackPlayer.setRate(newRate);
+            setRate(newRate);
+          }}>
+          Rate+
+        </Button>
+
+        <Button
+          mode="outlined"
+          uppercase={false}
+          style={globalStyles.button}
+          disabled={rate === 1}
+          onPress={async () => {
+            if (rate === 1) return;
+            const newRate = +(rate - 0.5).toFixed(1);
+            console.log(`[Player] Setting rate from ${rate} to ${newRate}...`);
+            await TrackPlayer.setRate(newRate);
+            setRate(newRate);
+          }}>
+          Rate-
+        </Button>
+
+        <Button
+          mode="outlined"
+          uppercase={false}
+          style={globalStyles.button}
+          disabled={volume === 1}
+          onPress={async () => {
             if (volume === 1) return;
             const newVol = +(volume + 0.1).toFixed(1);
             console.log(`[Player] Vol+ : ${volume} to ${newVol}...`);
@@ -336,6 +406,7 @@ const Player = ({ style }) => {
           mode="outlined"
           uppercase={false}
           style={globalStyles.button}
+          disabled={volume === 0}
           onPress={async () => {
             if (volume === 0) return;
             const newVol = +(volume - 0.1).toFixed(1);
