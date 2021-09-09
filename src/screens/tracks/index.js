@@ -128,8 +128,8 @@ const Tracks = ({ navigation }) => {
         case SortingOptions.ALBUM:
           return track.album.trim();
         case SortingOptions.FOLDER:
-          return `${track.folder.name} (${track.folder.path.trim()})`;
-        // return track.folder.name.trim();
+          // return `${track.folder.name} (${track.folder.path.trim()})`;
+          return track.folder.name.trim();
         default:
           throw new Error(`Invalid sortBy value: ${sortBy}`);
       }
