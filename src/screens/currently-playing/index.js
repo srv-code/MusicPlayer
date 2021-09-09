@@ -8,7 +8,6 @@ import {
   heightPercentageToDP as hp,
   widthPercentageToDP as wp,
 } from 'react-native-responsive-screen';
-import { ScrollView } from 'react-native';
 
 const CurrentlyPlaying = ({ navigation, extraData }) => {
   return (

@@ -16,7 +16,7 @@ import {
   widthPercentageToDP as wp,
 } from 'react-native-responsive-screen';
 import { ActivityIndicator, Text } from 'react-native-paper';
-import MusicUtils from '../../utils/tracks';
+import MusicUtils from '../../utils/music';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import keys from '../../constants/keys';
 

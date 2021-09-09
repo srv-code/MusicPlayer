@@ -185,7 +185,12 @@ const Search = ({ navigation }) => {
         switch (type) {
           case keys.TRACKS:
             if (data.artwork)
-              return <Avatar.Image size={hp(6)} source={{ uri: data.artwork }} />;
+              return (
+                <Avatar.Image
+                  size={hp(6)}
+                  source={{ uri: `file://${data.artwork}` }}
+                />
+              );
             else iconName = 'music';
             break;
           case keys.ALBUMS:
