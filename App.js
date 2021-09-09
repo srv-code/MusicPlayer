@@ -1,11 +1,5 @@
-import React, { useMemo, useRef, useState } from 'react';
-import {
-  PermissionsAndroid,
-  StatusBar,
-  TouchableOpacity,
-  View,
-  AppState,
-} from 'react-native';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { StatusBar } from 'react-native';
 import { PreferencesContext } from './src/context/preferences';
 import { MusicContext } from './src/context/music';
 import Navigator from './src/navigator';
@@ -13,7 +7,6 @@ import {
   Provider as PaperProvider,
   DefaultTheme as PaperDefaultTheme,
   DarkTheme as PaperDarkTheme,
-  Text,
 } from 'react-native-paper';
 import {
   DefaultTheme as NavigationDefaultTheme,
@@ -23,9 +16,14 @@ import { SafeAreaProvider } from 'react-native-safe-area-context/src/SafeAreaCon
 import Colors from 'react-native/Libraries/NewAppScreen/components/Colors';
 import colors from './src/constants/colors';
 import Splash from './src/screens/splash';
-import FileSystem from 'react-native-fs';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import keys from './src/constants/keys';
+import TrackPlayer from 'react-native-track-player';
+import {
+  Capability as PlayerCapability,
+  Event as PlayerEvent,
+  RatingType as PlayerRatingType,
+} from 'react-native-track-player/lib/interfaces';
+import { useTrackPlayerEvents as usePlayerEvents } from 'react-native-track-player/lib/hooks';
+import { getPlayerStateInfo } from './src/components/player';
 
 const App = () => {
   console.log('App loaded');
@@ -68,6 +66,115 @@ const App = () => {
   };
 
   const theme = enabledDarkTheme ? MergedDarkTheme : MergedDefaultTheme;
+
+  const initPlayer = async () => {
+    console.log(`[App] Player::setupPlayer....`);
+    await TrackPlayer.setupPlayer({});
+
+    const capabilities = [
+      PlayerCapability.Play,
+      // PlayerCapability.PlayFromId,
+      // PlayerCapability.PlayFromSearch,
+      PlayerCapability.Pause,
+      PlayerCapability.Stop,
+      PlayerCapability.SeekTo,
+      PlayerCapability.Skip,
+      PlayerCapability.SkipToNext,
+      PlayerCapability.SkipToPrevious,
+      PlayerCapability.JumpForward,
+      PlayerCapability.JumpBackward,
+      // PlayerCapability.SetRating,
+      // PlayerCapability.Like,
+      // PlayerCapability.Dislike,
+      // PlayerCapability.Bookmark,
+    ];
+    console.log(`[App] Player::updateOptions....`);
+    await TrackPlayer.updateOptions({
+      ratingType: PlayerRatingType.Heart,
+
+      // // Whether the player will be destroyed when the app closes
+      // stopWithApp: true,
+      //
+      // // Whether the remote-duck event will be triggered on every interruption
+      // alwaysPauseOnInterruption: true,
+
+      // The notification icon
+      icon: require('./assets/images/logo.png'),
+
+      // color: enabledDarkTheme ? 0 : parseInt('00004e', 16),
+      // color: parseInt('000000', 16),
+
+      // Media controls capabilities
+      capabilities,
+
+      // Capabilities that will show up when the notification is in the compact form on Android
+      compactCapabilities: capabilities,
+
+      // // The buttons that it will show in the notification. Defaults to data.capabilities
+      // notificationCapabilities: [
+      //   ...capabilities,
+      //   PlayerCapability.SetRating,
+      //   PlayerCapability.Like,
+      //   PlayerCapability.Dislike,
+      //   PlayerCapability.Bookmark,
+      // ],
+
+      // // Icons for the notification on Android (if you don't like the default ones)
+      // playIcon: require('./play-icon.png'),
+      // pauseIcon: require('./pause-icon.png'),
+      // stopIcon: require('./stop-icon.png'),
+      // previousIcon: require('./previous-icon.png'),
+      // nextIcon: require('./next-icon.png'),
+      // icon: require('./notification-icon.png'),
+    });
+  };
+
+  useEffect(() => {
+    initPlayer().catch(err => {
+      console.log(`[App] Player: Error initializing: ${JSON.stringify(err)}`);
+      throw err;
+    });
+
+    /* wont be called when the app is dismissed from background */
+    return () => {
+      console.log(`[App] Player: Destroying...`);
+      TrackPlayer.destroy();
+    };
+  }, []);
+
+  usePlayerEvents(
+    [
+      PlayerEvent.PlaybackTrackChanged,
+      PlayerEvent.PlaybackState,
+      PlayerEvent.PlaybackError,
+      PlayerEvent.PlaybackQueueEnded,
+      PlayerEvent.PlaybackTrackChanged,
+      PlayerEvent.PlaybackMetadataReceived,
+      PlayerEvent.RemotePlay,
+      PlayerEvent.RemotePlayId,
+      PlayerEvent.RemotePlaySearch,
+      PlayerEvent.RemotePause,
+      PlayerEvent.RemoteStop,
+      PlayerEvent.RemoteSkip,
+      PlayerEvent.RemoteNext,
+      PlayerEvent.RemotePrevious,
+      PlayerEvent.RemoteJumpForward,
+      PlayerEvent.RemoteJumpBackward,
+      PlayerEvent.RemoteSeek,
+      PlayerEvent.RemoteSetRating,
+      PlayerEvent.RemoteDuck,
+      PlayerEvent.RemoteLike,
+      PlayerEvent.RemoteDislike,
+      PlayerEvent.RemoteBookmark,
+    ],
+    async event => {
+      console.log(
+        `[App] Player: Event: type=${event.type}, state=${JSON.stringify(
+          getPlayerStateInfo(event.state),
+        )}, event=${JSON.stringify(event)}`,
+      );
+    },
+  );
 
   // useEffect(() => {
   //   if (showSplash)

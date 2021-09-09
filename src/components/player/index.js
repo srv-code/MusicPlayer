@@ -1,22 +1,10 @@
-import React, { useContext, useEffect, useRef, useState } from 'react';
-import {
-  FlatList,
-  PermissionsAndroid,
-  Platform,
-  ScrollView,
-  StyleSheet,
-  View,
-} from 'react-native';
+import React, { useContext, useState } from 'react';
+import { StyleSheet, View } from 'react-native';
 import { Button, Text } from 'react-native-paper';
 import TrackPlayer, {
   State as PlayerState,
-  Capability as PlayerCapability,
-  Event as PlayerEvent,
   RepeatMode as PlayerRepeatMode,
-  RatingType as PlayerRatingType,
-  FeedbackOptions as PlayerFeedbackOptions,
   useProgress as usePlayerProgress,
-  useTrackPlayerEvents as usePlayerEvents,
 } from 'react-native-track-player';
 import {
   heightPercentageToDP as hp,
@@ -24,15 +12,65 @@ import {
 } from 'react-native-responsive-screen';
 import globalStyles from '../../styles';
 import { MusicContext } from '../../context/music';
-import FileSystem from 'react-native-fs';
-import { BottomSheetFlatList } from '@gorhom/bottom-sheet';
-import { platforms } from 'react-native/react-native.config';
-import { PreferencesContext } from '../../context/preferences';
-import colors from '../../constants/colors';
+
+export const getPlayerStateInfo = stateValue => {
+  switch (stateValue) {
+    case null:
+    case undefined:
+      return null;
+
+    case PlayerState.None:
+      return {
+        constant: 'None',
+        description: 'State indicating that no media is currently loaded',
+      };
+
+    case PlayerState.Ready:
+      return {
+        constant: 'Ready',
+        description:
+          'State indicating that the player is ready to start playing',
+      };
+
+    case PlayerState.Playing:
+      return {
+        constant: 'Playing',
+        description: 'State indicating that the player is currently playing',
+      };
+
+    case PlayerState.Paused:
+      return {
+        constant: 'Paused',
+        description: 'State indicating that the player is currently paused',
+      };
+
+    case PlayerState.Stopped:
+      return {
+        constant: 'Stopped',
+        description: 'State indicating that the player is currently stopped',
+      };
+
+    case PlayerState.Buffering:
+      return {
+        constant: 'Buffering',
+        description:
+          'State indicating that the player is currently buffering (in “play” state)',
+      };
+
+    case PlayerState.Connecting:
+      return {
+        constant: 'Connecting',
+        description:
+          'State indicating that the player is currently buffering (in “pause” state)',
+      };
+
+    default:
+      throw new Error(`Invalid value: ${stateValue}`);
+  }
+};
 
 const Player = ({ style }) => {
   const { musicInfo } = useContext(MusicContext);
-  const { enabledDarkTheme } = useContext(PreferencesContext);
 
   const trackProgress = usePlayerProgress();
 
@@ -41,158 +79,6 @@ const Player = ({ style }) => {
   const [repeatMode, setRepeatMode] = useState(
     PlayerRepeatMode.Off,
   ); /* default value */
-
-  useEffect(async () => {
-    console.log(`[Player] setupPlayer`);
-    await TrackPlayer.setupPlayer({});
-
-    console.log(`[Player] updateOptions`);
-    const capabilities = [
-      PlayerCapability.Play,
-      // PlayerCapability.PlayFromId,
-      // PlayerCapability.PlayFromSearch,
-      PlayerCapability.Pause,
-      PlayerCapability.Stop,
-      PlayerCapability.SeekTo,
-      PlayerCapability.Skip,
-      PlayerCapability.SkipToNext,
-      PlayerCapability.SkipToPrevious,
-      PlayerCapability.JumpForward,
-      PlayerCapability.JumpBackward,
-      // PlayerCapability.SetRating,
-      // PlayerCapability.Like,
-      // PlayerCapability.Dislike,
-      // PlayerCapability.Bookmark,
-    ];
-    await TrackPlayer.updateOptions({
-      ratingType: PlayerRatingType.Heart,
-
-      // // Whether the player will be destroyed when the app closes
-      // stopWithApp: true,
-      //
-      // // Whether the remote-duck event will be triggered on every interruption
-      // alwaysPauseOnInterruption: true,
-
-      // The notification icon
-      icon: require('../../../assets/images/logo.png'),
-
-      // color: enabledDarkTheme ? 0 : parseInt('00004e', 16),
-      // color: parseInt('000000', 16),
-
-      // Media controls capabilities
-      capabilities,
-
-      // Capabilities that will show up when the notification is in the compact form on Android
-      compactCapabilities: capabilities,
-
-      // // The buttons that it will show in the notification. Defaults to data.capabilities
-      // notificationCapabilities: [
-      //   ...capabilities,
-      //   PlayerCapability.SetRating,
-      //   PlayerCapability.Like,
-      //   PlayerCapability.Dislike,
-      //   PlayerCapability.Bookmark,
-      // ],
-
-      // // Icons for the notification on Android (if you don't like the default ones)
-      // playIcon: require('./play-icon.png'),
-      // pauseIcon: require('./pause-icon.png'),
-      // stopIcon: require('./stop-icon.png'),
-      // previousIcon: require('./previous-icon.png'),
-      // nextIcon: require('./next-icon.png'),
-      // icon: require('./notification-icon.png'),
-    });
-  }, []);
-
-  usePlayerEvents(
-    [
-      PlayerEvent.PlaybackTrackChanged,
-      PlayerEvent.PlaybackState,
-      PlayerEvent.PlaybackError,
-      PlayerEvent.PlaybackQueueEnded,
-      PlayerEvent.PlaybackTrackChanged,
-      PlayerEvent.PlaybackMetadataReceived,
-      PlayerEvent.RemotePlay,
-      PlayerEvent.RemotePlayId,
-      PlayerEvent.RemotePlaySearch,
-      PlayerEvent.RemotePause,
-      PlayerEvent.RemoteStop,
-      PlayerEvent.RemoteSkip,
-      PlayerEvent.RemoteNext,
-      PlayerEvent.RemotePrevious,
-      PlayerEvent.RemoteJumpForward,
-      PlayerEvent.RemoteJumpBackward,
-      PlayerEvent.RemoteSeek,
-      PlayerEvent.RemoteSetRating,
-      PlayerEvent.RemoteDuck,
-      PlayerEvent.RemoteLike,
-      PlayerEvent.RemoteDislike,
-      PlayerEvent.RemoteBookmark,
-    ],
-    async event => {
-      console.log(
-        `[Player] event: type=${event.type}, state=${JSON.stringify(
-          getPlayerStateInfo(event.state),
-        )}, event=${JSON.stringify(event)}`,
-      );
-    },
-  );
-
-  const getPlayerStateInfo = stateValue => {
-    switch (stateValue) {
-      case null:
-      case undefined:
-        return null;
-
-      case PlayerState.None:
-        return {
-          constant: 'None',
-          description: 'State indicating that no media is currently loaded',
-        };
-
-      case PlayerState.Ready:
-        return {
-          constant: 'Ready',
-          description:
-            'State indicating that the player is ready to start playing',
-        };
-
-      case PlayerState.Playing:
-        return {
-          constant: 'Playing',
-          description: 'State indicating that the player is currently playing',
-        };
-
-      case PlayerState.Paused:
-        return {
-          constant: 'Paused',
-          description: 'State indicating that the player is currently paused',
-        };
-
-      case PlayerState.Stopped:
-        return {
-          constant: 'Stopped',
-          description: 'State indicating that the player is currently stopped',
-        };
-
-      case PlayerState.Buffering:
-        return {
-          constant: 'Buffering',
-          description:
-            'State indicating that the player is currently buffering (in “play” state)',
-        };
-
-      case PlayerState.Connecting:
-        return {
-          constant: 'Connecting',
-          description:
-            'State indicating that the player is currently buffering (in “pause” state)',
-        };
-
-      default:
-        throw new Error(`Invalid value: ${stateValue}`);
-    }
-  };
 
   const getRepeatModeInfo = value => {
     switch (value) {

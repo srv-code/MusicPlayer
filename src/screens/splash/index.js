@@ -5,7 +5,6 @@ import {
   StyleSheet,
   StatusBar,
   PermissionsAndroid,
-  Alert,
   Platform,
   BackHandler,
 } from 'react-native';
