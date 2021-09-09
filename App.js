@@ -23,7 +23,7 @@ import {
   RatingType as PlayerRatingType,
 } from 'react-native-track-player/lib/interfaces';
 import { useTrackPlayerEvents as usePlayerEvents } from 'react-native-track-player/lib/hooks';
-import { getPlayerStateInfo } from './src/components/player';
+import PlayerUtils from './src/utils/player';
 
 const App = () => {
   console.log('App loaded');
@@ -170,7 +170,7 @@ const App = () => {
     async event => {
       console.log(
         `[App] Player: Event: type=${event.type}, state=${JSON.stringify(
-          getPlayerStateInfo(event.state),
+          PlayerUtils.getPlayerStateInfo(event.state),
         )}, event=${JSON.stringify(event)}`,
       );
     },

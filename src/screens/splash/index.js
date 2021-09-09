@@ -16,7 +16,7 @@ import {
   widthPercentageToDP as wp,
 } from 'react-native-responsive-screen';
 import { ActivityIndicator, Text } from 'react-native-paper';
-import { fetchAllMusicTracks } from '../../utils/tracks';
+import MusicUtils from '../../utils/tracks';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import keys from '../../constants/keys';
 
@@ -153,8 +153,7 @@ const Splash = ({ setShow, setMusicInfo }) => {
           error.message = `Failed loading music tracks`;
 
           console.log(`[Splash] Discovering all music tracks from phone...`);
-          const tracks = stripMusicInfo(await fetchAllMusicTracks());
-          // console.log('fetchAllMusicTracks:', { tracks });
+          const tracks = stripMusicInfo(await MusicUtils.fetchAllTracks());
 
           // Write music tracks to async-storage
           error.title = 'Storage Write Error';

@@ -2,7 +2,6 @@ import React, { useContext, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { Button, Text } from 'react-native-paper';
 import TrackPlayer, {
-  State as PlayerState,
   RepeatMode as PlayerRepeatMode,
   useProgress as usePlayerProgress,
 } from 'react-native-track-player';
@@ -12,62 +11,7 @@ import {
 } from 'react-native-responsive-screen';
 import globalStyles from '../../styles';
 import { MusicContext } from '../../context/music';
-
-export const getPlayerStateInfo = stateValue => {
-  switch (stateValue) {
-    case null:
-    case undefined:
-      return null;
-
-    case PlayerState.None:
-      return {
-        constant: 'None',
-        description: 'State indicating that no media is currently loaded',
-      };
-
-    case PlayerState.Ready:
-      return {
-        constant: 'Ready',
-        description:
-          'State indicating that the player is ready to start playing',
-      };
-
-    case PlayerState.Playing:
-      return {
-        constant: 'Playing',
-        description: 'State indicating that the player is currently playing',
-      };
-
-    case PlayerState.Paused:
-      return {
-        constant: 'Paused',
-        description: 'State indicating that the player is currently paused',
-      };
-
-    case PlayerState.Stopped:
-      return {
-        constant: 'Stopped',
-        description: 'State indicating that the player is currently stopped',
-      };
-
-    case PlayerState.Buffering:
-      return {
-        constant: 'Buffering',
-        description:
-          'State indicating that the player is currently buffering (in “play” state)',
-      };
-
-    case PlayerState.Connecting:
-      return {
-        constant: 'Connecting',
-        description:
-          'State indicating that the player is currently buffering (in “pause” state)',
-      };
-
-    default:
-      throw new Error(`Invalid value: ${stateValue}`);
-  }
-};
+import PlayerUtils from '../../utils/player';
 
 const Player = ({ style }) => {
   const { musicInfo } = useContext(MusicContext);
@@ -79,19 +23,6 @@ const Player = ({ style }) => {
   const [repeatMode, setRepeatMode] = useState(
     PlayerRepeatMode.Off,
   ); /* default value */
-
-  const getRepeatModeInfo = value => {
-    switch (value) {
-      case PlayerRepeatMode.Off:
-        return 'Off';
-      case PlayerRepeatMode.Track:
-        return 'Track';
-      case PlayerRepeatMode.Queue:
-        return 'Queue';
-      default:
-        throw new Error(`Invalid value: ${value}`);
-    }
-  };
 
   const getNextMode = () => {
     return (repeatMode + 1) % 3;
@@ -254,14 +185,14 @@ const Player = ({ style }) => {
           onPress={async () => {
             const nextRepeatMode = getNextMode();
             console.log(
-              `[Player] Setting repeat mode to ${getRepeatModeInfo(
+              `[Player] Setting repeat mode to ${PlayerUtils.getRepeatModeInfo(
                 nextRepeatMode,
               )} (${nextRepeatMode})...`,
             );
             await TrackPlayer.setRepeatMode(nextRepeatMode);
             setRepeatMode(nextRepeatMode);
           }}>
-          Repeat Mode: {getRepeatModeInfo(repeatMode)}
+          Repeat Mode: {PlayerUtils.getRepeatModeInfo(repeatMode)}
         </Button>
 
         <Button
