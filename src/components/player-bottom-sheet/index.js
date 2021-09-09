@@ -17,7 +17,7 @@ import colors from '../../constants/colors';
 import CustomHandle from './sub-components/custom-handle';
 
 const PlayerBottomSheet = ({ navigator: Navigator }) => {
-  const startSnapIndex = 2; // TODO: 0 indicates minimized, to hide pass -1 (when there's no currently playing)
+  const startSnapIndex = 0; // TODO: 0 indicates minimized, to hide pass -1 (when there's no currently playing)
   const snapPoints = useMemo(() => ['10%', '45%', '92%'], []);
   const [snapIndex, setSnapIndex] = useState(startSnapIndex);
 

@@ -13,7 +13,8 @@ import { useBackHandler } from '@react-native-community/hooks';
 import labels from '../../constants/labels';
 
 const Settings = ({ navigation }) => {
-  const prefInfo = useContext(PreferencesContext);
+  const { enabledDarkTheme, setEnabledDarkTheme } =
+    useContext(PreferencesContext);
 
   const [showSearch, setShowSearch] = useState(false);
   const [searchedTerm, setSearchedTerm] = useState('');
@@ -58,10 +59,10 @@ const Settings = ({ navigation }) => {
         style={{
           marginVertical: hp(2),
         }}>
-        <Text>
-          {`Preferences Info:
-${JSON.stringify(prefInfo)}`}
-        </Text>
+        {/*        <Text>*/}
+        {/*          {`Preferences Info:*/}
+        {/*${JSON.stringify(prefInfo)}`}*/}
+        {/*        </Text>*/}
 
         {/*<Switch*/}
         {/*  value={prefInfo.enabledDarkTheme}*/}
@@ -75,12 +76,20 @@ ${JSON.stringify(prefInfo)}`}
             justifyContent: 'space-between',
           }}>
           <Text style={{ fontSize: wp(4.5) }}>Theme</Text>
-          <ToggleButton.Row
-            onValueChange={prefInfo.toggleDarkTheme}
-            value={prefInfo.enabledDarkTheme}>
-            <ToggleButton icon="white-balance-sunny" value={false} />
-            <ToggleButton icon="moon-waning-crescent" value={true} />
-          </ToggleButton.Row>
+          <View style={styles.themeToggleContainer}>
+            <ToggleButton
+              icon="white-balance-sunny"
+              onPress={setEnabledDarkTheme.bind(this, false)}
+              status={enabledDarkTheme ? 'unchecked' : 'checked'}
+              value={false}
+            />
+            <ToggleButton
+              icon="moon-waning-crescent"
+              onPress={setEnabledDarkTheme.bind(this, true)}
+              status={enabledDarkTheme ? 'checked' : 'unchecked'}
+              value={true}
+            />
+          </View>
         </View>
       </View>
     </ScreenContainer>
@@ -90,6 +99,11 @@ ${JSON.stringify(prefInfo)}`}
 const styles = StyleSheet.create({
   iconContainer: {
     alignItems: 'center',
+  },
+  themeToggleContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });
 

@@ -6,6 +6,7 @@ import {
   Image,
   Keyboard,
   StyleSheet,
+  ToastAndroid,
   View,
 } from 'react-native';
 import ScreenContainer from '../../components/screen-container';
@@ -47,14 +48,14 @@ const Search = ({ navigation }) => {
   const [musicData, setMusicData] = useState(null);
   const [expandedKeys, setExpandedKeys] = useState([]);
   const [showMoreOptionFor, setShowMoreOptionFor] = useState(null);
-  const [showInfoInSnackBar, setShowInfoInSnackBar] = useState(null);
+  // const [showInfoInSnackBar, setShowInfoInSnackBar] = useState(null);
   const searchBar = useRef(null);
 
   console.log('[Search]', {
     musicData,
     searchedTerm,
     previousSearchedTerms,
-    showInfoInSnackBar,
+    // showInfoInSnackBar,
     searchBar,
   });
 
@@ -255,13 +256,7 @@ const Search = ({ navigation }) => {
                   onPress={() => {
                     // alert(JSON.stringify(props));
                     setShowMoreOptionFor(null);
-                    setShowInfoInSnackBar({
-                      message: labels.addedToQueue,
-                      actions: {
-                        label: labels.dismiss,
-                        onPress: setShowInfoInSnackBar.bind(this, null),
-                      },
-                    });
+                    ToastAndroid.show(labels.addedToQueue, ToastAndroid.SHORT);
                   }}
                 />
                 <Menu.Item
@@ -319,13 +314,7 @@ const Search = ({ navigation }) => {
                   onPress={() => {
                     // alert(JSON.stringify(props));
                     setShowMoreOptionFor(null);
-                    setShowInfoInSnackBar({
-                      message: labels.addedToQueue,
-                      actions: {
-                        label: labels.dismiss,
-                        onPress: setShowInfoInSnackBar.bind(this, null),
-                      },
-                    });
+                    ToastAndroid.show(labels.addedToQueue, ToastAndroid.SHORT);
                   }}
                 />
                 <Menu.Item
@@ -383,13 +372,7 @@ const Search = ({ navigation }) => {
                   onPress={() => {
                     // alert(JSON.stringify(props));
                     setShowMoreOptionFor(null);
-                    setShowInfoInSnackBar({
-                      message: labels.addedToQueue,
-                      actions: {
-                        label: labels.dismiss,
-                        onPress: setShowInfoInSnackBar.bind(this, null),
-                      },
-                    });
+                    ToastAndroid.show(labels.addedToQueue, ToastAndroid.SHORT);
                   }}
                 />
                 <Menu.Item
@@ -447,13 +430,7 @@ const Search = ({ navigation }) => {
                   onPress={() => {
                     // alert(JSON.stringify(props));
                     setShowMoreOptionFor(null);
-                    setShowInfoInSnackBar({
-                      message: labels.addedToQueue,
-                      actions: {
-                        label: labels.dismiss,
-                        onPress: setShowInfoInSnackBar.bind(this, null),
-                      },
-                    });
+                    ToastAndroid.show(labels.addedToQueue, ToastAndroid.SHORT);
                   }}
                 />
                 <Menu.Item
@@ -737,16 +714,16 @@ const Search = ({ navigation }) => {
         {/*/>*/}
       </ScreenContainer>
 
-      <Snackbar
-        visible={Boolean(showInfoInSnackBar)}
-        duration={showInfoInSnackBar?.duration ?? 1500}
-        onDismiss={() => {
-          if (showInfoInSnackBar.onDismiss) showInfoInSnackBar.onDismiss();
-          setShowInfoInSnackBar(null);
-        }}
-        action={showInfoInSnackBar?.actions}>
-        {showInfoInSnackBar?.message}
-      </Snackbar>
+      {/*<Snackbar*/}
+      {/*  visible={Boolean(showInfoInSnackBar)}*/}
+      {/*  duration={showInfoInSnackBar?.duration ?? 1500}*/}
+      {/*  onDismiss={() => {*/}
+      {/*    if (showInfoInSnackBar.onDismiss) showInfoInSnackBar.onDismiss();*/}
+      {/*    setShowInfoInSnackBar(null);*/}
+      {/*  }}*/}
+      {/*  action={showInfoInSnackBar?.actions}>*/}
+      {/*  {showInfoInSnackBar?.message}*/}
+      {/*</Snackbar>*/}
 
       {/*<Modal*/}
       {/*  testID={'modal1'}*/}

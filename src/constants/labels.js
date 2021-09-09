@@ -25,6 +25,8 @@ const labels = {
   currentlyPlaying: 'Currently Playing',
   currentPlaylist: 'Current Playlist',
   songInfo: 'Song Info',
+  title: 'Title',
+  noTracksFound: 'No tracks found',
 };
 
 export default labels;

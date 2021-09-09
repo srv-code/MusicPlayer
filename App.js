@@ -24,13 +24,14 @@ import {
 } from 'react-native-track-player/lib/interfaces';
 import { useTrackPlayerEvents as usePlayerEvents } from 'react-native-track-player/lib/hooks';
 import PlayerUtils from './src/utils/player';
+import useColorScheme from 'react-native/Libraries/Utilities/useColorScheme';
 
 const App = () => {
   console.log('App loaded');
 
   const [enabledDarkTheme, setEnabledDarkTheme] = useState(
-    // useColorScheme() === 'dark',
-    false, // TODO revert later, for testing purpose only
+    useColorScheme() === 'dark',
+    // false, // TODO revert later, for testing purpose only
     // true,
   );
   const [musicInfo, setMusicInfo] = useState(null);
@@ -51,8 +52,8 @@ const App = () => {
 
   const preferencesContextValue = useMemo(
     () => ({
-      toggleDarkTheme: setEnabledDarkTheme.bind(this, !enabledDarkTheme),
       enabledDarkTheme,
+      setEnabledDarkTheme,
     }),
     [enabledDarkTheme],
   );

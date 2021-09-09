@@ -1,10 +1,23 @@
-import React, { useContext, useMemo } from 'react';
-import { StyleSheet, TouchableOpacity, View } from 'react-native';
+import React, { useContext, useMemo, useState } from 'react';
+import {
+  Alert,
+  FlatList,
+  StyleSheet,
+  ToastAndroid,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import ScreenContainer from '../../components/screen-container';
 import { PreferencesContext } from '../../context/preferences';
-import { Button, Text } from 'react-native-paper';
+import {
+  Avatar,
+  IconButton,
+  List,
+  Menu,
+  Text,
+  ToggleButton,
+} from 'react-native-paper';
 import { MusicContext } from '../../context/music';
-import globalStyles from '../../styles';
 import Colors from 'react-native/Libraries/NewAppScreen/components/Colors';
 import {
   heightPercentageToDP as hp,
@@ -13,10 +26,33 @@ import {
 import TrackPlayer from 'react-native-track-player';
 import colors from '../../constants/colors';
 import Icon from '../../components/icon';
+import labels from '../../constants/labels';
+
+const SortingOptions = {
+  TITLE: labels.title,
+  ARTIST: labels.artist,
+  ALBUM: labels.album,
+  DURATION: labels.duration,
+  FOLDER: labels.folder,
+};
+
+const SortingOrders = {
+  ASCENDING: 'ASCENDING',
+  DECREASING: 'DECREASING',
+};
 
 const Tracks = ({ navigation }) => {
   const { enabledDarkTheme } = useContext(PreferencesContext);
-  const { playerControls } = useContext(MusicContext);
+  const {
+    playerControls,
+    musicInfo: { tracks },
+  } = useContext(MusicContext);
+
+  const [showSortingMenu, setShowSortingMenu] = useState(false);
+  const [sortBy, setSortBy] = useState(SortingOptions.TITLE);
+  const [sortOrder, setSortOrder] = useState(SortingOrders.ASCENDING);
+  const [showMoreOptionForTrackId, setShowMoreOptionForTrackId] =
+    useState(null);
 
   const dynamicStyles = useMemo(
     () => ({
@@ -35,6 +71,132 @@ const Tracks = ({ navigation }) => {
     }),
     [enabledDarkTheme],
   );
+
+  const onShuffleTracks = () => {};
+
+  const onPlayWholePlayList = () => {};
+
+  // console.log(`[Tracks] tracks=${JSON.stringify(tracks)}`);
+
+  const getIconInfo = type => {
+    switch (type) {
+      case SortingOptions.TITLE:
+        return { name: 'format-text', type: 'MaterialCommunityIcons' };
+      case SortingOptions.DURATION:
+        return { name: 'clock-time-five-outline' };
+      case SortingOptions.ALBUM:
+        return { name: 'disc-outline', type: 'Ionicons' };
+      case SortingOptions.ARTIST:
+        return {
+          name: 'account-music-outline',
+          type: 'MaterialCommunityIcons',
+        };
+      case SortingOptions.FOLDER:
+        return { name: 'folder-music-outline', type: 'MaterialCommunityIcons' };
+      default:
+        throw new Error(`Invalid type: ${type}`);
+    }
+  };
+
+  const renderTrackDescription = track => {
+    const getText = () => {
+      switch (sortBy) {
+        case SortingOptions.TITLE:
+        case SortingOptions.ARTIST:
+          return track.artist.trim();
+        case SortingOptions.DURATION:
+          return track.duration.trim();
+        case SortingOptions.ALBUM:
+          return track.album.trim();
+        case SortingOptions.FOLDER:
+          return track.folder.name.trim();
+        default:
+          throw new Error(`Invalid sortBy value: ${sortBy}`);
+      }
+    };
+
+    return (
+      <View style={styles.trackDescText}>
+        <Icon
+          {...getIconInfo(
+            sortBy === SortingOptions.TITLE ? SortingOptions.ARTIST : sortBy,
+          )}
+          size={wp(3.5)}
+          color={colors.lightGrey}
+        />
+        <Text numberOfLines={1} style={styles.trackSubtitleText}>
+          {getText()}
+        </Text>
+      </View>
+    );
+  };
+
+  const renderTrackItemLeftComponent = track => {
+    if (track.artwork)
+      return (
+        <Avatar.Image
+          size={hp(6)}
+          source={{ uri: `file://${track.artwork}` }}
+        />
+      );
+    return 'music';
+  };
+
+  const renderTrackItemRightComponent = (track, props) => (
+    <Menu
+      {...props}
+      visible={showMoreOptionForTrackId === track.id}
+      onDismiss={setShowMoreOptionForTrackId.bind(this, null)}
+      anchor={
+        <IconButton
+          {...props}
+          icon="dots-vertical"
+          onPress={setShowMoreOptionForTrackId.bind(this, track.id)}
+        />
+      }>
+      <Menu.Item
+        icon="skip-next-outline"
+        title={labels.playNext}
+        onPress={() => {
+          alert(JSON.stringify(props));
+          setShowMoreOptionForTrackId(null);
+        }}
+      />
+      <Menu.Item
+        icon="playlist-plus"
+        title={labels.addToPlaylist}
+        onPress={() => {
+          setShowMoreOptionForTrackId(null);
+          alert(JSON.stringify(props));
+        }}
+      />
+      <Menu.Item
+        icon="table-column-plus-after"
+        title={labels.addToQueue}
+        onPress={() => {
+          // alert(JSON.stringify(props));
+          setShowMoreOptionForTrackId(null);
+          ToastAndroid.show(labels.addedToQueue, ToastAndroid.SHORT);
+        }}
+      />
+      <Menu.Item
+        icon="information-variant"
+        title={labels.showInfo}
+        onPress={() => {
+          // alert(JSON.stringify(props));
+          // navigation.navigate(screenNames.itemInfo, { type, data });
+          // setInfoModalData({ type, data });
+          setShowMoreOptionForTrackId(null);
+        }}
+      />
+    </Menu>
+  );
+
+  const sortTracks = (by, order) => {
+    // TODO Do the actual sorting here
+    setSortBy(by);
+    setSortOrder(order);
+  };
 
   return (
     <ScreenContainer style={dynamicStyles.container}>
@@ -85,28 +247,121 @@ const Tracks = ({ navigation }) => {
 
       {/* Player Controls */}
       <View style={styles.playerControlsContainer}>
-        <TouchableOpacity onPress={() => {}}>
-          <Icon
-            name="sort-amount-down"
-            type="FontAwesome5"
-            size={wp(4)}
-            // color={colors.lightPurple}
-            style={{ marginRight: wp(1) }}
-          />
-        </TouchableOpacity>
+        <Menu
+          visible={showSortingMenu}
+          onDismiss={setShowSortingMenu.bind(this, false)}
+          anchor={
+            <TouchableOpacity
+              onPress={setShowSortingMenu.bind(this, true)}
+              style={styles.sortButton}>
+              <Icon
+                name={
+                  sortOrder === SortingOrders.ASCENDING
+                    ? 'sort-amount-down-alt'
+                    : 'sort-amount-up-alt'
+                }
+                type="FontAwesome5"
+                size={wp(4)}
+              />
+              <Icon
+                {...getIconInfo(sortBy)}
+                size={wp(4.5)}
+                color={colors.lightGrey}
+              />
+            </TouchableOpacity>
+          }>
+          {/*<Text>{sortOrder}</Text>*/}
+          <View style={styles.sortOrderContainer}>
+            <ToggleButton
+              icon="sort-ascending"
+              onPress={sortTracks.bind(this, sortBy, SortingOrders.ASCENDING)}
+              style={styles.sortOrderButton}
+              size={wp(4.5)}
+              status={
+                sortOrder === SortingOrders.ASCENDING ? 'checked' : 'unchecked'
+              }
+              value={SortingOrders.ASCENDING}
+            />
+            <ToggleButton
+              icon="sort-descending"
+              onPress={sortTracks.bind(this, sortBy, SortingOrders.DECREASING)}
+              style={styles.sortOrderButton}
+              size={wp(4.5)}
+              status={
+                sortOrder === SortingOrders.DECREASING ? 'checked' : 'unchecked'
+              }
+              value={SortingOrders.DECREASING}
+            />
+          </View>
+
+          {Object.values(SortingOptions).map((option, index) => (
+            <TouchableOpacity
+              key={index}
+              style={styles.sortOptionButton}
+              onPress={sortTracks.bind(this, option, sortOrder)}>
+              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <Icon
+                  {...getIconInfo(option)}
+                  size={wp(4.5)}
+                  color={colors.lightGrey}
+                />
+                <Text style={styles.sortOptionText}>{option}</Text>
+              </View>
+              {sortBy === option && (
+                <Icon
+                  name="check"
+                  type="Entypo"
+                  size={wp(4)}
+                  color={colors.lightGrey}
+                />
+              )}
+            </TouchableOpacity>
+          ))}
+        </Menu>
 
         <View style={styles.playerRightButtonContainer}>
           <TouchableOpacity
             style={dynamicStyles.playerButton}
-            onPress={() => {}}>
+            onPress={onShuffleTracks}>
             <Icon name="shuffle" type="Entypo" size={wp(4)} />
           </TouchableOpacity>
           <TouchableOpacity
             style={dynamicStyles.playerButton}
-            onPress={() => {}}>
+            onPress={onPlayWholePlayList}>
             <Icon name="controller-play" type="Entypo" size={wp(4)} />
           </TouchableOpacity>
         </View>
+      </View>
+
+      <View>
+        {tracks && tracks.length === 0 ? (
+          <Text style={styles.noTracksText}>{labels.noTracksFound}</Text>
+        ) : (
+          <FlatList
+            contentContainerStyle={styles.musicList}
+            data={tracks}
+            keyExtractor={(_, index) => index.toString()}
+            renderItem={({ item: track }) => (
+              <List.Item
+                onPress={() => {
+                  // TODO
+                  //  - tracks: insert current track in the stack (at the top) & play it
+                  //  - albums|artists|folders: show album tracks
+                  Alert.alert(`Track Info`, JSON.stringify(track));
+                }}
+                titleEllipsizeMode={'tail'}
+                titleNumberOfLines={1}
+                titleStyle={styles.listItemText}
+                title={track.title}
+                descriptionEllipsizeMode={'tail'}
+                descriptionNumberOfLines={1}
+                description={renderTrackDescription.bind(this, track)}
+                left={props => renderTrackItemLeftComponent(track)}
+                right={props => renderTrackItemRightComponent(track, props)}
+              />
+            )}
+          />
+        )}
       </View>
     </ScreenContainer>
   );
@@ -136,11 +391,61 @@ const styles = StyleSheet.create({
   },
   playerButton: {
     elevation: 2,
-    borderRadius: hp(5),
+    borderRadius: hp(10),
     padding: hp(1),
     alignItems: 'center',
     justifyContent: 'center',
     marginLeft: wp(2),
+  },
+  sortOptionButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: hp(0.7),
+    paddingHorizontal: wp(4),
+    width: wp(37),
+  },
+  sortOptionText: {
+    fontSize: wp(4),
+    marginLeft: wp(1.8),
+  },
+  musicList: {},
+  listItemText: {
+    fontSize: wp(4),
+    // marginBottom: hp(0.3),
+  },
+  noTracksText: {
+    fontSize: wp(5),
+    textAlign: 'center',
+    textAlignVertical: 'center',
+    marginTop: hp(8),
+    color: colors.lightGrey,
+  },
+  trackSubtitleText: {
+    fontSize: wp(3.2),
+    color: colors.lightGrey,
+    marginLeft: wp(0.5),
+  },
+  trackDescText: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  sortOrderRow: {
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  sortOrderContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  sortOrderButton: {
+    height: hp(4),
+    width: wp(15),
+  },
+  sortButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
 });
 
