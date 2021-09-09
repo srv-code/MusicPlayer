@@ -1,4 +1,4 @@
-import React, { useContext, useMemo, useState } from 'react';
+import React, { useContext, useEffect, useMemo, useState } from 'react';
 import {
   Alert,
   FlatList,
@@ -30,6 +30,7 @@ import colors from '../../constants/colors';
 import Icon from '../../components/icon';
 import labels from '../../constants/labels';
 import globalStyles from '../../styles';
+import DateTimeUtils from '../../utils/datetime';
 
 const SortingOptions = {
   TITLE: labels.title,
@@ -48,7 +49,7 @@ const Tracks = ({ navigation }) => {
   const { enabledDarkTheme } = useContext(PreferencesContext);
   const {
     playerControls,
-    musicInfo: { tracks },
+    musicInfo: { tracks: _tracks },
     bottomSheetMiniPositionIndex,
   } = useContext(MusicContext);
 
@@ -57,6 +58,12 @@ const Tracks = ({ navigation }) => {
   const [sortOrder, setSortOrder] = useState(SortingOrders.ASCENDING);
   const [showMoreOptionForTrackId, setShowMoreOptionForTrackId] =
     useState(null);
+  const [tracks, setTracks] = useState([]);
+
+  useEffect(() => {
+    console.log(`[Tracks] Populating tracks for first time`);
+    sortTracks([..._tracks], SortingOptions.TITLE, SortingOrders.ASCENDING);
+  }, [_tracks]);
 
   const dynamicStyles = useMemo(
     () => ({
@@ -76,9 +83,17 @@ const Tracks = ({ navigation }) => {
     [enabledDarkTheme],
   );
 
-  const onShuffleTracks = () => {};
+  // console.log(`[Tracks] sortBy=${sortBy}, sortOrder=${sortOrder}`);
 
-  const onPlayWholePlayList = () => {};
+  const onShuffleTracks = () => {
+    // TODO implement logic
+    playerControls.collapse();
+  };
+
+  const onPlayWholePlayList = () => {
+    // TODO implement logic
+    playerControls.collapse();
+  };
 
   // console.log(`[Tracks] tracks=${JSON.stringify(tracks)}`);
 
@@ -109,11 +124,12 @@ const Tracks = ({ navigation }) => {
         case SortingOptions.ARTIST:
           return track.artist.trim();
         case SortingOptions.DURATION:
-          return track.duration.trim();
+          return DateTimeUtils.msToTime(track.duration).trim();
         case SortingOptions.ALBUM:
           return track.album.trim();
         case SortingOptions.FOLDER:
-          return track.folder.name.trim();
+          return `${track.folder.name} (${track.folder.path.trim()})`;
+        // return track.folder.name.trim();
         default:
           throw new Error(`Invalid sortBy value: ${sortBy}`);
       }
@@ -135,7 +151,7 @@ const Tracks = ({ navigation }) => {
     );
   };
 
-  const renderTrackItemLeftComponent = track => {
+  const renderTrackItemLeftComponent = (track, props) => {
     if (track.artwork)
       return (
         <Avatar.Image
@@ -143,7 +159,7 @@ const Tracks = ({ navigation }) => {
           source={{ uri: `file://${track.artwork}` }}
         />
       );
-    return 'music';
+    return <Avatar.Icon size={hp(6)} icon="music" style={styles.musicIcon} />;
   };
 
   const renderTrackItemRightComponent = (track, props) => (
@@ -213,7 +229,7 @@ const Tracks = ({ navigation }) => {
         descriptionEllipsizeMode={'tail'}
         descriptionNumberOfLines={1}
         description={renderTrackDescription.bind(this, track)}
-        left={props => renderTrackItemLeftComponent(track)}
+        left={props => renderTrackItemLeftComponent(track, props)}
         right={props => renderTrackItemRightComponent(track, props)}
       />
       {index === tracks.length - 1 ? (
@@ -224,8 +240,57 @@ const Tracks = ({ navigation }) => {
     </>
   );
 
-  const sortTracks = (by, order) => {
-    // TODO Do the actual sorting here
+  const sortTracks = (list, by, order) => {
+    const _sort = ({ keys, type = 'string' } = {}) => {
+      let compare;
+      const getKeyValue = x => {
+        let val = { ...x };
+        for (const key of keys) val = val[key];
+        return val;
+      };
+
+      if (type === 'string' && order === SortingOrders.ASCENDING)
+        compare = (a, b) =>
+          getKeyValue(a) < getKeyValue(b)
+            ? -1
+            : getKeyValue(a) > getKeyValue(b)
+            ? 1
+            : 0;
+      else if (type === 'string' && order === SortingOrders.DECREASING)
+        compare = (a, b) =>
+          getKeyValue(b) < getKeyValue(a)
+            ? -1
+            : getKeyValue(b) > getKeyValue(a)
+            ? 1
+            : 0;
+      else if (type === 'number' && order === SortingOrders.ASCENDING)
+        compare = (a, b) => getKeyValue(a) - getKeyValue(b);
+      else if (type === 'number' && order === SortingOrders.DECREASING)
+        compare = (a, b) => getKeyValue(b) - getKeyValue(a);
+      else throw new Error(`Invalid type: ${type} or order=${order}`);
+
+      setTracks(list.sort(compare));
+    };
+
+    // TODO implement logic
+    switch (by) {
+      case SortingOptions.ARTIST:
+        _sort({ keys: ['artist'] });
+        break;
+      case SortingOptions.TITLE:
+        _sort({ keys: ['title'] });
+        break;
+      case SortingOptions.DURATION:
+        _sort({ keys: ['duration'], type: 'number' });
+        break;
+      case SortingOptions.ALBUM:
+        _sort({ keys: ['album'] });
+        break;
+      case SortingOptions.FOLDER:
+        _sort({ keys: ['folder', 'path'] });
+        break;
+    }
+
     setSortBy(by);
     setSortOrder(order);
   };
@@ -307,7 +372,12 @@ const Tracks = ({ navigation }) => {
           <View style={styles.sortOrderContainer}>
             <ToggleButton
               icon="sort-ascending"
-              onPress={sortTracks.bind(this, sortBy, SortingOrders.ASCENDING)}
+              onPress={sortTracks.bind(
+                this,
+                [...tracks],
+                sortBy,
+                SortingOrders.ASCENDING,
+              )}
               style={styles.sortOrderButton}
               size={wp(4.5)}
               status={
@@ -317,7 +387,12 @@ const Tracks = ({ navigation }) => {
             />
             <ToggleButton
               icon="sort-descending"
-              onPress={sortTracks.bind(this, sortBy, SortingOrders.DECREASING)}
+              onPress={sortTracks.bind(
+                this,
+                [...tracks],
+                sortBy,
+                SortingOrders.DECREASING,
+              )}
               style={styles.sortOrderButton}
               size={wp(4.5)}
               status={
@@ -331,7 +406,7 @@ const Tracks = ({ navigation }) => {
             <TouchableOpacity
               key={index}
               style={styles.sortOptionButton}
-              onPress={sortTracks.bind(this, option, sortOrder)}>
+              onPress={sortTracks.bind(this, [...tracks], option, sortOrder)}>
               <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                 <Icon
                   {...getIconInfo(option)}
@@ -470,6 +545,9 @@ const styles = StyleSheet.create({
     opacity: 0.1,
     borderRadius: 10,
     alignSelf: 'center',
+  },
+  musicIcon: {
+    backgroundColor: colors.lightPurple,
   },
 });
 

@@ -53,19 +53,8 @@ const ScreenContainer = ({
       )}
 
       {noScroll ? (
-        <View
-          style={[
-            styles.scrollView,
-            styles.scrollViewContent,
-            style,
-            {
-              // backgroundColor: 'red',
-              // borderWidth: 1,
-              // borderColor: 'blue',
-            },
-          ]}>
+        <View style={[styles.scrollView, styles.scrollViewContent, style]}>
           {children}
-          <Text>End</Text>
         </View>
       ) : (
         <ScrollView
