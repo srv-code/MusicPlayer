@@ -11,6 +11,8 @@ import ScreenContainer from '../../components/screen-container';
 import { PreferencesContext } from '../../context/preferences';
 import {
   Avatar,
+  Button,
+  Divider,
   IconButton,
   List,
   Menu,
@@ -27,6 +29,7 @@ import TrackPlayer from 'react-native-track-player';
 import colors from '../../constants/colors';
 import Icon from '../../components/icon';
 import labels from '../../constants/labels';
+import globalStyles from '../../styles';
 
 const SortingOptions = {
   TITLE: labels.title,
@@ -46,6 +49,7 @@ const Tracks = ({ navigation }) => {
   const {
     playerControls,
     musicInfo: { tracks },
+    bottomSheetMiniPositionIndex,
   } = useContext(MusicContext);
 
   const [showSortingMenu, setShowSortingMenu] = useState(false);
@@ -192,6 +196,34 @@ const Tracks = ({ navigation }) => {
     </Menu>
   );
 
+  const renderTrackItem = ({ item: track, index }) => (
+    <>
+      <List.Item
+        onPress={() => {
+          // TODO
+          //  - tracks: insert current track in the stack (at the top) & play it
+          //  - albums|artists|folders: show album tracks
+          Alert.alert(`Track Info`, JSON.stringify(track));
+        }}
+        titleEllipsizeMode={'tail'}
+        titleNumberOfLines={1}
+        titleStyle={styles.listItemText}
+        // title={`[${index + 1}] ${track.title}`}
+        title={track.title}
+        descriptionEllipsizeMode={'tail'}
+        descriptionNumberOfLines={1}
+        description={renderTrackDescription.bind(this, track)}
+        left={props => renderTrackItemLeftComponent(track)}
+        right={props => renderTrackItemRightComponent(track, props)}
+      />
+      {index === tracks.length - 1 ? (
+        <View style={styles.listItemEndSmallBar} />
+      ) : (
+        <Divider inset />
+      )}
+    </>
+  );
+
   const sortTracks = (by, order) => {
     // TODO Do the actual sorting here
     setSortBy(by);
@@ -199,7 +231,8 @@ const Tracks = ({ navigation }) => {
   };
 
   return (
-    <ScreenContainer style={dynamicStyles.container}>
+    <ScreenContainer noScroll style={dynamicStyles.container}>
+      {/*<Text>{`bottomSheetMiniPositionIndex=${bottomSheetMiniPositionIndex}`}</Text>*/}
       {/*<View style={styles.container}>*/}
       {/*{playerControls && (*/}
       {/*  <View>*/}
@@ -338,28 +371,12 @@ const Tracks = ({ navigation }) => {
           <Text style={styles.noTracksText}>{labels.noTracksFound}</Text>
         ) : (
           <FlatList
-            contentContainerStyle={styles.musicList}
+            contentContainerStyle={{
+              paddingBottom: hp(bottomSheetMiniPositionIndex === -1 ? 5 : 15),
+            }}
             data={tracks}
             keyExtractor={(_, index) => index.toString()}
-            renderItem={({ item: track }) => (
-              <List.Item
-                onPress={() => {
-                  // TODO
-                  //  - tracks: insert current track in the stack (at the top) & play it
-                  //  - albums|artists|folders: show album tracks
-                  Alert.alert(`Track Info`, JSON.stringify(track));
-                }}
-                titleEllipsizeMode={'tail'}
-                titleNumberOfLines={1}
-                titleStyle={styles.listItemText}
-                title={track.title}
-                descriptionEllipsizeMode={'tail'}
-                descriptionNumberOfLines={1}
-                description={renderTrackDescription.bind(this, track)}
-                left={props => renderTrackItemLeftComponent(track)}
-                right={props => renderTrackItemRightComponent(track, props)}
-              />
-            )}
+            renderItem={renderTrackItem}
           />
         )}
       </View>
@@ -384,6 +401,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    marginBottom: hp(1),
   },
   playerRightButtonContainer: {
     flexDirection: 'row',
@@ -409,10 +427,8 @@ const styles = StyleSheet.create({
     fontSize: wp(4),
     marginLeft: wp(1.8),
   },
-  musicList: {},
   listItemText: {
     fontSize: wp(4),
-    // marginBottom: hp(0.3),
   },
   noTracksText: {
     fontSize: wp(5),
@@ -446,6 +462,14 @@ const styles = StyleSheet.create({
   sortButton: {
     flexDirection: 'row',
     alignItems: 'center',
+  },
+  listItemEndSmallBar: {
+    paddingVertical: hp(0.3),
+    width: wp(12),
+    backgroundColor: colors.black,
+    opacity: 0.1,
+    borderRadius: 10,
+    alignSelf: 'center',
   },
 });
 

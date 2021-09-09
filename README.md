@@ -11,4 +11,8 @@ A cross-platform (Android & iOS) music player.
 
 1. Cannot open app when pressing the notification (implement React-Native-Linking)
 2. Capabilities: Like/Dislike/Rating
+3. Lift up the scroller when the bottom-sheet is at 1st index position
 
+### Finalising
+
+1. Apply `useMemo` & `useCallback` wherever possible and do each case studies

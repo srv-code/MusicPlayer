@@ -10,6 +10,7 @@ import BottomSheet, {
   BottomSheetBackdrop,
   useBottomSheetSpringConfigs,
 } from '@gorhom/bottom-sheet';
+import { heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import Colors from 'react-native/Libraries/NewAppScreen/components/Colors';
 import { PreferencesContext } from '../../context/preferences';
 import { MusicContext } from '../../context/music';
@@ -18,7 +19,7 @@ import CustomHandle from './sub-components/custom-handle';
 
 const PlayerBottomSheet = ({ navigator: Navigator }) => {
   const startSnapIndex = 0; // TODO: 0 indicates minimized, to hide pass -1 (when there's no currently playing)
-  const snapPoints = useMemo(() => ['10%', '45%', '92%'], []);
+  const snapPoints = ['10%', '45%', '92%'];
   const [snapIndex, setSnapIndex] = useState(startSnapIndex);
 
   // const handleSnapPress = useCallback(index => {
@@ -26,8 +27,12 @@ const PlayerBottomSheet = ({ navigator: Navigator }) => {
   //   bottomSheet.current?.snapToIndex(index);
   // }, []);
 
-  const { _playerBottomSheet, playerControls, setPlayerControls } =
-    useContext(MusicContext);
+  const {
+    _playerBottomSheet,
+    playerControls,
+    setPlayerControls,
+    setBottomSheetMiniPositionIndex,
+  } = useContext(MusicContext);
 
   const bottomSheetExpandHandler = useCallback(() => {
     _playerBottomSheet.current?.expand();
@@ -61,6 +66,7 @@ const PlayerBottomSheet = ({ navigator: Navigator }) => {
 
   const handleSheetChange = useCallback(index => {
     setSnapIndex(index);
+    if (index <= 0) setBottomSheetMiniPositionIndex(index);
   }, []);
 
   const handleSheetAnimate = useCallback((fromIndex, toIndex) => {
@@ -91,7 +97,7 @@ const PlayerBottomSheet = ({ navigator: Navigator }) => {
       enableHandlePanningGesture={true}
       handleComponent={renderCustomHandle}
       backgroundStyle={{
-        marginTop: 3,
+        marginTop: hp(0.3),
         backgroundColor: enabledDarkTheme ? Colors.darker : Colors.lighter,
       }}
       handleIndicatorStyle={styles.bottomSheetHandleIndicator}

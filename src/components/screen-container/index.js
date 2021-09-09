@@ -18,7 +18,7 @@ const ScreenContainer = ({
   actionIcons,
   iconName,
   style,
-  noScrollView,
+  noScroll,
   children,
 }) => {
   const { enabledDarkTheme } = useContext(PreferencesContext);
@@ -52,7 +52,7 @@ const ScreenContainer = ({
         </Appbar.Header>
       )}
 
-      {noScrollView ? (
+      {noScroll ? (
         <View
           style={[
             styles.scrollView,

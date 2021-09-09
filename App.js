@@ -30,24 +30,28 @@ const App = () => {
   console.log('App loaded');
 
   const [enabledDarkTheme, setEnabledDarkTheme] = useState(
-    useColorScheme() === 'dark',
-    // false, // TODO revert later, for testing purpose only
+    // useColorScheme() === 'dark',
+    false, // TODO revert later, for testing purpose only
     // true,
   );
   const [musicInfo, setMusicInfo] = useState(null);
   const _playerBottomSheet = useRef(null);
   const [playerControls, setPlayerControls] = useState({});
   const [showSplash, setShowSplash] = useState(true);
+  const [bottomSheetMiniPositionIndex, setBottomSheetMiniPositionIndex] =
+    useState(-1);
 
   const musicContextValue = useMemo(
     () => ({
       _playerBottomSheet,
       playerControls,
       setPlayerControls,
+      bottomSheetMiniPositionIndex,
+      setBottomSheetMiniPositionIndex,
       musicInfo,
       setMusicInfo,
     }),
-    [musicInfo, playerControls],
+    [musicInfo, playerControls, bottomSheetMiniPositionIndex],
   );
 
   const preferencesContextValue = useMemo(
