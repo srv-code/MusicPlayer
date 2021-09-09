@@ -38,22 +38,24 @@ const App = () => {
   const [playerControls, setPlayerControls] = useState({});
   const [showSplash, setShowSplash] = useState(true);
 
-  const musicContextValue = useMemo(() => {
-    return {
+  const musicContextValue = useMemo(
+    () => ({
       _playerBottomSheet,
       playerControls,
       setPlayerControls,
       musicInfo,
       setMusicInfo,
-    };
-  }, [musicInfo, playerControls]);
+    }),
+    [musicInfo, playerControls],
+  );
 
-  const preferencesContextValue = useMemo(() => {
-    return {
+  const preferencesContextValue = useMemo(
+    () => ({
       toggleDarkTheme: setEnabledDarkTheme.bind(this, !enabledDarkTheme),
       enabledDarkTheme,
-    };
-  }, [enabledDarkTheme]);
+    }),
+    [enabledDarkTheme],
+  );
 
   const MergedDefaultTheme = {
     ...NavigationDefaultTheme,

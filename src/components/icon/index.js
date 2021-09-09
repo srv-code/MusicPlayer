@@ -2,6 +2,7 @@ import React from 'react';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Entypo from 'react-native-vector-icons/Entypo';
+import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import { widthPercentageToDP as wp } from 'react-native-responsive-screen';
 import colors from '../../constants/colors';
 
@@ -23,6 +24,10 @@ const Icon = ({
     case 'Entypo':
       _Icon = Entypo;
       break;
+    case 'FontAwesome5':
+      _Icon = FontAwesome5;
+      break;
+
     default:
       throw new Error(`Invalid type: ${type}`);
   }
