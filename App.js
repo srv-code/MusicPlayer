@@ -4,6 +4,7 @@ import {
   StatusBar,
   TouchableOpacity,
   View,
+  AppState,
 } from 'react-native';
 import { PreferencesContext } from './src/context/preferences';
 import { MusicContext } from './src/context/music';

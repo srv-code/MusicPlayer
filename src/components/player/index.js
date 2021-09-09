@@ -2,6 +2,7 @@ import React, { useContext, useEffect, useRef, useState } from 'react';
 import {
   FlatList,
   PermissionsAndroid,
+  Platform,
   ScrollView,
   StyleSheet,
   View,
@@ -12,6 +13,8 @@ import TrackPlayer, {
   Capability as PlayerCapability,
   Event as PlayerEvent,
   RepeatMode as PlayerRepeatMode,
+  RatingType as PlayerRatingType,
+  FeedbackOptions as PlayerFeedbackOptions,
   useProgress as usePlayerProgress,
   useTrackPlayerEvents as usePlayerEvents,
 } from 'react-native-track-player';
@@ -23,9 +26,13 @@ import globalStyles from '../../styles';
 import { MusicContext } from '../../context/music';
 import FileSystem from 'react-native-fs';
 import { BottomSheetFlatList } from '@gorhom/bottom-sheet';
+import { platforms } from 'react-native/react-native.config';
+import { PreferencesContext } from '../../context/preferences';
+import colors from '../../constants/colors';
 
 const Player = ({ style }) => {
   const { musicInfo } = useContext(MusicContext);
+  const { enabledDarkTheme } = useContext(PreferencesContext);
 
   const trackProgress = usePlayerProgress();
 
@@ -58,6 +65,20 @@ const Player = ({ style }) => {
       // PlayerCapability.Bookmark,
     ];
     await TrackPlayer.updateOptions({
+      ratingType: PlayerRatingType.Heart,
+
+      // // Whether the player will be destroyed when the app closes
+      // stopWithApp: true,
+      //
+      // // Whether the remote-duck event will be triggered on every interruption
+      // alwaysPauseOnInterruption: true,
+
+      // The notification icon
+      icon: require('../../../assets/images/logo.png'),
+
+      // color: enabledDarkTheme ? 0 : parseInt('00004e', 16),
+      // color: parseInt('000000', 16),
+
       // Media controls capabilities
       capabilities,
 

@@ -37,7 +37,7 @@ const Splash = ({ setShow, setMusicInfo }) => {
     info: null,
   });
 
-  const stripTracks = data => {
+  const stripMusicInfo = data => {
     // sample input (value of data)
     // {
     //   "results": [
@@ -54,6 +54,8 @@ const Splash = ({ setShow, setMusicInfo }) => {
     //   ],
     //   "length": 13
     // }
+
+    // console.log(`[Splash/stripTracks] (INPUT) data=${JSON.stringify(data)}`);
 
     const tracks = data.results,
       albums = [],
@@ -97,15 +99,14 @@ const Splash = ({ setShow, setMusicInfo }) => {
         }
     });
 
-    console.log(
-      `Splash: stripTracks: ${JSON.stringify({
-        data,
-        tracks,
-        albums,
-        artists,
-        folders,
-      })}`,
-    );
+    // console.log(
+    //   `[Splash/stripTracks] (OUTPUT) result=${JSON.stringify({
+    //     tracks,
+    //     albums,
+    //     artists,
+    //     folders,
+    //   })}`,
+    // );
 
     return { tracks, albums, artists, folders };
   };
@@ -116,6 +117,7 @@ const Splash = ({ setShow, setMusicInfo }) => {
       try {
         // Check Android permissions
         if (Platform.OS === 'android') {
+          console.log(`[Splash] Checking Android permissions...`);
           setLoadingInfo({
             loading: true,
             info: 'Checking for app permissions...',
@@ -142,6 +144,7 @@ const Splash = ({ setShow, setMusicInfo }) => {
         error.title = 'Storage Read Error';
         error.message = `Failed reading music information from storage`;
 
+        console.log(`[Splash] Loading track info from cache...`);
         let musicInfo = JSON.parse(await AsyncStorage.getItem(keys.MUSIC_INFO));
         // console.log('Splash:', { musicInfo });
 
@@ -150,20 +153,26 @@ const Splash = ({ setShow, setMusicInfo }) => {
           error.title = 'I/O Error';
           error.message = `Failed loading music tracks`;
 
-          const tracks = await fetchAllMusicTracks();
+          console.log(`[Splash] Discovering all music tracks from phone...`);
+          const tracks = stripMusicInfo(await fetchAllMusicTracks());
           // console.log('fetchAllMusicTracks:', { tracks });
 
           // Write music tracks to async-storage
-          error.title = 'Storage Read Error';
+          error.title = 'Storage Write Error';
           error.message = `Failed writing music information in storage`;
 
+          console.log(
+            `[Splash] Recalculating & writing track info in cache...`,
+          );
           await AsyncStorage.setItem(keys.MUSIC_INFO, JSON.stringify(tracks));
 
           musicInfo = tracks;
         }
 
-        // Update stripped data in context
-        setMusicInfo(stripTracks(musicInfo));
+        console.log(`[Splash] musicInfo=${JSON.stringify(musicInfo)}`);
+
+        console.log(`[Splash] Storing track info in context...`);
+        setMusicInfo(musicInfo);
       } catch (err) {
         console.log(
           `Error: ${error.title}. ${error.message}\n${JSON.stringify(err)}`,

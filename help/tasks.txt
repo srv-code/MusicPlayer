@@ -25,6 +25,7 @@
   - Check how to destroy the TrackPlayer and when to (means after stopping the playback everytime or only once in the app lifecycle)
 
 [Player Functionalities]
+  - 🔥 Move the TrackPlayer to the App (otherwise navigating away from the Player component is killing the module)
   - Check why 'genre' information is not available after fetching from filesystem
   - <ADD-FEATURE> When ducking should not stop but resume
 
