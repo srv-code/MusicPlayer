@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { BottomSheetView } from '@gorhom/bottom-sheet';
 import { Button, Text } from 'react-native-paper';
 import screenNames from '../../constants/screen-names';
@@ -8,8 +8,13 @@ import {
   heightPercentageToDP as hp,
   widthPercentageToDP as wp,
 } from 'react-native-responsive-screen';
+import TrackPlayer from 'react-native-track-player';
 
 const CurrentlyPlaying = ({ navigation, extraData }) => {
+  useEffect(async () => {
+    if (extraData.snapIndex === -1) await TrackPlayer.reset();
+  }, [extraData.snapIndex]);
+
   return (
     <BottomSheetView
       style={{

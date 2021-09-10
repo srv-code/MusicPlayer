@@ -61,38 +61,80 @@ const Tracks = ({ navigation }) => {
   const [tracks, setTracks] = useState([]);
 
   useEffect(() => {
-    console.log(`[Tracks] Populating tracks for first time`);
-    sortTracks([..._tracks], SortingOptions.TITLE, SortingOrders.ASCENDING);
+    if (_tracks?.length)
+      // console.log(`[Tracks] Populating tracks for first time`);
+      sortTracks([..._tracks], SortingOptions.TITLE, SortingOrders.ASCENDING);
   }, [_tracks]);
 
-  const dynamicStyles = useMemo(
-    () => ({
-      container: [
-        styles.container,
-        {
-          backgroundColor: enabledDarkTheme ? Colors.dark : Colors.light,
-        },
-      ],
-      playerButton: [
-        styles.playerButton,
-        {
-          backgroundColor: enabledDarkTheme ? Colors.darker : Colors.lighter,
-        },
-      ],
-    }),
-    [enabledDarkTheme],
-  );
+  // TODO apply useMemo later
+  const dynamicStyles = {
+    container: [
+      styles.container,
+      {
+        backgroundColor: enabledDarkTheme ? Colors.dark : Colors.light,
+      },
+    ],
+    playerButton: [
+      styles.playerButton,
+      {
+        backgroundColor: enabledDarkTheme ? Colors.darker : Colors.lighter,
+        opacity: tracks.length ? 1 : 0.8,
+      },
+    ],
+    sortButton: [
+      styles.sortButton,
+      {
+        opacity: tracks.length ? 1 : 0.8,
+      },
+    ],
+  };
 
   // console.log(`[Tracks] sortBy=${sortBy}, sortOrder=${sortOrder}`);
 
-  const onShuffleTracks = () => {
-    // TODO implement logic
+  const playTracks = async list => {
+    await TrackPlayer.reset();
+    await TrackPlayer.add(list);
     playerControls.collapse();
+    await TrackPlayer.play();
+  };
+
+  const onShuffleTracks = () => {
+    const randomizedList = [...tracks];
+    // console.log(`list=${randomizedList.map(e => e.id)}`);
+    randomizedList.sort(() => 0.5 - Math.random());
+    // console.log(`list(randomized)=${randomizedList.map(e => e.id)}`);
+
+    playTracks(randomizedList)
+      .then(() =>
+        ToastAndroid.show(
+          `${labels.shuffled} ${randomizedList.length} ${labels.tracks}`,
+          ToastAndroid.SHORT,
+        ),
+      )
+      .catch(err => {
+        ToastAndroid.show(
+          `${labels.couldntShuffleTracks} (${err.message}}`,
+          ToastAndroid.LONG,
+        );
+        throw err;
+      });
   };
 
   const onPlayWholePlayList = () => {
-    // TODO implement logic
-    playerControls.collapse();
+    playTracks(tracks)
+      .then(() =>
+        ToastAndroid.show(
+          `${labels.playing} ${tracks.length} ${labels.tracks}`,
+          ToastAndroid.SHORT,
+        ),
+      )
+      .catch(err => {
+        ToastAndroid.show(
+          `${labels.couldntPlayTracks} (${err.message}}`,
+          ToastAndroid.LONG,
+        );
+        throw err;
+      });
   };
 
   // console.log(`[Tracks] tracks=${JSON.stringify(tracks)}`);
@@ -350,8 +392,9 @@ const Tracks = ({ navigation }) => {
           onDismiss={setShowSortingMenu.bind(this, false)}
           anchor={
             <TouchableOpacity
+              disabled={tracks.length === 0}
               onPress={setShowSortingMenu.bind(this, true)}
-              style={styles.sortButton}>
+              style={dynamicStyles.sortButton}>
               <Icon
                 name={
                   sortOrder === SortingOrders.ASCENDING
@@ -429,11 +472,13 @@ const Tracks = ({ navigation }) => {
 
         <View style={styles.playerRightButtonContainer}>
           <TouchableOpacity
+            disabled={tracks.length === 0}
             style={dynamicStyles.playerButton}
             onPress={onShuffleTracks}>
             <Icon name="shuffle" type="Entypo" size={wp(4)} />
           </TouchableOpacity>
           <TouchableOpacity
+            disabled={tracks.length === 0}
             style={dynamicStyles.playerButton}
             onPress={onPlayWholePlayList}>
             <Icon name="controller-play" type="Entypo" size={wp(4)} />
@@ -442,7 +487,7 @@ const Tracks = ({ navigation }) => {
       </View>
 
       <View>
-        {tracks && tracks.length === 0 ? (
+        {tracks.length === 0 ? (
           <Text style={styles.noTracksText}>{labels.noTracksFound}</Text>
         ) : (
           <FlatList

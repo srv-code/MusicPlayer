@@ -1,3 +1,4 @@
+/* US English */
 const labels = {
   musicPlayer: 'Music Player',
   sync: 'Sync',
@@ -20,6 +21,7 @@ const labels = {
   trackInformation: 'Track Information',
   album: 'Album',
   track: 'Track',
+  tracks: 'tracks',
   artist: 'Artist',
   folder: 'Folder',
   currentlyPlaying: 'Currently Playing',
@@ -27,6 +29,10 @@ const labels = {
   songInfo: 'Song Info',
   title: 'Title',
   noTracksFound: 'No tracks found',
+  shuffled: 'Shuffled',
+  couldntShuffleTracks: "Couldn't shuffle tracks",
+  playing: 'Playing',
+  couldntPlayTracks: "Couldn't play tracks",
 };
 
 export default labels;
