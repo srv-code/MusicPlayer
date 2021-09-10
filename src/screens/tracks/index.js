@@ -45,13 +45,12 @@ const SortingOrders = {
   DECREASING: 'DECREASING',
 };
 
+// TODO Scroll to the currently playing track automatically
+// FIXME When shuffling the playlist skip to previous & next tracks player buttons are not correctly disabled
 const Tracks = ({ navigation }) => {
   const { enabledDarkTheme } = useContext(PreferencesContext);
-  const {
-    playerControls,
-    musicInfo: { tracks: _tracks },
-    bottomSheetMiniPositionIndex,
-  } = useContext(MusicContext);
+  const { playerControls, musicInfo, bottomSheetMiniPositionIndex } =
+    useContext(MusicContext);
 
   const [showSortingMenu, setShowSortingMenu] = useState(false);
   const [sortBy, setSortBy] = useState(SortingOptions.TITLE);
@@ -59,12 +58,26 @@ const Tracks = ({ navigation }) => {
   const [showMoreOptionForTrackId, setShowMoreOptionForTrackId] =
     useState(null);
   const [tracks, setTracks] = useState([]);
+  const [currentlyPlayingTrackId, setCurrentlyPlayingTrackId] = useState(null);
 
   useEffect(() => {
-    if (_tracks?.length)
+    if (musicInfo.tracks?.length)
       // console.log(`[Tracks] Populating tracks for first time`);
-      sortTracks([..._tracks], SortingOptions.TITLE, SortingOrders.ASCENDING);
-  }, [_tracks]);
+      sortTracks(
+        [...musicInfo.tracks],
+        SortingOptions.TITLE,
+        SortingOrders.ASCENDING,
+      );
+  }, [musicInfo.tracks]);
+
+  useEffect(() => {
+    // console.log(
+    //   `>> currentlyPlayingTrack=${JSON.stringify(
+    //     musicInfo.currentlyPlayingTrack,
+    //   )}`,
+    // );
+    setCurrentlyPlayingTrackId(musicInfo.currentlyPlayingTrack?.info?.id);
+  }, [musicInfo.currentlyPlayingTrack]);
 
   // TODO apply useMemo later
   const dynamicStyles = {
@@ -261,48 +274,68 @@ const Tracks = ({ navigation }) => {
     </Menu>
   );
 
-  const renderTrackItem = ({ item: track, index }) => (
-    <>
-      <List.Item
-        onPress={() => {
-          // TODO
-          //  - tracks: insert current track in the stack (at the top) & play it
-          //  - albums|artists|folders: show album tracks
-          // Alert.alert(`Track Info`, JSON.stringify(track));
+  const renderTrackItem = ({ item: track, index }) => {
+    const renderDivider = () => {
+      if (index === tracks.length - 1) {
+        return <View style={styles.listItemEndSmallBar} />;
+      } else {
+        if (currentlyPlayingTrackId) {
+          const playingIndex = tracks.findIndex(
+            t => t.id === currentlyPlayingTrackId,
+          );
+          if (playingIndex === -1)
+            throw new Error(`Could not find playing track index`);
+          if (index === playingIndex - 1 || index === playingIndex) return null;
+          else return <Divider inset />;
+        } else return <Divider inset />;
+      }
+    };
 
-          playTracks(tracks, index)
-            .then(() =>
-              ToastAndroid.show(
-                `${labels.playing} ${labels.fromAll} ${tracks.length} ${labels.tracks}`,
-                ToastAndroid.SHORT,
-              ),
-            )
-            .catch(err => {
-              ToastAndroid.show(
-                `${labels.couldntPlayTracks} (${err.message}}`,
-                ToastAndroid.LONG,
-              );
-              throw err;
-            });
-        }}
-        titleEllipsizeMode={'tail'}
-        titleNumberOfLines={1}
-        titleStyle={styles.listItemText}
-        // title={`[${index + 1}] ${track.title}`}
-        title={track.title}
-        descriptionEllipsizeMode={'tail'}
-        descriptionNumberOfLines={1}
-        description={renderTrackDescription.bind(this, track)}
-        left={props => renderTrackItemLeftComponent(track, props)}
-        right={props => renderTrackItemRightComponent(track, props)}
-      />
-      {index === tracks.length - 1 ? (
-        <View style={styles.listItemEndSmallBar} />
-      ) : (
-        <Divider inset />
-      )}
-    </>
-  );
+    return (
+      <>
+        <List.Item
+          style={{
+            ...styles.trackItemContainer,
+            backgroundColor:
+              currentlyPlayingTrackId === track.id
+                ? enabledDarkTheme
+                  ? Colors.darker
+                  : Colors.lighter
+                : null,
+            elevation: currentlyPlayingTrackId === track.id ? 2 : 0,
+          }}
+          onPress={() => {
+            playTracks(tracks, index)
+              .then(() =>
+                ToastAndroid.show(
+                  `${labels.playing} ${labels.fromAll} ${tracks.length} ${labels.tracks}`,
+                  ToastAndroid.SHORT,
+                ),
+              )
+              .catch(err => {
+                ToastAndroid.show(
+                  `${labels.couldntPlayTracks} (${err.message}}`,
+                  ToastAndroid.LONG,
+                );
+                throw err;
+              });
+          }}
+          titleEllipsizeMode={'tail'}
+          titleNumberOfLines={1}
+          titleStyle={styles.listItemText}
+          // title={`[${index}] ${track.title}`}
+          title={track.title}
+          descriptionEllipsizeMode={'tail'}
+          descriptionNumberOfLines={1}
+          description={renderTrackDescription.bind(this, track)}
+          left={props => renderTrackItemLeftComponent(track, props)}
+          right={props => renderTrackItemRightComponent(track, props)}
+        />
+
+        {renderDivider()}
+      </>
+    );
+  };
 
   const sortTracks = (list, by, order) => {
     const _sort = ({ keys, type = 'string' } = {}) => {
@@ -508,12 +541,14 @@ const Tracks = ({ navigation }) => {
         </View>
       </View>
 
+      {/*<Text>{`currentlyPlayingTrackId=${currentlyPlayingTrackId}`}</Text>*/}
       <View>
         {tracks.length === 0 ? (
           <Text style={styles.noTracksText}>{labels.noTracksFound}</Text>
         ) : (
           <FlatList
             contentContainerStyle={{
+              ...styles.musicList,
               paddingBottom: hp(bottomSheetMiniPositionIndex === -1 ? 5 : 15),
             }}
             data={tracks}
@@ -533,6 +568,7 @@ const styles = StyleSheet.create({
     borderTopEndRadius: 25,
     elevation: 4,
     marginTop: hp(0.4),
+    paddingHorizontal: wp(3),
   },
   iconButton: {
     alignSelf: 'flex-start',
@@ -544,6 +580,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: hp(1),
+    paddingHorizontal: wp(2),
   },
   playerRightButtonContainer: {
     flexDirection: 'row',
@@ -612,9 +649,19 @@ const styles = StyleSheet.create({
     opacity: 0.1,
     borderRadius: 10,
     alignSelf: 'center',
+    marginTop: hp(1),
   },
   musicIcon: {
     backgroundColor: colors.lightPurple,
+  },
+  trackItemContainer: {
+    alignItems: 'center',
+    borderRadius: wp(2),
+    // paddingVertical: 0,
+    // backgroundColor: 'lightgreen',
+  },
+  musicList: {
+    paddingHorizontal: wp(2),
   },
 });
 

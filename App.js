@@ -19,7 +19,6 @@ import Splash from './src/screens/splash';
 import TrackPlayer from 'react-native-track-player';
 import {
   Capability as PlayerCapability,
-  Event as PlayerEvent,
   RatingType as PlayerRatingType,
 } from 'react-native-track-player/lib/interfaces';
 import { useTrackPlayerEvents as usePlayerEvents } from 'react-native-track-player/lib/hooks';
@@ -149,39 +148,7 @@ const App = () => {
     };
   }, []);
 
-  usePlayerEvents(
-    [
-      PlayerEvent.PlaybackTrackChanged,
-      PlayerEvent.PlaybackState,
-      PlayerEvent.PlaybackError,
-      PlayerEvent.PlaybackQueueEnded,
-      PlayerEvent.PlaybackTrackChanged,
-      PlayerEvent.PlaybackMetadataReceived,
-      PlayerEvent.RemotePlay,
-      PlayerEvent.RemotePlayId,
-      PlayerEvent.RemotePlaySearch,
-      PlayerEvent.RemotePause,
-      PlayerEvent.RemoteStop,
-      PlayerEvent.RemoteSkip,
-      PlayerEvent.RemoteNext,
-      PlayerEvent.RemotePrevious,
-      PlayerEvent.RemoteJumpForward,
-      PlayerEvent.RemoteJumpBackward,
-      PlayerEvent.RemoteSeek,
-      PlayerEvent.RemoteSetRating,
-      PlayerEvent.RemoteDuck,
-      PlayerEvent.RemoteLike,
-      PlayerEvent.RemoteDislike,
-      PlayerEvent.RemoteBookmark,
-    ],
-    async event => {
-      console.log(
-        `[App] Player: Event: type=${event.type}, state=${JSON.stringify(
-          PlayerUtils.getPlayerStateInfo(event.state),
-        )}, event=${JSON.stringify(event)}`,
-      );
-    },
-  );
+
 
   // useEffect(() => {
   //   if (showSplash)

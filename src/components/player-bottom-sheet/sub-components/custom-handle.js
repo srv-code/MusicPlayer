@@ -102,13 +102,20 @@ const styles = StyleSheet.create({
   container: {
     alignContent: 'center',
     alignItems: 'center',
+    // paddingBottom: hp(2.7),  20,
     paddingBottom: 20,
-    paddingHorizontal: 16,
+    // paddingHorizontal: wp(10),// 16,
     zIndex: 99999,
+
+    // borderWidth: 1,
+    // borderWidth: 1,
+    // borderColor: 'blue',
   },
   indicator: {
+    // marginTop: hp(1), // 10,
     marginTop: 10,
     position: 'absolute',
+    // width: wp(2.8), //10,
     width: 10,
     height: 4,
     backgroundColor: colors.lightGrey1,

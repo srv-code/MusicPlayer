@@ -13,6 +13,7 @@ import globalStyles from '../../styles';
 import { MusicContext } from '../../context/music';
 import PlayerUtils from '../../utils/player';
 
+// TODO To be removed, for testing purpose only
 const Player = ({ style }) => {
   const { musicInfo } = useContext(MusicContext);
 

@@ -20,7 +20,11 @@ import SongInfo from '../../screens/song-info';
 import PlayerBottomSheet from '../../components/player-bottom-sheet';
 
 const BottomSheetStack = createStackNavigator();
-const BottomSheetNavigator = ({ snapIndex, enabledDarkTheme }) => {
+const BottomSheetNavigator = ({
+  snapIndex,
+  setSnapIndex,
+  enabledDarkTheme,
+}) => {
   const screenOptions = useMemo(
     () => ({
       ...TransitionPresets.SlideFromRightIOS,
@@ -57,7 +61,12 @@ const BottomSheetNavigator = ({ snapIndex, enabledDarkTheme }) => {
             headerLeft: () => null,
             title: labels.currentlyPlaying,
           }}>
-          {props => <CurrentlyPlaying {...props} extraData={{ snapIndex }} />}
+          {props => (
+            <CurrentlyPlaying
+              {...props}
+              extraData={{ snapIndex, setSnapIndex }}
+            />
+          )}
         </BottomSheetStack.Screen>
 
         <BottomSheetStack.Screen
@@ -81,7 +90,10 @@ const TabbedStackNavigator = () => {
   return (
     <>
       <TabbedStack.Navigator screenOptions={{ headerShown: false }}>
-        <TabbedStack.Screen name={screenNames.tabbedView} component={TabbedView} />
+        <TabbedStack.Screen
+          name={screenNames.tabbedView}
+          component={TabbedView}
+        />
       </TabbedStack.Navigator>
 
       <PlayerBottomSheet navigator={BottomSheetNavigator} />
