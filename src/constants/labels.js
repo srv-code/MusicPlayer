@@ -33,6 +33,7 @@ const labels = {
   couldntShuffleTracks: "Couldn't shuffle tracks",
   playing: 'Playing',
   couldntPlayTracks: "Couldn't play tracks",
+  fromAll: 'from all',
 };
 
 export default labels;

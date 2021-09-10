@@ -91,11 +91,18 @@ const Tracks = ({ navigation }) => {
 
   // console.log(`[Tracks] sortBy=${sortBy}, sortOrder=${sortOrder}`);
 
-  const playTracks = async list => {
+  const playTracks = async (list, index = 0) => {
     await TrackPlayer.reset();
     await TrackPlayer.add(list);
+    await TrackPlayer.skip(index);
     playerControls.collapse();
     await TrackPlayer.play();
+
+    // console.log(
+    //   `[Tracks] Playing: {queue=${JSON.stringify(
+    //     (await TrackPlayer.getQueue()).map(e => e.id),
+    //   )}, current track index: ${await TrackPlayer.getCurrentTrack()}`,
+    // );
   };
 
   const onShuffleTracks = () => {
@@ -261,7 +268,22 @@ const Tracks = ({ navigation }) => {
           // TODO
           //  - tracks: insert current track in the stack (at the top) & play it
           //  - albums|artists|folders: show album tracks
-          Alert.alert(`Track Info`, JSON.stringify(track));
+          // Alert.alert(`Track Info`, JSON.stringify(track));
+
+          playTracks(tracks, index)
+            .then(() =>
+              ToastAndroid.show(
+                `${labels.playing} ${labels.fromAll} ${tracks.length} ${labels.tracks}`,
+                ToastAndroid.SHORT,
+              ),
+            )
+            .catch(err => {
+              ToastAndroid.show(
+                `${labels.couldntPlayTracks} (${err.message}}`,
+                ToastAndroid.LONG,
+              );
+              throw err;
+            });
         }}
         titleEllipsizeMode={'tail'}
         titleNumberOfLines={1}
