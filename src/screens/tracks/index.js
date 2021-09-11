@@ -105,6 +105,8 @@ const Tracks = ({ navigation }) => {
   // console.log(`[Tracks] sortBy=${sortBy}, sortOrder=${sortOrder}`);
 
   const playTracks = async (list, index = 0) => {
+    console.log(`[Tracks] track pressed=${JSON.stringify(list[index])}`);
+
     await TrackPlayer.reset();
     await TrackPlayer.add(list);
     await TrackPlayer.skip(index);

@@ -6,7 +6,7 @@ import globalStyles from '../../styles';
 
 const SongInfo = ({ navigation, extraData }) => {
   if (extraData.snapIndex === 0)
-    navigation.navigate(screenNames.currentlyPlaying);
+    navigation.navigate(screenNames.nowPlaying);
 
   return (
     <BottomSheetView
@@ -27,7 +27,7 @@ const SongInfo = ({ navigation, extraData }) => {
         mode="outlined"
         uppercase={false}
         style={globalStyles.button}
-        onPress={navigation.navigate.bind(this, screenNames.currentlyPlaying)}>
+        onPress={navigation.navigate.bind(this, screenNames.nowPlaying)}>
         Go to Currently Playing
       </Button>
       <Text>{extraData.snapIndex}</Text>

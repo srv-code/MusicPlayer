@@ -3,6 +3,10 @@ import {
   createStackNavigator,
   TransitionPresets,
 } from '@react-navigation/stack';
+import {
+  heightPercentageToDP as hp,
+  widthPercentageToDP as wp,
+} from 'react-native-responsive-screen';
 import screenNames from '../../constants/screen-names';
 import TabbedView from '../tabbed-view';
 import Settings from '../../screens/settings';
@@ -14,7 +18,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import Colors from 'react-native/Libraries/NewAppScreen/components/Colors';
 import colors from '../../constants/colors';
 import labels from '../../constants/labels';
-import CurrentlyPlaying from '../../screens/currently-playing';
+import NowPlaying from '../../screens/now-playing';
 import CurrentPlaylist from '../../screens/current-playlist';
 import SongInfo from '../../screens/song-info';
 import PlayerBottomSheet from '../../components/player-bottom-sheet';
@@ -51,21 +55,32 @@ const BottomSheetNavigator = ({
   return (
     <NavigationContainer independent={true}>
       <BottomSheetStack.Navigator
-        initialRouteName={screenNames.currentlyPlaying}
+        initialRouteName={screenNames.nowPlaying}
         screenOptions={screenOptions}
         // headerMode="screen"
       >
         <BottomSheetStack.Screen
-          name={screenNames.currentlyPlaying}
+          name={screenNames.nowPlaying}
           options={{
             headerLeft: () => null,
-            title: labels.currentlyPlaying,
+            title: labels.nowPlaying,
+            headerTitleStyle: {
+              fontSize: wp(5),
+              // backgroundColor: 'lightblue',
+              // padding: 0,
+              // margin: 0,
+            },
+            headerTitleContainerStyle: {
+              // backgroundColor: 'lightblue',
+              width: wp(90),
+              alignItems: 'center',
+              // padding: 0,
+              // margin: 0,
+              // marginTop: hp(-2),
+            },
           }}>
           {props => (
-            <CurrentlyPlaying
-              {...props}
-              extraData={{ snapIndex, setSnapIndex }}
-            />
+            <NowPlaying {...props} extraData={{ snapIndex, setSnapIndex }} />
           )}
         </BottomSheetStack.Screen>
 

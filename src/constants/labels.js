@@ -24,7 +24,7 @@ const labels = {
   tracks: 'tracks',
   artist: 'Artist',
   folder: 'Folder',
-  currentlyPlaying: 'Currently Playing',
+  nowPlaying: 'Now Playing',
   currentPlaylist: 'Current Playlist',
   songInfo: 'Song Info',
   title: 'Title',

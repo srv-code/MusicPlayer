@@ -13,6 +13,8 @@ import TrackPlayer, {
   useTrackPlayerEvents as usePlayerEvents,
   Event as PlayerEvent,
   State as PlayerState,
+  RepeatMode as PlayerRepeatMode,
+  useProgress as usePlayerProgress,
 } from 'react-native-track-player';
 import { MusicContext } from '../../context/music';
 // import { useTrackPlayerEvents as usePlayerEvents } from "react-native-track-player/lib/hooks";
@@ -23,11 +25,9 @@ import DateTimeUtils from '../../utils/datetime';
 import Icon from '../../components/icon';
 import colors from '../../constants/colors';
 import { PreferencesContext } from '../../context/preferences';
+import Slider from 'react-native-slider';
 
-const CurrentlyPlaying = ({
-  navigation,
-  extraData: { snapIndex, setSnapIndex },
-}) => {
+const NowPlaying = ({ navigation, extraData: { snapIndex, setSnapIndex } }) => {
   const { setMusicInfo } = useContext(MusicContext);
   const { enabledDarkTheme } = useContext(PreferencesContext);
 
@@ -35,6 +35,11 @@ const CurrentlyPlaying = ({
   const [isPlaying, setIsPlaying] = useState(false);
   const [hasPreviousTrack, setHasPreviousTrack] = useState(false);
   const [hasNextTrack, setHasNextTrack] = useState(false);
+  const [showRemainingTime, setShowRemainingTime] = useState(false);
+
+  const trackProgress = usePlayerProgress();
+
+  // console.log(`>> Progress: ${JSON.stringify(trackProgress)}`);
 
   useEffect(async () => {
     if (snapIndex === -1) {
@@ -74,12 +79,12 @@ const CurrentlyPlaying = ({
     ],
     async event => {
       console.log(
-        `[CurrentlyPlaying] Player: Event: type=${
-          event.type
-        }, state=${JSON.stringify(
+        `[NowPlaying] Player: Event: type=${event.type}, state=${JSON.stringify(
           PlayerUtils.getPlayerStateInfo(event.state),
         )}, event=${JSON.stringify(event)}`,
       );
+
+      // TODO Add Queue ended event and show via AndroidToast
 
       if (
         event.type === PlayerEvent.PlaybackTrackChanged &&
@@ -309,6 +314,39 @@ const CurrentlyPlaying = ({
                 />
               )}
             </View>
+
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                // backgroundColor: 'lightgreen',
+                width: wp(95),
+              }}>
+              <Text>
+                {DateTimeUtils.msToTime(trackProgress.position * 1000)}
+              </Text>
+              <Slider
+                minimumValue={0}
+                maximumValue={trackProgress.duration}
+                value={trackProgress.position}
+                // onValueChange={value => this.setState({ value })}
+                // animateTransitions={true}
+                // animationType="spring"
+                // style={{ borderWidth: 1 }}
+                trackStyle={{ width: wp(70) }}
+              />
+              <TouchableOpacity
+                onPress={setShowRemainingTime.bind(this, value => !value)}>
+                <Text>
+                  {`${showRemainingTime ? '-' : ''} ${DateTimeUtils.msToTime(
+                    (showRemainingTime
+                      ? trackProgress.duration - trackProgress.position
+                      : trackProgress.duration) * 1000,
+                  )}`}
+                </Text>
+              </TouchableOpacity>
+            </View>
           </View>
         );
       case 2:
@@ -380,4 +418,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default CurrentlyPlaying;
+export default NowPlaying;

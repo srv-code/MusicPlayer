@@ -10,7 +10,7 @@ const screenNames = {
   about: 'about',
   folders: 'folders',
   itemInfo: 'item-info',
-  currentlyPlaying: 'currently-playing',
+  nowPlaying: 'now-playing',
   currentPlaylist: 'current-playlist',
   songInfo: 'song-info',
   tabbedView: 'tabbed-view',
