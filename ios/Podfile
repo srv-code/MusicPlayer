@@ -26,6 +26,8 @@ target 'MusicPlayer' do
 
   pod 'react-native-get-music-files', :path => '../node_modules/react-native-get-music-files-v3dev-test'
 
+  pod 'BVLinearGradient', :path => '../node_modules/react-native-linear-gradient'
+
   target 'MusicPlayerTests' do
     inherit! :complete
     # Pods for testing

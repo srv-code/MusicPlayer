@@ -76,7 +76,7 @@ const BottomSheetNavigator = ({
               alignItems: 'center',
               // padding: 0,
               // margin: 0,
-              // marginTop: hp(-2),
+              marginTop: hp(-2),
             },
           }}>
           {props => (

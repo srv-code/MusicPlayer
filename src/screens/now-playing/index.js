@@ -26,6 +26,8 @@ import Icon from '../../components/icon';
 import colors from '../../constants/colors';
 import { PreferencesContext } from '../../context/preferences';
 import Slider from 'react-native-slider';
+import LinearGradient from 'react-native-linear-gradient';
+import Colors from 'react-native/Libraries/NewAppScreen/components/Colors';
 
 const NowPlaying = ({ navigation, extraData: { snapIndex, setSnapIndex } }) => {
   const { setMusicInfo } = useContext(MusicContext);
@@ -183,81 +185,79 @@ const NowPlaying = ({ navigation, extraData: { snapIndex, setSnapIndex } }) => {
     return <Avatar.Icon size={hp(6)} icon="music" style={styles.musicIcon} />;
   };
 
-  const renderPlayerControls = () => {
-    const play = async () => {
-      await TrackPlayer.play();
-    };
-
-    const pause = async () => {
-      await TrackPlayer.pause();
-    };
-
-    const skipBack = async () => {
-      if (hasPreviousTrack) await TrackPlayer.skipToPrevious();
-    };
-
-    const skipForward = async () => {
-      if (hasNextTrack) await TrackPlayer.skipToNext();
-    };
-
-    return (
-      <View
-        style={{
-          flexDirection: 'row',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          // borderWidth: 1,
-          width: wp(25),
-          // padding: 0,
-        }}>
-        <TouchableOpacity
-          style={styles.playerButton}
-          activeOpacity={hasPreviousTrack ? 0.2 : 1}
-          onPress={skipBack}>
-          <Icon
-            name="ios-play-skip-back"
-            // TODO update the button colors
-            type="Ionicons"
-            size={wp(7)}
-            style={{ opacity: hasPreviousTrack ? 1 : 0.2 }}
-          />
-        </TouchableOpacity>
-
-        {isPlaying ? (
-          <TouchableOpacity style={styles.playerButton} onPress={pause}>
-            <Icon
-              name="pause"
-              type="FontAwesome5"
-              // TODO update the button colors, add spring animation
-              size={wp(8.4)}
-            />
-          </TouchableOpacity>
-        ) : (
-          <TouchableOpacity style={styles.playerButton} onPress={play}>
-            <Icon
-              name="play"
-              type="FontAwesome5"
-              // TODO update the button colors, add spring animation
-              size={wp(8)}
-            />
-          </TouchableOpacity>
-        )}
-
-        <TouchableOpacity
-          style={styles.playerButton}
-          activeOpacity={hasNextTrack ? 0.2 : 1}
-          onPress={skipForward}>
-          <Icon
-            style={{ opacity: hasNextTrack ? 1 : 0.2 }}
-            name="ios-play-skip-forward"
-            type="Ionicons"
-            // TODO update the button colors
-            size={wp(7)}
-          />
-        </TouchableOpacity>
-      </View>
-    );
+  const play = async () => {
+    await TrackPlayer.play();
   };
+
+  const pause = async () => {
+    await TrackPlayer.pause();
+  };
+
+  const skipBack = async () => {
+    if (hasPreviousTrack) await TrackPlayer.skipToPrevious();
+  };
+
+  const skipForward = async () => {
+    if (hasNextTrack) await TrackPlayer.skipToNext();
+  };
+
+  const renderPlayerControls = () => (
+    <View
+      style={{
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        // borderWidth: 1,
+        width: wp(25),
+        // padding: 0,
+      }}>
+      <TouchableOpacity
+        style={styles.playerButton}
+        activeOpacity={hasPreviousTrack ? 0.2 : 1}
+        onPress={skipBack}>
+        <Icon
+          name="ios-play-skip-back"
+          // TODO update the button colors
+          type="Ionicons"
+          size={wp(7)}
+          style={{ opacity: hasPreviousTrack ? 1 : 0.2 }}
+        />
+      </TouchableOpacity>
+
+      {isPlaying ? (
+        <TouchableOpacity style={styles.playerButton} onPress={pause}>
+          <Icon
+            name="pause"
+            type="FontAwesome5"
+            // TODO update the button colors, add spring animation
+            size={wp(8.4)}
+          />
+        </TouchableOpacity>
+      ) : (
+        <TouchableOpacity style={styles.playerButton} onPress={play}>
+          <Icon
+            name="play"
+            type="FontAwesome5"
+            // TODO update the button colors, add spring animation
+            size={wp(8)}
+          />
+        </TouchableOpacity>
+      )}
+
+      <TouchableOpacity
+        style={styles.playerButton}
+        activeOpacity={hasNextTrack ? 0.2 : 1}
+        onPress={skipForward}>
+        <Icon
+          style={{ opacity: hasNextTrack ? 1 : 0.2 }}
+          name="ios-play-skip-forward"
+          type="Ionicons"
+          // TODO update the button colors
+          size={wp(7)}
+        />
+      </TouchableOpacity>
+    </View>
+  );
 
   const renderContent = () => {
     if (!trackInfo) return null;
@@ -273,6 +273,7 @@ const NowPlaying = ({ navigation, extraData: { snapIndex, setSnapIndex } }) => {
             titleEllipsizeMode={'tail'}
             titleNumberOfLines={1}
             titleStyle={styles.listItemText}
+            // TODO Apply marquee effect to title and artist
             title={trackInfo.title}
             descriptionEllipsizeMode={'tail'}
             descriptionNumberOfLines={1}
@@ -281,40 +282,72 @@ const NowPlaying = ({ navigation, extraData: { snapIndex, setSnapIndex } }) => {
             right={props => renderPlayerControls()}
           />
         );
+
       case 1:
         return (
           <View
             style={{
               alignItems: 'center',
               justifyContent: 'center',
-              // borderWidth: 1,
             }}>
-            {/* TODO Add react-native-linear-gradient for icon border */}
+            <LinearGradient
+              colors={['#d4d4d4', '#999999', '#7b7b7b', '#373737']} // TODO colors are yet to optimize
+              style={{
+                elevation: 10,
+                // borderRadius: hp(10),
+                // borderColor: 'transparent',
+                // borderWidth: wp(2),
+                borderRadius: hp(20),
+                padding: wp(2),
+              }}>
+              <View
+                style={{
+                  // elevation: 10,
+                  // alignItems: 'center',
+                  // borderWidth: wp(2),
+                  // justifyContent: 'center',
+                  // alignContent: 'center',
+                  // alignSelf: 'flex-start',
+                  borderRadius: hp(20),
+                  // borderColor: enabledDarkTheme ? '#3b3b3b' : '#c0c0c0',
+                  // elevation: 10,
+                  // backgroundColor: 'transparent'
+                }}>
+                {trackInfo.artwork ? (
+                  <Avatar.Image
+                    size={hp(15)}
+                    source={{ uri: `file://${trackInfo.artwork}` }}
+                  />
+                ) : (
+                  // <Avatar.Icon
+                  //   size={hp(18)}
+                  //   icon="music"
+                  //   style={styles.musicIcon}
+                  // />
+                  <Icon
+                    name={'music'}
+                    size={hp(12)}
+                    style={{
+                      padding: wp(5.5),
+                      color: colors.lightPurple,
+                    }}
+                  />
+                )}
+              </View>
+            </LinearGradient>
             <View
               style={{
-                // alignItems: 'center',
-                borderWidth: wp(2),
+                // flexDirection: 'row',
+                alignItems: 'center',
                 // justifyContent: 'center',
-                // alignContent: 'center',
-                // alignSelf: 'flex-start',
-                borderRadius: hp(10),
-                borderColor: enabledDarkTheme ? '#3b3b3b' : '#c0c0c0',
-                elevation: 10,
+                marginTop: hp(1),
               }}>
-              {trackInfo.artwork ? (
-                <Avatar.Image
-                  size={hp(18)}
-                  source={{ uri: `file://${trackInfo.artwork}` }}
-                />
-              ) : (
-                <Avatar.Icon
-                  size={hp(18)}
-                  icon="music"
-                  style={styles.musicIcon}
-                />
-              )}
+              {/*TODO Apply marquee effect*/}
+              <Text style={{ fontSize: wp(4.5) }}>{trackInfo.title}</Text>
+              {/*<Text style={{ fontSize: wp(3), color: colors.lightGrey }}>*/}
+              {/*  {trackInfo.artist}*/}
+              {/*</Text>*/}
             </View>
-
             <View
               style={{
                 flexDirection: 'row',
@@ -322,8 +355,9 @@ const NowPlaying = ({ navigation, extraData: { snapIndex, setSnapIndex } }) => {
                 justifyContent: 'space-between',
                 // backgroundColor: 'lightgreen',
                 width: wp(95),
+                marginTop: hp(1),
               }}>
-              <Text>
+              <Text style={{ fontSize: wp(3), color: colors.lightGrey }}>
                 {DateTimeUtils.msToTime(trackProgress.position * 1000)}
               </Text>
               <Slider
@@ -334,11 +368,30 @@ const NowPlaying = ({ navigation, extraData: { snapIndex, setSnapIndex } }) => {
                 // animateTransitions={true}
                 // animationType="spring"
                 // style={{ borderWidth: 1 }}
-                trackStyle={{ width: wp(70) }}
+                minimumTrackTintColor="#1073ff"
+                maximumTrackTintColor="#b7b7b7"
+                trackStyle={{
+                  height: hp(0.3),
+                  borderRadius: hp(0.3),
+                  width: wp(70),
+                }}
+                thumbStyle={{
+                  width: hp(2.5),
+                  height: hp(2.5),
+                  borderRadius: hp(3),
+                  backgroundColor: enabledDarkTheme
+                    ? Colors.dark
+                    : Colors.lighter,
+                  elevation: 2,
+                  shadowColor: 'black',
+                  shadowOffset: { width: 0, height: 2 },
+                  shadowRadius: 2,
+                  shadowOpacity: 0.35,
+                }}
               />
               <TouchableOpacity
                 onPress={setShowRemainingTime.bind(this, value => !value)}>
-                <Text>
+                <Text style={{ fontSize: wp(3), color: colors.lightGrey }}>
                   {`${showRemainingTime ? '-' : ''} ${DateTimeUtils.msToTime(
                     (showRemainingTime
                       ? trackProgress.duration - trackProgress.position
@@ -347,10 +400,69 @@ const NowPlaying = ({ navigation, extraData: { snapIndex, setSnapIndex } }) => {
                 </Text>
               </TouchableOpacity>
             </View>
+
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                // borderWidth: 1,
+                width: wp(55),
+                // padding: 0,
+                // flex:1,
+              }}>
+              <TouchableOpacity
+                style={styles.playerButton}
+                activeOpacity={hasPreviousTrack ? 0.2 : 1}
+                onPress={skipBack}>
+                <Icon
+                  name="ios-play-skip-back"
+                  // TODO update the button colors
+                  type="Ionicons"
+                  size={wp(7)}
+                  style={{ opacity: hasPreviousTrack ? 1 : 0.2 }}
+                />
+              </TouchableOpacity>
+
+              {isPlaying ? (
+                <TouchableOpacity style={styles.playerButton} onPress={pause}>
+                  <Icon
+                    name="pause"
+                    type="FontAwesome5"
+                    // TODO update the button colors, add spring animation
+                    size={wp(8.4)}
+                  />
+                </TouchableOpacity>
+              ) : (
+                <TouchableOpacity style={styles.playerButton} onPress={play}>
+                  <Icon
+                    name="play"
+                    type="FontAwesome5"
+                    // TODO update the button colors, add spring animation
+                    size={wp(8)}
+                  />
+                </TouchableOpacity>
+              )}
+
+              <TouchableOpacity
+                style={styles.playerButton}
+                activeOpacity={hasNextTrack ? 0.2 : 1}
+                onPress={skipForward}>
+                <Icon
+                  style={{ opacity: hasNextTrack ? 1 : 0.2 }}
+                  name="ios-play-skip-forward"
+                  type="Ionicons"
+                  // TODO update the button colors
+                  size={wp(7)}
+                />
+              </TouchableOpacity>
+            </View>
           </View>
         );
+
       case 2:
         return <Text>State 2</Text>;
+
       default:
         throw new Error(`Invalid snapIndex=${snapIndex}`);
     }
