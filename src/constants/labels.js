@@ -34,6 +34,7 @@ const labels = {
   playing: 'Playing',
   couldntPlayTracks: "Couldn't play tracks",
   fromAll: 'from all',
+  playingSpeedReset: 'Reset playing speed',
 };
 
 export default labels;

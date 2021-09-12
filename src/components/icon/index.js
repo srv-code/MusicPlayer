@@ -5,6 +5,7 @@ import Entypo from 'react-native-vector-icons/Entypo';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import { widthPercentageToDP as wp } from 'react-native-responsive-screen';
 import colors from '../../constants/colors';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 
 const Icon = ({
   type = 'MaterialCommunityIcons',
@@ -17,6 +18,9 @@ const Icon = ({
   switch (type) {
     case 'MaterialCommunityIcons':
       _Icon = MaterialCommunityIcons;
+      break;
+    case 'MaterialIcons':
+      _Icon = MaterialIcons;
       break;
     case 'Ionicons':
       _Icon = Ionicons;

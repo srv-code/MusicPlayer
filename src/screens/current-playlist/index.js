@@ -1,12 +1,20 @@
 import React from 'react';
+import {
+  heightPercentageToDP as hp,
+  widthPercentageToDP as wp,
+} from 'react-native-responsive-screen';
 import screenNames from '../../constants/screen-names';
 import { BottomSheetView } from '@gorhom/bottom-sheet';
 import { Button, Text } from 'react-native-paper';
 import globalStyles from '../../styles';
+import { Platform, TouchableOpacity, View } from 'react-native';
+import Icon from '../../components/icon';
+import labels from '../../constants/labels';
 
 const CurrentPlaylist = ({ navigation, extraData }) => {
-  if (extraData.snapIndex === 0)
-    navigation.navigate(screenNames.nowPlaying);
+  const { snapIndex } = extraData;
+
+  if (snapIndex === 0) navigation.navigate(screenNames.nowPlaying);
 
   return (
     <BottomSheetView
@@ -15,6 +23,9 @@ const CurrentPlaylist = ({ navigation, extraData }) => {
         paddingHorizontal: 16,
         overflow: 'visible',
       }}>
+      {/* Header */}
+      {/*{snapIndex === 2 && renderScreenHeader()}*/}
+
       <Text>{screenNames.currentPlaylist}</Text>
       <Button
         mode="outlined"
@@ -30,7 +41,7 @@ const CurrentPlaylist = ({ navigation, extraData }) => {
         onPress={navigation.navigate.bind(this, screenNames.songInfo)}>
         Go to Song Info
       </Button>
-      <Text>{extraData.snapIndex}</Text>
+      <Text>{snapIndex}</Text>
     </BottomSheetView>
   );
 };

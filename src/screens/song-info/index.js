@@ -4,9 +4,8 @@ import { BottomSheetView } from '@gorhom/bottom-sheet';
 import { Button, Text } from 'react-native-paper';
 import globalStyles from '../../styles';
 
-const SongInfo = ({ navigation, extraData }) => {
-  if (extraData.snapIndex === 0)
-    navigation.navigate(screenNames.nowPlaying);
+const SongInfo = ({ navigation, route, extraData }) => {
+  if (extraData.snapIndex === 0) navigation.navigate(screenNames.nowPlaying);
 
   return (
     <BottomSheetView
@@ -31,6 +30,7 @@ const SongInfo = ({ navigation, extraData }) => {
         Go to Currently Playing
       </Button>
       <Text>{extraData.snapIndex}</Text>
+      <Text>{`data=${JSON.stringify(route.params.info)}`}</Text>
     </BottomSheetView>
   );
 };

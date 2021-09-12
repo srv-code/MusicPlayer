@@ -166,7 +166,10 @@ const Tracks = ({ navigation }) => {
       case SortingOptions.TITLE:
         return { name: 'format-text', type: 'MaterialCommunityIcons' };
       case SortingOptions.DURATION:
-        return { name: 'clock-time-five-outline' };
+        return {
+          name: 'clock-time-five-outline',
+          type: 'MaterialCommunityIcons',
+        };
       case SortingOptions.ALBUM:
         return { name: 'disc-outline', type: 'Ionicons' };
       case SortingOptions.ARTIST:

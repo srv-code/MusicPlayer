@@ -15,6 +15,7 @@ import TrackPlayer, {
   State as PlayerState,
   RepeatMode as PlayerRepeatMode,
   useProgress as usePlayerProgress,
+  RepeatMode,
 } from 'react-native-track-player';
 import { MusicContext } from '../../context/music';
 // import { useTrackPlayerEvents as usePlayerEvents } from "react-native-track-player/lib/hooks";
@@ -30,6 +31,8 @@ import LinearGradient from 'react-native-linear-gradient';
 import Colors from 'react-native/Libraries/NewAppScreen/components/Colors';
 import MarqueeText from 'react-native-marquee';
 
+const playSpeeds = [0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2];
+
 // FIXME Player buttons are not corresponding to the actual play state (sometimes)
 const NowPlaying = ({ navigation, extraData: { snapIndex, setSnapIndex } }) => {
   const { setMusicInfo } = useContext(MusicContext);
@@ -40,6 +43,8 @@ const NowPlaying = ({ navigation, extraData: { snapIndex, setSnapIndex } }) => {
   const [hasPreviousTrack, setHasPreviousTrack] = useState(false);
   const [hasNextTrack, setHasNextTrack] = useState(false);
   const [showRemainingTime, setShowRemainingTime] = useState(false);
+  const [playSpeedIndex, setPlaySpeedIndex] = useState(3);
+  const [repeatMode, setRepeatMode] = useState(PlayerRepeatMode.Off);
 
   const trackProgress = usePlayerProgress();
 
@@ -222,6 +227,8 @@ const NowPlaying = ({ navigation, extraData: { snapIndex, setSnapIndex } }) => {
         style={{
           fontSize: wp(fontSizes[snapIndex]),
           marginBottom: snapIndex === 2 ? hp(1) : 0,
+          color: enabledDarkTheme ? Colors.light : Colors.darker,
+          // color: enabledDarkTheme ? 'white' : 'black',
           // backgroundColor: 'lightgreen',
           // width:
           //     snapIndex === 0 ? wp(58) :
@@ -234,6 +241,7 @@ const NowPlaying = ({ navigation, extraData: { snapIndex, setSnapIndex } }) => {
         loop
         marqueeDelay={1000}
         marqueeResetDelay={1000}>
+        {/*<Text>{title}</Text>*/}
         {title}
       </MarqueeText>
     );
@@ -275,63 +283,175 @@ const NowPlaying = ({ navigation, extraData: { snapIndex, setSnapIndex } }) => {
   };
 
   const renderPlayerControls = () => (
-    <View
-      style={{
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        // borderWidth: 1,
-        width: wp(snapIndex === 0 ? 25 : 55),
-        // padding: 0,
-        // backgroundColor: 'lightgreen',
-        // marginLeft: wp(1.5),
-      }}>
-      <TouchableOpacity
-        style={styles.playerButton}
-        activeOpacity={hasPreviousTrack ? 0.2 : 1}
-        onPress={skipBack}>
-        <Icon
-          name="ios-play-skip-back"
-          // TODO update the button colors
-          type="Ionicons"
-          size={wp(snapIndex === 2 ? 11 : 7)}
-          style={{ opacity: hasPreviousTrack ? 1 : 0.2 }}
-        />
-      </TouchableOpacity>
+    <>
+      {snapIndex === 2 && (
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            // backgroundColor: 'lightgreen',
+            width: wp(90),
+            marginBottom: hp(2.5),
+          }}>
+          {/*<Text>Playlist</Text>*/}
+          <TouchableOpacity
+            style={styles.playerButton}
+            // activeOpacity={hasPreviousTrack ? 0.2 : 1}
+            onPress={navigation.navigate.bind(
+              this,
+              screenNames.currentPlaylist,
+            )}>
+            <Icon
+              name="playlist-music-outline"
+              // TODO update the button colors
+              size={wp(7)}
+              // style={{ opacity: hasPreviousTrack ? 1 : 0.2 }}
+            />
+          </TouchableOpacity>
 
-      {isPlaying ? (
-        <TouchableOpacity style={styles.playerButton} onPress={pause}>
-          <Icon
-            name="pause"
-            type="FontAwesome5"
-            // TODO update the button colors, add spring animation
-            size={wp(snapIndex === 2 ? 12.4 : 8.4)}
-          />
-        </TouchableOpacity>
-      ) : (
-        <TouchableOpacity style={styles.playerButton} onPress={play}>
-          <Icon
-            name="play"
-            type="FontAwesome5"
-            // TODO update the button colors, add spring animation
-            size={wp(snapIndex === 2 ? 12 : 8)}
-          />
-        </TouchableOpacity>
+          {/*<Text>Rate</Text>*/}
+          <TouchableOpacity
+            style={styles.playerButton}
+            // activeOpacity={hasPreviousTrack ? 0.2 : 1}
+            onLongPress={() => {
+              if (playSpeeds[playSpeedIndex] === 1) return;
+              const normalSpeedIndex = playSpeeds.findIndex(s => s === 1);
+              TrackPlayer.setRate(playSpeeds[normalSpeedIndex]).then(() => {
+                setPlaySpeedIndex(normalSpeedIndex);
+                ToastAndroid.show(labels.playingSpeedReset, ToastAndroid.SHORT);
+              });
+            }}
+            onPress={() => {
+              const newSpeedIndex = (playSpeedIndex + 1) % playSpeeds.length;
+              TrackPlayer.setRate(playSpeeds[newSpeedIndex]).then(() => {
+                setPlaySpeedIndex(newSpeedIndex);
+              });
+            }}>
+            {/*<Text>{playSpeedIndex}</Text>*/}
+            <Text
+              style={{
+                fontSize: wp(5),
+                color: colors.lightGrey,
+              }}>
+              {`${playSpeeds[playSpeedIndex]}x`}
+            </Text>
+          </TouchableOpacity>
+
+          {/*<Text>Heart</Text>*/}
+          <TouchableOpacity
+            style={styles.playerButton}
+            // activeOpacity={hasPreviousTrack ? 0.2 : 1}
+            onPress={() => {
+              // TODO Write in async-storage, update the favourites list
+            }}>
+            <Icon
+              name="heart-outline" // "heart"
+              // TODO update the button colors
+              size={wp(7)}
+              // style={{ opacity: hasPreviousTrack ? 1 : 0.2 }}
+            />
+          </TouchableOpacity>
+
+          {/*<Text>Repeat Mode</Text>*/}
+          <TouchableOpacity
+            style={styles.playerButton}
+            // activeOpacity={hasPreviousTrack ? 0.2 : 1}
+            onPress={() => {
+              const nextMode = (repeatMode + 1) % 3;
+              TrackPlayer.setRepeatMode(nextMode).then(
+                setRepeatMode.bind(this, nextMode),
+              );
+            }}>
+            {/*<Text>{repeatMode}</Text>*/}
+            <Icon
+              name={
+                repeatMode === RepeatMode.Off
+                  ? 'repeat-off'
+                  : repeatMode === RepeatMode.Track
+                  ? 'repeat-once'
+                  : 'repeat'
+              }
+              // TODO update the button colors
+              size={wp(7)}
+              // style={{ opacity: hasPreviousTrack ? 1 : 0.2 }}
+            />
+          </TouchableOpacity>
+
+          {/*<Text>Info</Text>*/}
+          <TouchableOpacity
+            style={styles.playerButton}
+            // activeOpacity={hasPreviousTrack ? 0.2 : 1}
+            onPress={navigation.navigate.bind(this, screenNames.songInfo, {
+              info: trackInfo,
+            })}>
+            <Icon
+              name="information-outline"
+              // TODO update the button colors
+              size={wp(7)}
+              // style={{ opacity: hasPreviousTrack ? 1 : 0.2 }}
+            />
+          </TouchableOpacity>
+        </View>
       )}
+      <View
+        style={{
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          // borderWidth: 1,
+          width: wp(snapIndex === 0 ? 25 : 55),
+          // padding: 0,
+          // backgroundColor: 'lightgreen',
+          // marginLeft: wp(1.5),
+        }}>
+        <TouchableOpacity
+          style={styles.playerButton}
+          activeOpacity={hasPreviousTrack ? 0.2 : 1}
+          onPress={skipBack}>
+          <Icon
+            name="ios-play-skip-back"
+            // TODO update the button colors
+            type="Ionicons"
+            size={wp(snapIndex === 2 ? 11 : 7)}
+            style={{ opacity: hasPreviousTrack ? 1 : 0.2 }}
+          />
+        </TouchableOpacity>
 
-      <TouchableOpacity
-        style={styles.playerButton}
-        activeOpacity={hasNextTrack ? 0.2 : 1}
-        onPress={skipForward}>
-        <Icon
-          style={{ opacity: hasNextTrack ? 1 : 0.2 }}
-          name="ios-play-skip-forward"
-          type="Ionicons"
-          // TODO update the button colors
-          size={wp(snapIndex === 2 ? 11 : 7)}
-        />
-      </TouchableOpacity>
-    </View>
+        {isPlaying ? (
+          <TouchableOpacity style={styles.playerButton} onPress={pause}>
+            <Icon
+              name="pause"
+              type="FontAwesome5"
+              // TODO update the button colors, add spring animation
+              size={wp(snapIndex === 2 ? 12.4 : 8.4)}
+            />
+          </TouchableOpacity>
+        ) : (
+          <TouchableOpacity style={styles.playerButton} onPress={play}>
+            <Icon
+              name="play"
+              type="FontAwesome5"
+              // TODO update the button colors, add spring animation
+              size={wp(snapIndex === 2 ? 12 : 8)}
+            />
+          </TouchableOpacity>
+        )}
+
+        <TouchableOpacity
+          style={styles.playerButton}
+          activeOpacity={hasNextTrack ? 0.2 : 1}
+          onPress={skipForward}>
+          <Icon
+            style={{ opacity: hasNextTrack ? 1 : 0.2 }}
+            name="ios-play-skip-forward"
+            type="Ionicons"
+            // TODO update the button colors
+            size={wp(snapIndex === 2 ? 11 : 7)}
+          />
+        </TouchableOpacity>
+      </View>
+    </>
   );
 
   const renderExpandedPlayerView = () => (
@@ -342,7 +462,11 @@ const NowPlaying = ({ navigation, extraData: { snapIndex, setSnapIndex } }) => {
       }}>
       {/* Renders artwork */}
       <LinearGradient
-        colors={['#d4d4d4', '#999999', '#7b7b7b', '#373737']} // TODO colors are yet to optimize
+        colors={
+          enabledDarkTheme
+            ? ['#767676', '#595959', '#323232', '#323232']
+            : ['#d4d4d4', '#999999', '#7b7b7b', '#373737']
+        }
         style={{
           elevation: 10,
           // borderRadius: hp(10),
@@ -432,7 +556,7 @@ const NowPlaying = ({ navigation, extraData: { snapIndex, setSnapIndex } }) => {
           // backgroundColor: 'lightgreen',
           width: wp(95),
           marginTop: hp(snapIndex === 2 ? 2 : 0.5),
-          marginBottom: hp(snapIndex === 2 ? 3 : 0),
+          marginBottom: hp(snapIndex === 2 ? 2.5 : 0),
         }}>
         <Text
           style={{
@@ -445,7 +569,7 @@ const NowPlaying = ({ navigation, extraData: { snapIndex, setSnapIndex } }) => {
           minimumValue={0}
           maximumValue={trackProgress.duration}
           value={trackProgress.position}
-          // onValueChange={value => this.setState({ value })}
+          onValueChange={TrackPlayer.seekTo}
           // animateTransitions={true}
           // animationType="spring"
           // style={{ borderWidth: 1 }}

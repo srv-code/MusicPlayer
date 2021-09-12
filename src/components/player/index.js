@@ -165,7 +165,7 @@ const Player = ({ style }) => {
             console.log(`[Player] Removing upcoming tracks...`);
             await TrackPlayer.removeUpcomingTracks();
           }}>
-          Remove Upcoming Tracks{' '}
+          Remove Upcoming Tracks
         </Button>
 
         <Button

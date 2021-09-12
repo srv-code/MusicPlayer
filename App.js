@@ -133,6 +133,8 @@ const App = () => {
       // nextIcon: require('./next-icon.png'),
       // icon: require('./notification-icon.png'),
     });
+
+    await TrackPlayer.setVolume(1); // Set to full volume
   };
 
   useEffect(() => {
@@ -147,8 +149,6 @@ const App = () => {
       TrackPlayer.destroy();
     };
   }, []);
-
-
 
   // useEffect(() => {
   //   if (showSplash)

@@ -1,12 +1,10 @@
 import React, { useMemo } from 'react';
+import { StyleSheet } from 'react-native';
 import {
   createStackNavigator,
   TransitionPresets,
 } from '@react-navigation/stack';
-import {
-  heightPercentageToDP as hp,
-  widthPercentageToDP as wp,
-} from 'react-native-responsive-screen';
+import { widthPercentageToDP as wp } from 'react-native-responsive-screen';
 import screenNames from '../../constants/screen-names';
 import TabbedView from '../tabbed-view';
 import Settings from '../../screens/settings';
@@ -64,21 +62,8 @@ const BottomSheetNavigator = ({
           options={{
             headerLeft: () => null,
             title: labels.nowPlaying,
-            headerTitleStyle: {
-              fontSize: wp(5),
-              textTransform: 'capitalize',
-              // backgroundColor: 'lightblue',
-              // padding: 0,
-              // margin: 0,
-            },
-            headerTitleContainerStyle: {
-              // backgroundColor: 'lightblue',
-              width: wp(90),
-              alignItems: 'center',
-              // padding: 0,
-              // margin: 0,
-              marginTop: hp(-2),
-            },
+            headerTitleStyle: styles.headerTitleText,
+            headerTitleAlign: 'center',
           }}>
           {props => (
             <NowPlaying {...props} extraData={{ snapIndex, setSnapIndex }} />
@@ -87,13 +72,21 @@ const BottomSheetNavigator = ({
 
         <BottomSheetStack.Screen
           name={screenNames.currentPlaylist}
-          options={{ title: labels.currentPlaylist }}>
+          options={{
+            title: labels.currentPlaylist,
+            headerTitleStyle: styles.headerTitleText,
+            headerTitleAlign: 'center',
+          }}>
           {props => <CurrentPlaylist {...props} extraData={{ snapIndex }} />}
         </BottomSheetStack.Screen>
 
         <BottomSheetStack.Screen
           name={screenNames.songInfo}
-          options={{ title: labels.songInfo }}>
+          options={{
+            title: labels.songInfo,
+            headerTitleStyle: styles.headerTitleText,
+            headerTitleAlign: 'center',
+          }}>
           {props => <SongInfo {...props} extraData={{ snapIndex }} />}
         </BottomSheetStack.Screen>
       </BottomSheetStack.Navigator>
@@ -141,5 +134,12 @@ const RootStackNavigator = () => (
     <RootStack.Screen name={screenNames.about} component={About} />
   </RootStack.Navigator>
 );
+
+const styles = StyleSheet.create({
+  headerTitleText: {
+    fontSize: wp(5),
+    textTransform: 'capitalize',
+  },
+});
 
 export default RootStackNavigator;
