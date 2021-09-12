@@ -33,7 +33,7 @@ const BottomSheetNavigator = ({
     () => ({
       ...TransitionPresets.SlideFromRightIOS,
 
-      headerShown: snapIndex !== 0,
+      headerShown: snapIndex === 2,
       safeAreaInsets: { top: 0 },
       cardStyle: {
         backgroundColor: enabledDarkTheme ? Colors.darker : Colors.lighter,
@@ -66,6 +66,7 @@ const BottomSheetNavigator = ({
             title: labels.nowPlaying,
             headerTitleStyle: {
               fontSize: wp(5),
+              textTransform: 'capitalize',
               // backgroundColor: 'lightblue',
               // padding: 0,
               // margin: 0,
