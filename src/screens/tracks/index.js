@@ -76,8 +76,8 @@ const Tracks = ({ navigation }) => {
     //     musicInfo.currentlyPlayingTrack,
     //   )}`,
     // );
-    setCurrentlyPlayingTrackId(musicInfo.currentlyPlayingTrack?.info?.id);
-  }, [musicInfo.currentlyPlayingTrack]);
+    setCurrentlyPlayingTrackId(musicInfo.currentlyPlaying?.track?.id);
+  }, [musicInfo.currentlyPlaying]);
 
   // TODO apply useMemo later
   const dynamicStyles = {
@@ -189,14 +189,14 @@ const Tracks = ({ navigation }) => {
       switch (sortBy) {
         case SortingOptions.TITLE:
         case SortingOptions.ARTIST:
-          return track.artist.trim();
+          return track.artist;
         case SortingOptions.DURATION:
-          return DateTimeUtils.msToTime(track.duration).trim();
+          return DateTimeUtils.msToTime(track.duration);
         case SortingOptions.ALBUM:
-          return track.album.trim();
+          return track.album;
         case SortingOptions.FOLDER:
-          // return `${track.folder.name} (${track.folder.path.trim()})`;
-          return track.folder.name.trim();
+          // return `${track.folder.name} (${track.folder.path)})`;
+          return track.folder.name;
         default:
           throw new Error(`Invalid sortBy value: ${sortBy}`);
       }

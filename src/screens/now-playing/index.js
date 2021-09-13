@@ -30,12 +30,14 @@ import Slider from 'react-native-slider';
 import LinearGradient from 'react-native-linear-gradient';
 import Colors from 'react-native/Libraries/NewAppScreen/components/Colors';
 import MarqueeText from 'react-native-marquee';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import keys from '../../constants/keys';
 
 const playSpeeds = [0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2];
 
 // FIXME Player buttons are not corresponding to the actual play state (sometimes)
 const NowPlaying = ({ navigation, extraData: { snapIndex, setSnapIndex } }) => {
-  const { setMusicInfo } = useContext(MusicContext);
+  const { musicInfo, setMusicInfo } = useContext(MusicContext);
   const { enabledDarkTheme } = useContext(PreferencesContext);
 
   const [trackInfo, setTrackInfo] = useState(null);
@@ -101,12 +103,21 @@ const NowPlaying = ({ navigation, extraData: { snapIndex, setSnapIndex } }) => {
       ) {
         TrackPlayer.getTrack(event.nextTrack)
           .then(track => {
-            setTrackInfo(track);
+            console.log(
+              `[Now Playing] changed to track=${JSON.stringify(track)}`,
+            );
+            setTrackInfo({
+              ...track,
+              playlistName: null,
+              markedFavorite: musicInfo.favoriteIds.find(id => id === track.id),
+            });
             setMusicInfo(data => ({
               ...data,
-              currentlyPlayingTrack: {
-                info: track,
-                index: event.nextTrack,
+              currentlyPlaying: {
+                track: track,
+                indexInPlaylist: event.nextTrack,
+                playlistId: null,
+                markedFavorite: false,
               },
             }));
           })
@@ -142,7 +153,7 @@ const NowPlaying = ({ navigation, extraData: { snapIndex, setSnapIndex } }) => {
           setTrackInfo(null);
           setMusicInfo(data => ({
             ...data,
-            currentlyPlayingTrack: null,
+            currentlyPlaying: null,
           }));
         }
       }
@@ -168,19 +179,28 @@ const NowPlaying = ({ navigation, extraData: { snapIndex, setSnapIndex } }) => {
   const renderMarqueeTrackDescription = track => {
     const info = [
       {
-        text: track.artist.trim(),
+        text: track.artist,
         icon: { name: 'account-music-outline', type: 'MaterialCommunityIcons' },
       },
     ];
     if (snapIndex === 2) {
       info.push({
-        text: track.album.trim(),
+        text: track.album,
         icon: { name: 'disc-outline', type: 'Ionicons' },
       });
       info.push({
-        text: track.folder.name.trim(),
+        text: track.folder.name,
         icon: { name: 'folder-music-outline', type: 'MaterialCommunityIcons' },
       });
+
+      if (track.playlistName)
+        info.push({
+          text: track.playlistName,
+          icon: {
+            name: 'playlist-music-outline',
+            type: 'MaterialCommunityIcons',
+          },
+        });
     }
 
     return (
@@ -344,10 +364,35 @@ const NowPlaying = ({ navigation, extraData: { snapIndex, setSnapIndex } }) => {
             style={styles.secondaryPlayerButtons}
             // activeOpacity={hasPreviousTrack ? 0.2 : 1}
             onPress={() => {
-              // TODO Write in async-storage, update the favourites list
+              const newFavoriteValue = !trackInfo.markedFavorite;
+              const newFavoriteIds = newFavoriteValue
+                ? [...musicInfo.favoriteIds, trackInfo.id]
+                : musicInfo.favoriteIds.filter(id => id !== trackInfo.id);
+
+              AsyncStorage.setItem(
+                keys.FAVORITE_IDS,
+                JSON.stringify(newFavoriteIds),
+              )
+                .then(() => {
+                  setMusicInfo(data => ({
+                    ...data,
+                    favoriteIds: newFavoriteIds,
+                  }));
+                  setTrackInfo(data => ({
+                    ...data,
+                    markedFavorite: newFavoriteValue,
+                  }));
+                })
+                .catch(err => {
+                  ToastAndroid.show(
+                    `${labels.couldntFavSong}: ${err.message}`,
+                    ToastAndroid.LONG,
+                  );
+                  throw err;
+                });
             }}>
             <Icon
-              name="heart-outline" // "heart"
+              name={trackInfo.markedFavorite ? 'heart' : 'heart-outline'}
               // TODO update the button colors
               size={wp(6)}
               // style={{ opacity: hasPreviousTrack ? 1 : 0.2 }}
@@ -526,7 +571,7 @@ const NowPlaying = ({ navigation, extraData: { snapIndex, setSnapIndex } }) => {
           // backgroundColor: 'lightgreen',
         }}>
         {/*TODO Apply marquee effect*/}
-        {renderMarqueeTrackTitle(trackInfo.title.trim())}
+        {renderMarqueeTrackTitle(trackInfo.title)}
         {/*<Text*/}
         {/*  numberOfLines={snapIndex === 1 ? 1 : 2}*/}
         {/*  style={{*/}
@@ -632,7 +677,7 @@ const NowPlaying = ({ navigation, extraData: { snapIndex, setSnapIndex } }) => {
                 // backgroundColor: 'lightgray',
                 overflow: 'hidden',
               }}>
-              {renderMarqueeTrackTitle(trackInfo.title.trim())}
+              {renderMarqueeTrackTitle(trackInfo.title)}
               {renderMarqueeTrackDescription(trackInfo)}
             </View>
             {renderPlayerControls()}

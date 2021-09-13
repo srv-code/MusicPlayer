@@ -73,6 +73,12 @@ export default class MusicUtils {
       track.artwork = track.cover;
       delete track.cover;
 
+      /* trim fields */
+      track.title = track.title.trim();
+      track.album = track.album.trim();
+      track.artist = track.artist.trim();
+
+      /* split path components */
       const pathComponents = track.url.split('/');
       pathComponents.pop(); // removes the file name
       track.folder = {

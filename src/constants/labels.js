@@ -35,6 +35,7 @@ const labels = {
   couldntPlayTracks: "Couldn't play tracks",
   fromAll: 'from all',
   playingSpeedReset: 'Reset playing speed',
+  couldntFavSong: 'Could not set song as favorite',
 };
 
 export default labels;

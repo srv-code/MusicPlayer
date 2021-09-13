@@ -107,7 +107,7 @@ const Splash = ({ setShow, setMusicInfo }) => {
     //   })}`,
     // );
 
-    return { tracks, albums, artists, folders };
+    return { tracks, albums, artists, folders, favoriteIds: [], playlists: [] };
   };
 
   useEffect(() => {
@@ -145,9 +145,31 @@ const Splash = ({ setShow, setMusicInfo }) => {
 
         console.log(`[Splash] Loading track info from cache...`);
         let musicInfo = JSON.parse(await AsyncStorage.getItem(keys.MUSIC_INFO));
-        // console.log('Splash:', { musicInfo });
+        console.log(
+          `[Splash] musicInfo (from cache)=${JSON.stringify(musicInfo)}`,
+        );
 
-        if (!musicInfo) {
+        if (musicInfo) {
+          console.log(`[Splash] Loading favorite Ids from cache...`);
+          const favs = await AsyncStorage.getItem(keys.FAVORITE_IDS);
+
+          console.log(`[Splash] Loading playlists from cache...`);
+          const pl = await AsyncStorage.getItem(keys.PLAYLISTS);
+
+          musicInfo = {
+            ...musicInfo,
+            favoriteIds: favs ? JSON.parse(favs) : [],
+            playlists: pl ? JSON.parse(pl) : [],
+          };
+
+          console.log(
+            `[Splash] favoriteIds=${JSON.stringify(
+              favs,
+            )}, playlists=${JSON.stringify(pl)}, musicInfo=${JSON.stringify(
+              musicInfo,
+            )}`,
+          );
+        } else {
           // Load all music tracks
           error.title = 'I/O Error';
           error.message = `Failed loading music tracks`;
@@ -163,11 +185,12 @@ const Splash = ({ setShow, setMusicInfo }) => {
             `[Splash] Recalculating & writing track info in cache...`,
           );
           await AsyncStorage.setItem(keys.MUSIC_INFO, JSON.stringify(tracks));
+          console.log(
+            `[Splash] musicInfo(recalculated)=${JSON.stringify(tracks)}`,
+          );
 
           musicInfo = tracks;
         }
-
-        console.log(`[Splash] musicInfo=${JSON.stringify(musicInfo)}`);
 
         console.log(`[Splash] Storing track info in context...`);
         setMusicInfo(musicInfo);
