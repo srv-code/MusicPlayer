@@ -296,7 +296,7 @@ const NowPlaying = ({ navigation, extraData: { snapIndex, setSnapIndex } }) => {
           }}>
           {/*<Text>Playlist</Text>*/}
           <TouchableOpacity
-            style={styles.playerButton}
+            style={styles.secondaryPlayerButtons}
             // activeOpacity={hasPreviousTrack ? 0.2 : 1}
             onPress={navigation.navigate.bind(
               this,
@@ -305,14 +305,14 @@ const NowPlaying = ({ navigation, extraData: { snapIndex, setSnapIndex } }) => {
             <Icon
               name="playlist-music-outline"
               // TODO update the button colors
-              size={wp(7)}
+              size={wp(6)}
               // style={{ opacity: hasPreviousTrack ? 1 : 0.2 }}
             />
           </TouchableOpacity>
 
           {/*<Text>Rate</Text>*/}
           <TouchableOpacity
-            style={styles.playerButton}
+            style={styles.secondaryPlayerButtons}
             // activeOpacity={hasPreviousTrack ? 0.2 : 1}
             onLongPress={() => {
               if (playSpeeds[playSpeedIndex] === 1) return;
@@ -331,7 +331,8 @@ const NowPlaying = ({ navigation, extraData: { snapIndex, setSnapIndex } }) => {
             {/*<Text>{playSpeedIndex}</Text>*/}
             <Text
               style={{
-                fontSize: wp(5),
+                fontSize: wp(4),
+                fontWeight: 'bold',
                 color: colors.lightGrey,
               }}>
               {`${playSpeeds[playSpeedIndex]}x`}
@@ -340,7 +341,7 @@ const NowPlaying = ({ navigation, extraData: { snapIndex, setSnapIndex } }) => {
 
           {/*<Text>Heart</Text>*/}
           <TouchableOpacity
-            style={styles.playerButton}
+            style={styles.secondaryPlayerButtons}
             // activeOpacity={hasPreviousTrack ? 0.2 : 1}
             onPress={() => {
               // TODO Write in async-storage, update the favourites list
@@ -348,14 +349,14 @@ const NowPlaying = ({ navigation, extraData: { snapIndex, setSnapIndex } }) => {
             <Icon
               name="heart-outline" // "heart"
               // TODO update the button colors
-              size={wp(7)}
+              size={wp(6)}
               // style={{ opacity: hasPreviousTrack ? 1 : 0.2 }}
             />
           </TouchableOpacity>
 
           {/*<Text>Repeat Mode</Text>*/}
           <TouchableOpacity
-            style={styles.playerButton}
+            style={styles.secondaryPlayerButtons}
             // activeOpacity={hasPreviousTrack ? 0.2 : 1}
             onPress={() => {
               const nextMode = (repeatMode + 1) % 3;
@@ -373,14 +374,14 @@ const NowPlaying = ({ navigation, extraData: { snapIndex, setSnapIndex } }) => {
                   : 'repeat'
               }
               // TODO update the button colors
-              size={wp(7)}
+              size={wp(6)}
               // style={{ opacity: hasPreviousTrack ? 1 : 0.2 }}
             />
           </TouchableOpacity>
 
           {/*<Text>Info</Text>*/}
           <TouchableOpacity
-            style={styles.playerButton}
+            style={styles.secondaryPlayerButtons}
             // activeOpacity={hasPreviousTrack ? 0.2 : 1}
             onPress={navigation.navigate.bind(this, screenNames.songInfo, {
               info: trackInfo,
@@ -388,7 +389,7 @@ const NowPlaying = ({ navigation, extraData: { snapIndex, setSnapIndex } }) => {
             <Icon
               name="information-outline"
               // TODO update the button colors
-              size={wp(7)}
+              size={wp(6)}
               // style={{ opacity: hasPreviousTrack ? 1 : 0.2 }}
             />
           </TouchableOpacity>
@@ -464,7 +465,7 @@ const NowPlaying = ({ navigation, extraData: { snapIndex, setSnapIndex } }) => {
       <LinearGradient
         colors={
           enabledDarkTheme
-            ? ['#767676', '#595959', '#323232', '#323232']
+            ? ['#767676', '#595959', '#323232'] // excluded: '#282828'
             : ['#d4d4d4', '#999999', '#7b7b7b', '#373737']
         }
         style={{
@@ -728,7 +729,18 @@ const styles = StyleSheet.create({
     // backgroundColor: 'blue',
     alignItems: 'center',
     justifyContent: 'center',
+    // marginLeft: WP(2),
+  },
+  secondaryPlayerButtons: {
+    // elevation: 2,
+    // borderRadius: hp(10),
+    // padding: hp(1),
+    // backgroundColor: 'blue',
+    alignItems: 'center',
+    justifyContent: 'center',
     // marginLeft: wp(2),
+    // backgroundColor: 'lightgreen',
+    width: wp(14),
   },
   listItemText: {
     fontSize: wp(4),

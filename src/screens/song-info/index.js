@@ -5,7 +5,7 @@ import { Button, Text } from 'react-native-paper';
 import globalStyles from '../../styles';
 
 const SongInfo = ({ navigation, route, extraData }) => {
-  if (extraData.snapIndex === 0) navigation.navigate(screenNames.nowPlaying);
+  if (extraData.snapIndex < 2) navigation.navigate(screenNames.nowPlaying);
 
   return (
     <BottomSheetView

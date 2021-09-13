@@ -14,7 +14,7 @@ import labels from '../../constants/labels';
 const CurrentPlaylist = ({ navigation, extraData }) => {
   const { snapIndex } = extraData;
 
-  if (snapIndex === 0) navigation.navigate(screenNames.nowPlaying);
+  if (snapIndex < 2) navigation.navigate(screenNames.nowPlaying);
 
   return (
     <BottomSheetView

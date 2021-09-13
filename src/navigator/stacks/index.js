@@ -137,7 +137,7 @@ const RootStackNavigator = () => (
 
 const styles = StyleSheet.create({
   headerTitleText: {
-    fontSize: wp(5),
+    fontSize: wp(5.5),
     textTransform: 'capitalize',
   },
 });
