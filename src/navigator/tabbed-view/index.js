@@ -197,9 +197,9 @@ const TabbedView = ({ navigation }) => {
         />
         <Menu.Item
           icon="bug-outline"
-          title={labels.info}
+          title={labels.appInfo}
           onPress={() => {
-            navigation.navigate(screenNames.info);
+            navigation.navigate(screenNames.appInfo);
             toggleMenuVisibility();
           }}
         />

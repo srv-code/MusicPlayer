@@ -134,7 +134,7 @@ const Splash = ({ setShow, setMusicInfo }) => {
               throw new Error(`Permission ${perm} denied.`);
         }
 
-        // Check for music info from async-storage
+        // Check for music app-info from async-storage
         setLoadingInfo({
           loading: true,
           info: 'Loading music tracks...',

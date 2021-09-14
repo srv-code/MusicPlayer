@@ -6,13 +6,12 @@ const screenNames = {
   favorites: 'favorites',
   artists: 'artists',
   albums: 'albums',
-  info: 'info',
+  appInfo: 'app-info',
+  itemInfo: 'item-app-info',
   about: 'about',
   folders: 'folders',
-  itemInfo: 'item-info',
   nowPlaying: 'now-playing',
   currentPlaylist: 'current-playlist',
-  songInfo: 'song-info',
   tabbedView: 'tabbed-view',
 };
 

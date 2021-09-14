@@ -35,7 +35,7 @@ const Settings = ({ navigation }) => {
   return (
     <ScreenContainer
       showHeader
-      title={screenNames.info}
+      title={screenNames.appInfo}
       iconName="cog-outline"
       onBackPress={navigation.goBack}
       actionIcons={[{ name: 'magnify', onPress: toggleSearch }]}>

@@ -4,6 +4,7 @@ const labels = {
   sync: 'Sync',
   settings: 'Settings',
   info: 'Info',
+  appInfo: 'App Info',
   about: 'About',
   addToPlaylist: 'Add To Playlist',
   addToQueue: 'Add To Queue',
@@ -36,6 +37,16 @@ const labels = {
   fromAll: 'from all',
   playingSpeedReset: 'Reset playing speed',
   couldntFavSong: 'Could not set song as favorite',
+  playDuration: 'Play Duration',
+  markedFavorite: 'Marked Favorite',
+  yes: 'Yes',
+  no: 'No',
+  includedInPlaylists: 'Included In Playlists',
+  location: 'Location',
+  noInfoFound: 'No Information Found',
+  name: 'Name',
+  trackCount: 'Track Count',
+  playlist: 'Playlist',
 };
 
 export default labels;

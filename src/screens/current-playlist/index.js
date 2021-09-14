@@ -38,7 +38,7 @@ const CurrentPlaylist = ({ navigation, extraData }) => {
         mode="outlined"
         uppercase={false}
         style={globalStyles.button}
-        onPress={navigation.navigate.bind(this, screenNames.songInfo)}>
+        onPress={navigation.navigate.bind(this, screenNames.itemInfo)}>
         Go to Song Info
       </Button>
       <Text>{snapIndex}</Text>

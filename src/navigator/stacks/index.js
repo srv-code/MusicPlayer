@@ -4,22 +4,23 @@ import {
   createStackNavigator,
   TransitionPresets,
 } from '@react-navigation/stack';
-import { widthPercentageToDP as wp } from 'react-native-responsive-screen';
-import screenNames from '../../constants/screen-names';
-import TabbedView from '../tabbed-view';
-import Settings from '../../screens/settings';
-import Search from '../../screens/search';
-import Info from '../../screens/info';
-import About from '../../screens/about';
-import ItemInfo from '../../screens/item-info';
 import { NavigationContainer } from '@react-navigation/native';
+import PlayerBottomSheet from '../../components/player-bottom-sheet';
 import Colors from 'react-native/Libraries/NewAppScreen/components/Colors';
 import colors from '../../constants/colors';
 import labels from '../../constants/labels';
+import screenNames from '../../constants/screen-names';
+import { widthPercentageToDP as wp } from 'react-native-responsive-screen';
+import TabbedView from '../tabbed-view';
+import Settings from '../../screens/settings';
+import Search from '../../screens/search';
+import AppInfo from '../../screens/app-info';
+import ItemInfo, {
+  getScreenTitle as getItemInfoScreenTitle,
+} from '../../screens/item-info';
+import About from '../../screens/about';
 import NowPlaying from '../../screens/now-playing';
 import CurrentPlaylist from '../../screens/current-playlist';
-import SongInfo from '../../screens/song-info';
-import PlayerBottomSheet from '../../components/player-bottom-sheet';
 
 const BottomSheetStack = createStackNavigator();
 const BottomSheetNavigator = ({
@@ -81,13 +82,14 @@ const BottomSheetNavigator = ({
         </BottomSheetStack.Screen>
 
         <BottomSheetStack.Screen
-          name={screenNames.songInfo}
-          options={{
-            title: labels.songInfo,
+          name={screenNames.itemInfo}
+          options={({ route }) => ({
+            title: getItemInfoScreenTitle(route.params.type),
+            // title: labels.songInfo,
             headerTitleStyle: styles.headerTitleText,
             headerTitleAlign: 'center',
-          }}>
-          {props => <SongInfo {...props} extraData={{ snapIndex }} />}
+          })}>
+          {props => <ItemInfo {...props} extraData={{ snapIndex }} />}
         </BottomSheetStack.Screen>
       </BottomSheetStack.Navigator>
     </NavigationContainer>
@@ -130,7 +132,7 @@ const RootStackNavigator = () => (
       name={screenNames.search}
       component={SearchStackNavigator}
     />
-    <RootStack.Screen name={screenNames.info} component={Info} />
+    <RootStack.Screen name={screenNames.appInfo} component={AppInfo} />
     <RootStack.Screen name={screenNames.about} component={About} />
   </RootStack.Navigator>
 );

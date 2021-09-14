@@ -16,13 +16,14 @@ import colors from '../../constants/colors';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import keys from '../../constants/keys';
 import globalStyles from '../../styles';
+import labels from '../../constants/labels';
 
 const inProgressKeys = {
   DELETE_MUSIC_CACHE: 'delete-music-cache',
   // DELETE_PREFERENCES_CACHE: 'delete-pref-cache',
 };
 
-const Info = ({ navigation }) => {
+const AppInfo = ({ navigation }) => {
   const musicContext = useContext(MusicContext);
   const preferencesContext = useContext(PreferencesContext);
 
@@ -33,7 +34,7 @@ const Info = ({ navigation }) => {
   const [musicData, setMusicData] = useState(null);
   const [prefData, setPrefData] = useState(null);
 
-  console.log('[Info]', { musicData, prefData, searchedTerm });
+  console.log('[AppInfo]', { musicData, prefData, searchedTerm });
 
   useEffect(() => {
     setMusicData(musicContext.musicInfo);
@@ -351,7 +352,7 @@ const Info = ({ navigation }) => {
   return (
     <ScreenContainer
       showHeader
-      title={screenNames.info}
+      title={labels.appInfo}
       iconName="bug-outline"
       onBackPress={navigation.goBack}
       actionIcons={[
@@ -426,4 +427,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Info;
+export default AppInfo;

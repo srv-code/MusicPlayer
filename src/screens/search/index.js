@@ -33,6 +33,7 @@ import DateTimeUtils from '../../utils/datetime';
 import { PreferencesContext } from '../../context/preferences';
 import labels from '../../constants/labels';
 import keys from '../../constants/keys';
+import { DisplayModes as ItemInfoDisplayModes } from '../item-info';
 
 // TODO
 //  - Save the searched term in async-storage (avoid duplicates)
@@ -213,6 +214,17 @@ const Search = ({ navigation }) => {
       };
 
       const renderRightComponent = (data, props, itemIndex) => {
+        const showItemInfo = () => {
+          // alert(JSON.stringify(props));
+          navigation.navigate(screenNames.itemInfo, {
+            displayMode: ItemInfoDisplayModes.SCREEN,
+            type,
+            data,
+          });
+          // setInfoModalData({ type, data });
+          setShowMoreOptionFor(null);
+        };
+
         switch (type) {
           case keys.TRACKS:
             return (
@@ -262,12 +274,7 @@ const Search = ({ navigation }) => {
                 <Menu.Item
                   icon="information-variant"
                   title={labels.showInfo}
-                  onPress={() => {
-                    // alert(JSON.stringify(props));
-                    navigation.navigate(screenNames.itemInfo, { type, data });
-                    // setInfoModalData({ type, data });
-                    setShowMoreOptionFor(null);
-                  }}
+                  onPress={showItemInfo}
                 />
               </Menu>
             );
@@ -320,12 +327,7 @@ const Search = ({ navigation }) => {
                 <Menu.Item
                   icon="information-variant"
                   title={labels.showInfo}
-                  onPress={() => {
-                    // alert(JSON.stringify(props));
-                    navigation.navigate(screenNames.itemInfo, { type, data });
-                    // setInfoModalData({ type, data });
-                    setShowMoreOptionFor(null);
-                  }}
+                  onPress={showItemInfo}
                 />
               </Menu>
             );
@@ -378,12 +380,7 @@ const Search = ({ navigation }) => {
                 <Menu.Item
                   icon="information-variant"
                   title={labels.showInfo}
-                  onPress={() => {
-                    // alert(JSON.stringify(props));
-                    navigation.navigate(screenNames.itemInfo, { type, data });
-                    // setInfoModalData({ type, data });
-                    setShowMoreOptionFor(null);
-                  }}
+                  onPress={showItemInfo}
                 />
               </Menu>
             );
@@ -436,12 +433,7 @@ const Search = ({ navigation }) => {
                 <Menu.Item
                   icon="information-variant"
                   title={labels.showInfo}
-                  onPress={() => {
-                    // alert(JSON.stringify(props));
-                    navigation.navigate(screenNames.itemInfo, { type, data });
-                    // setInfoModalData({ type, data });
-                    setShowMoreOptionFor(null);
-                  }}
+                  onPress={showItemInfo}
                 />
               </Menu>
             );
@@ -564,7 +556,7 @@ const Search = ({ navigation }) => {
     );
   };
 
-  // TODO move to item-info screen
+  // TODO move to item-app-info screen
   const renderInfoModalContent = () => {
     console.log('[Search]', { infoModalData });
 

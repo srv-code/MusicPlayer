@@ -32,6 +32,7 @@ import Colors from 'react-native/Libraries/NewAppScreen/components/Colors';
 import MarqueeText from 'react-native-marquee';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import keys from '../../constants/keys';
+import { DisplayModes as ItemInfoDisplayModes } from '../item-info';
 
 const playSpeeds = [0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2];
 
@@ -267,6 +268,7 @@ const NowPlaying = ({ navigation, extraData: { snapIndex, setSnapIndex } }) => {
     );
   };
 
+  // TODO Also check how it looks when no artwork is present (when using icon)
   const renderTrackArtwork = path => {
     const iconSizes = [6, 18, 30];
 
@@ -428,8 +430,10 @@ const NowPlaying = ({ navigation, extraData: { snapIndex, setSnapIndex } }) => {
           <TouchableOpacity
             style={styles.secondaryPlayerButtons}
             // activeOpacity={hasPreviousTrack ? 0.2 : 1}
-            onPress={navigation.navigate.bind(this, screenNames.songInfo, {
-              info: trackInfo,
+            onPress={navigation.navigate.bind(this, screenNames.itemInfo, {
+              type: keys.TRACKS,
+              displayMode: ItemInfoDisplayModes.MODAL,
+              data: trackInfo,
             })}>
             <Icon
               name="information-outline"
