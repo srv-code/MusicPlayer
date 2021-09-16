@@ -1,4 +1,4 @@
-import { State, RepeatMode } from 'react-native-track-player';
+import TrackPlayer, { State, RepeatMode } from 'react-native-track-player';
 
 export default class PlayerUtils {
   /* For debugging purpose */
@@ -16,7 +16,7 @@ export default class PlayerUtils {
   };
 
   /* For debugging purpose */
-  static getPlayerStateInfo = stateValue => {
+  static getStateInfo = stateValue => {
     switch (stateValue) {
       case null:
       case undefined:
@@ -70,5 +70,32 @@ export default class PlayerUtils {
       default:
         throw new Error(`Invalid value: ${stateValue}`);
     }
+  };
+
+  static playTracks = async (onCollapse, tracks, index = 0) => {
+    console.log(
+      `[PlayerUtils/playTracks] track to play=${JSON.stringify(tracks[index])}`,
+    );
+
+    await TrackPlayer.reset();
+    await TrackPlayer.add(tracks);
+    await TrackPlayer.skip(index);
+    onCollapse();
+    // playerControls.collapse();
+    await TrackPlayer.play();
+
+    // console.log(
+    //   `[Tracks] Playing: {queue=${JSON.stringify(
+    //     (await TrackPlayer.getQueue()).map(e => e.id),
+    //   )}, current track index: ${await TrackPlayer.getCurrentTrack()}`,
+    // );
+  };
+
+  static shuffleAndPlayTracks = async tracks => {
+    const randomizedTracks = [...tracks];
+    // console.log(`list=${randomizedList.map(e => e.id)}`);
+    randomizedTracks.sort(() => 0.5 - Math.random());
+    // console.log(`list(randomized)=${randomizedList.map(e => e.id)}`);
+    await PlayerUtils.playTracks(randomizedTracks);
   };
 }

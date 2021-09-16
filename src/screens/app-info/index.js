@@ -17,6 +17,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import keys from '../../constants/keys';
 import globalStyles from '../../styles';
 import labels from '../../constants/labels';
+import IconUtils from '../../utils/icon';
 
 const inProgressKeys = {
   DELETE_MUSIC_CACHE: 'delete-music-cache',
@@ -127,7 +128,7 @@ const AppInfo = ({ navigation }) => {
           <View style={styles.row}>
             <Text style={styles.titleText}>Music Info</Text>
             <Button
-              icon="delete"
+              icon={IconUtils.getInfo(keys.DELETE).name.default}
               mode="outlined"
               uppercase={false}
               disabled={!musicData}
@@ -144,7 +145,12 @@ const AppInfo = ({ navigation }) => {
             onPress={toggleAccordionExpansion.bind(this, keys.TRACKS)}
             title={`${keys.TRACKS} (${musicData?.tracks?.length || 0})`}
             titleStyle={styles.accordionTitleText}
-            left={props => <List.Icon {...props} icon="music" />}>
+            left={props => (
+              <List.Icon
+                {...props}
+                icon={IconUtils.getInfo(keys.TRACKS).name.default}
+              />
+            )}>
             {musicData?.tracks?.length ? (
               <FlatList
                 data={musicData.tracks}
@@ -170,7 +176,7 @@ const AppInfo = ({ navigation }) => {
                 )}
               />
             ) : (
-              <Text style={styles.errorText}>{`N/A`}</Text>
+              <Text style={styles.errorText}>{labels.na}</Text>
             )}
           </List.Accordion>
 
@@ -180,7 +186,12 @@ const AppInfo = ({ navigation }) => {
             onPress={toggleAccordionExpansion.bind(this, keys.ALBUMS)}
             title={`${keys.ALBUMS} (${musicData?.albums?.length || 0})`}
             titleStyle={styles.accordionTitleText}
-            left={props => <List.Icon {...props} icon="disc" />}>
+            left={props => (
+              <List.Icon
+                {...props}
+                icon={IconUtils.getInfo(keys.ALBUMS).name.default}
+              />
+            )}>
             {musicData?.albums?.length ? (
               <FlatList
                 data={musicData.albums}
@@ -227,7 +238,12 @@ const AppInfo = ({ navigation }) => {
             expanded={isAccordionExpanded(keys.ARTISTS)}
             onPress={toggleAccordionExpansion.bind(this, keys.ARTISTS)}
             title={`Artists (${musicData?.artists?.length || 0})`}
-            left={props => <List.Icon {...props} icon="account-music" />}>
+            left={props => (
+              <List.Icon
+                {...props}
+                icon={IconUtils.getInfo(keys.ARTISTS).name.filled}
+              />
+            )}>
             {musicData?.artists?.length ? (
               <FlatList
                 data={musicData.artists}
@@ -275,7 +291,12 @@ const AppInfo = ({ navigation }) => {
             onPress={toggleAccordionExpansion.bind(this, keys.FOLDERS)}
             title={`${keys.FOLDERS} (${musicData?.folders?.length || 0})`}
             titleStyle={styles.accordionTitleText}
-            left={props => <List.Icon {...props} icon="folder-music" />}>
+            left={props => (
+              <List.Icon
+                {...props}
+                icon={IconUtils.getInfo(keys.FOLDERS).name.filled}
+              />
+            )}>
             {musicData?.folders?.length ? (
               <FlatList
                 data={musicData.folders}
@@ -325,7 +346,7 @@ const AppInfo = ({ navigation }) => {
           <View style={styles.row}>
             <Text style={styles.titleText}>Preferences</Text>
             <Button
-              icon="delete"
+              icon={IconUtils.getInfo(keys.DELETE).name.default}
               mode="outlined"
               uppercase={false}
               disabled={!prefData}
@@ -353,11 +374,11 @@ const AppInfo = ({ navigation }) => {
     <ScreenContainer
       showHeader
       title={labels.appInfo}
-      iconName="bug-outline"
+      iconName={IconUtils.getInfo(keys.DEBUG).name.default}
       onBackPress={navigation.goBack}
       actionIcons={[
         {
-          name: 'arrow-expand',
+          name: IconUtils.getInfo(keys.EXPAND).name.default,
           disabled: !musicData || expandedAccordionIds.length === 4,
           onPress: setExpandedAccordionIds.bind(this, [
             keys.TRACKS,
@@ -367,14 +388,17 @@ const AppInfo = ({ navigation }) => {
           ]),
         },
         {
-          name: 'arrow-collapse',
+          name: IconUtils.getInfo(keys.COLLAPSE).name.default,
           disabled: !musicData || !expandedAccordionIds.length,
           onPress: setExpandedAccordionIds.bind(this, []),
         },
-        { name: 'magnify', onPress: toggleSearch },
+        {
+          name: IconUtils.getInfo(keys.SEARCH).name.default,
+          onPress: toggleSearch,
+        },
       ]}>
       <View style={styles.iconContainer}>
-        <Icon name="bug-outline" size={hp(20)} />
+        <Icon name={IconUtils.getInfo(keys.DEBUG).name.default} size={hp(20)} />
         <Text style={{ fontSize: wp(7) }}>Information</Text>
       </View>
 

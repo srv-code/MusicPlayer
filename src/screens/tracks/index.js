@@ -31,19 +31,11 @@ import Icon from '../../components/icon';
 import labels from '../../constants/labels';
 import globalStyles from '../../styles';
 import DateTimeUtils from '../../utils/datetime';
-
-const SortingOptions = {
-  TITLE: labels.title,
-  ARTIST: labels.artist,
-  ALBUM: labels.album,
-  DURATION: labels.duration,
-  FOLDER: labels.folder,
-};
-
-const SortingOrders = {
-  ASCENDING: 'ASCENDING',
-  DECREASING: 'DECREASING',
-};
+import TrackList from '../../components/track-list';
+import { SortingOptions, SortingOrders } from '../../constants/tracks';
+import IconUtils from '../../utils/icon';
+import keys from '../../constants/keys';
+import PlayerUtils from '../../utils/player';
 
 // TODO Scroll to the currently playing track automatically
 // FIXME When shuffling the playlist skip to previous & next tracks player buttons are not correctly disabled
@@ -55,8 +47,8 @@ const Tracks = ({ navigation }) => {
   const [showSortingMenu, setShowSortingMenu] = useState(false);
   const [sortBy, setSortBy] = useState(SortingOptions.TITLE);
   const [sortOrder, setSortOrder] = useState(SortingOrders.ASCENDING);
-  const [showMoreOptionForTrackId, setShowMoreOptionForTrackId] =
-    useState(null);
+  // const [showMoreOptionForTrackId, setShowMoreOptionForTrackId] =
+  //   useState(null);
   const [tracks, setTracks] = useState([]);
   const [currentlyPlayingTrackId, setCurrentlyPlayingTrackId] = useState(null);
 
@@ -104,32 +96,32 @@ const Tracks = ({ navigation }) => {
 
   // console.log(`[Tracks] sortBy=${sortBy}, sortOrder=${sortOrder}`);
 
-  const playTracks = async (list, index = 0) => {
-    console.log(`[Tracks] track pressed=${JSON.stringify(list[index])}`);
-
-    await TrackPlayer.reset();
-    await TrackPlayer.add(list);
-    await TrackPlayer.skip(index);
-    playerControls.collapse();
-    await TrackPlayer.play();
-
-    // console.log(
-    //   `[Tracks] Playing: {queue=${JSON.stringify(
-    //     (await TrackPlayer.getQueue()).map(e => e.id),
-    //   )}, current track index: ${await TrackPlayer.getCurrentTrack()}`,
-    // );
-  };
+  // const playTracks = async (list, index = 0) => {
+  //   console.log(`[Tracks] track pressed=${JSON.stringify(list[index])}`);
+  //
+  //   await TrackPlayer.reset();
+  //   await TrackPlayer.add(list);
+  //   await TrackPlayer.skip(index);
+  //   playerControls.collapse();
+  //   await TrackPlayer.play();
+  //
+  //   // console.log(
+  //   //   `[Tracks] Playing: {queue=${JSON.stringify(
+  //   //     (await TrackPlayer.getQueue()).map(e => e.id),
+  //   //   )}, current track index: ${await TrackPlayer.getCurrentTrack()}`,
+  //   // );
+  // };
 
   const onShuffleTracks = () => {
-    const randomizedList = [...tracks];
-    // console.log(`list=${randomizedList.map(e => e.id)}`);
-    randomizedList.sort(() => 0.5 - Math.random());
-    // console.log(`list(randomized)=${randomizedList.map(e => e.id)}`);
+    // const randomizedList = [...tracks];
+    // // console.log(`list=${randomizedList.map(e => e.id)}`);
+    // randomizedList.sort(() => 0.5 - Math.random());
+    // // console.log(`list(randomized)=${randomizedList.map(e => e.id)}`);
 
-    playTracks(randomizedList)
+    PlayerUtils.shuffleAndPlayTracks(tracks)
       .then(() =>
         ToastAndroid.show(
-          `${labels.shuffled} ${randomizedList.length} ${labels.tracks}`,
+          `${labels.shuffled} ${tracks.length} ${labels.tracks}`,
           ToastAndroid.SHORT,
         ),
       )
@@ -143,7 +135,7 @@ const Tracks = ({ navigation }) => {
   };
 
   const onPlayWholePlayList = () => {
-    playTracks(tracks)
+    PlayerUtils.playTracks(tracks)
       .then(() =>
         ToastAndroid.show(
           `${labels.playing} ${tracks.length} ${labels.tracks}`,
@@ -161,186 +153,187 @@ const Tracks = ({ navigation }) => {
 
   // console.log(`[Tracks] tracks=${JSON.stringify(tracks)}`);
 
-  const getIconInfo = type => {
-    switch (type) {
-      case SortingOptions.TITLE:
-        return { name: 'format-text', type: 'MaterialCommunityIcons' };
-      case SortingOptions.DURATION:
-        return {
-          name: 'clock-time-five-outline',
-          type: 'MaterialCommunityIcons',
-        };
-      case SortingOptions.ALBUM:
-        return { name: 'disc-outline', type: 'Ionicons' };
-      case SortingOptions.ARTIST:
-        return {
-          name: 'account-music-outline',
-          type: 'MaterialCommunityIcons',
-        };
-      case SortingOptions.FOLDER:
-        return { name: 'folder-music-outline', type: 'MaterialCommunityIcons' };
-      default:
-        throw new Error(`Invalid type: ${type}`);
-    }
-  };
+  // // TODO Apply this everywhere applicable
+  // const getIconInfo = type => {
+  //   switch (type) {
+  //     case SortingOptions.TITLE:
+  //       return { name: 'format-text', type: 'MaterialCommunityIcons' };
+  //     case SortingOptions.DURATION:
+  //       return {
+  //         name: 'clock-time-five-outline',
+  //         type: 'MaterialCommunityIcons',
+  //       };
+  //     case SortingOptions.ALBUM:
+  //       return { name: 'disc-outline', type: 'Ionicons' };
+  //     case SortingOptions.ARTIST:
+  //       return {
+  //         name: 'account-music-outline',
+  //         type: 'MaterialCommunityIcons',
+  //       };
+  //     case SortingOptions.FOLDER:
+  //       return { name: 'folder-music-outline', type: 'MaterialCommunityIcons' };
+  //     default:
+  //       throw new Error(`Invalid type: ${type}`);
+  //   }
+  // };
 
-  const renderTrackDescription = track => {
-    const getText = () => {
-      switch (sortBy) {
-        case SortingOptions.TITLE:
-        case SortingOptions.ARTIST:
-          return track.artist;
-        case SortingOptions.DURATION:
-          return DateTimeUtils.msToTime(track.duration);
-        case SortingOptions.ALBUM:
-          return track.album;
-        case SortingOptions.FOLDER:
-          // return `${track.folder.name} (${track.folder.path)})`;
-          return track.folder.name;
-        default:
-          throw new Error(`Invalid sortBy value: ${sortBy}`);
-      }
-    };
+  // const renderTrackDescription = track => {
+  //   const getText = () => {
+  //     switch (sortBy) {
+  //       case SortingOptions.TITLE:
+  //       case SortingOptions.ARTIST:
+  //         return track.artist;
+  //       case SortingOptions.DURATION:
+  //         return DateTimeUtils.msToTime(track.duration);
+  //       case SortingOptions.ALBUM:
+  //         return track.album;
+  //       case SortingOptions.FOLDER:
+  //         // return `${track.folder.name} (${track.folder.path)})`;
+  //         return track.folder.name;
+  //       default:
+  //         throw new Error(`Invalid sortBy value: ${sortBy}`);
+  //     }
+  //   };
+  //
+  //   return (
+  //     <View style={styles.trackDescText}>
+  //       <Icon
+  //         {...getIconInfo(
+  //           sortBy === SortingOptions.TITLE ? SortingOptions.ARTIST : sortBy,
+  //         )}
+  //         size={wp(3.5)}
+  //         color={colors.lightGrey}
+  //       />
+  //       <Text numberOfLines={1} style={styles.trackSubtitleText}>
+  //         {getText()}
+  //       </Text>
+  //     </View>
+  //   );
+  // };
+  //
+  // const renderTrackItemLeftComponent = (track, props) => {
+  //   if (track.artwork)
+  //     return (
+  //       <Avatar.Image
+  //         size={hp(6)}
+  //         source={{ uri: `file://${track.artwork}` }}
+  //       />
+  //     );
+  //   return <Avatar.Icon size={hp(6)} icon="music" style={styles.musicIcon} />;
+  // };
 
-    return (
-      <View style={styles.trackDescText}>
-        <Icon
-          {...getIconInfo(
-            sortBy === SortingOptions.TITLE ? SortingOptions.ARTIST : sortBy,
-          )}
-          size={wp(3.5)}
-          color={colors.lightGrey}
-        />
-        <Text numberOfLines={1} style={styles.trackSubtitleText}>
-          {getText()}
-        </Text>
-      </View>
-    );
-  };
+  // const renderTrackItemRightComponent = (track, props) => (
+  //   <Menu
+  //     {...props}
+  //     visible={showMoreOptionForTrackId === track.id}
+  //     onDismiss={setShowMoreOptionForTrackId.bind(this, null)}
+  //     anchor={
+  //       <IconButton
+  //         {...props}
+  //         icon="dots-vertical"
+  //         onPress={setShowMoreOptionForTrackId.bind(this, track.id)}
+  //       />
+  //     }>
+  //     <Menu.Item
+  //       icon="skip-next-outline"
+  //       title={labels.playNext}
+  //       onPress={() => {
+  //         alert(JSON.stringify(props));
+  //         setShowMoreOptionForTrackId(null);
+  //       }}
+  //     />
+  //     <Menu.Item
+  //       icon="playlist-plus"
+  //       title={labels.addToPlaylist}
+  //       onPress={() => {
+  //         setShowMoreOptionForTrackId(null);
+  //         alert(JSON.stringify(props));
+  //       }}
+  //     />
+  //     <Menu.Item
+  //       icon="table-column-plus-after"
+  //       title={labels.addToQueue}
+  //       onPress={() => {
+  //         // alert(JSON.stringify(props));
+  //         setShowMoreOptionForTrackId(null);
+  //         ToastAndroid.show(labels.addedToQueue, ToastAndroid.SHORT);
+  //       }}
+  //     />
+  //     <Menu.Item
+  //       icon="information-variant"
+  //       title={labels.showInfo}
+  //       onPress={() => {
+  //         // alert(JSON.stringify(props));
+  //         // navigation.navigate(screenNames.itemInfo, { type, data });
+  //         // setInfoModalData({ type, data });
+  //         setShowMoreOptionForTrackId(null);
+  //       }}
+  //     />
+  //   </Menu>
+  // );
 
-  const renderTrackItemLeftComponent = (track, props) => {
-    if (track.artwork)
-      return (
-        <Avatar.Image
-          size={hp(6)}
-          source={{ uri: `file://${track.artwork}` }}
-        />
-      );
-    return <Avatar.Icon size={hp(6)} icon="music" style={styles.musicIcon} />;
-  };
-
-  const renderTrackItemRightComponent = (track, props) => (
-    <Menu
-      {...props}
-      visible={showMoreOptionForTrackId === track.id}
-      onDismiss={setShowMoreOptionForTrackId.bind(this, null)}
-      anchor={
-        <IconButton
-          {...props}
-          icon="dots-vertical"
-          onPress={setShowMoreOptionForTrackId.bind(this, track.id)}
-        />
-      }>
-      <Menu.Item
-        icon="skip-next-outline"
-        title={labels.playNext}
-        onPress={() => {
-          alert(JSON.stringify(props));
-          setShowMoreOptionForTrackId(null);
-        }}
-      />
-      <Menu.Item
-        icon="playlist-plus"
-        title={labels.addToPlaylist}
-        onPress={() => {
-          setShowMoreOptionForTrackId(null);
-          alert(JSON.stringify(props));
-        }}
-      />
-      <Menu.Item
-        icon="table-column-plus-after"
-        title={labels.addToQueue}
-        onPress={() => {
-          // alert(JSON.stringify(props));
-          setShowMoreOptionForTrackId(null);
-          ToastAndroid.show(labels.addedToQueue, ToastAndroid.SHORT);
-        }}
-      />
-      <Menu.Item
-        icon="information-variant"
-        title={labels.showInfo}
-        onPress={() => {
-          // alert(JSON.stringify(props));
-          // navigation.navigate(screenNames.itemInfo, { type, data });
-          // setInfoModalData({ type, data });
-          setShowMoreOptionForTrackId(null);
-        }}
-      />
-    </Menu>
-  );
-
-  const renderTrackItem = ({ item: track, index }) => {
-    const renderDivider = () => {
-      if (index === tracks.length - 1) {
-        return <View style={styles.listItemEndSmallBar} />;
-      } else {
-        if (currentlyPlayingTrackId) {
-          const playingIndex = tracks.findIndex(
-            t => t.id === currentlyPlayingTrackId,
-          );
-          if (playingIndex === -1)
-            throw new Error(`Could not find playing track index`);
-          if (index === playingIndex - 1 || index === playingIndex) return null;
-          else return <Divider inset />;
-        } else return <Divider inset />;
-      }
-    };
-
-    return (
-      <>
-        <List.Item
-          style={{
-            ...styles.trackItemContainer,
-            backgroundColor:
-              currentlyPlayingTrackId === track.id
-                ? enabledDarkTheme
-                  ? Colors.darker
-                  : Colors.lighter
-                : null,
-            elevation: currentlyPlayingTrackId === track.id ? 2 : 0,
-          }}
-          onPress={() => {
-            playTracks(tracks, index)
-              .then(() =>
-                ToastAndroid.show(
-                  `${labels.playing} ${labels.fromAll} ${tracks.length} ${labels.tracks}`,
-                  ToastAndroid.SHORT,
-                ),
-              )
-              .catch(err => {
-                ToastAndroid.show(
-                  `${labels.couldntPlayTracks} (${err.message}}`,
-                  ToastAndroid.LONG,
-                );
-                throw err;
-              });
-          }}
-          titleEllipsizeMode={'tail'}
-          titleNumberOfLines={1}
-          titleStyle={styles.listItemText}
-          // title={`[${index}] ${track.title}`}
-          title={track.title}
-          descriptionEllipsizeMode={'tail'}
-          descriptionNumberOfLines={1}
-          description={renderTrackDescription.bind(this, track)}
-          left={props => renderTrackItemLeftComponent(track, props)}
-          right={props => renderTrackItemRightComponent(track, props)}
-        />
-
-        {renderDivider()}
-      </>
-    );
-  };
+  // const renderTrackItem = ({ item: track, index }) => {
+  //   const renderDivider = () => {
+  //     if (index === tracks.length - 1) {
+  //       return <View style={styles.listItemEndSmallBar} />;
+  //     } else {
+  //       if (currentlyPlayingTrackId) {
+  //         const playingIndex = tracks.findIndex(
+  //           t => t.id === currentlyPlayingTrackId,
+  //         );
+  //         if (playingIndex === -1)
+  //           throw new Error(`Could not find playing track index`);
+  //         if (index === playingIndex - 1 || index === playingIndex) return null;
+  //         else return <Divider inset />;
+  //       } else return <Divider inset />;
+  //     }
+  //   };
+  //
+  //   return (
+  //     <>
+  //       <List.Item
+  //         style={{
+  //           ...styles.trackItemContainer,
+  //           backgroundColor:
+  //             currentlyPlayingTrackId === track.id
+  //               ? enabledDarkTheme
+  //                 ? Colors.darker
+  //                 : Colors.lighter
+  //               : null,
+  //           elevation: currentlyPlayingTrackId === track.id ? 2 : 0,
+  //         }}
+  //         onPress={() => {
+  //           playTracks(tracks, index)
+  //             .then(() =>
+  //               ToastAndroid.show(
+  //                 `${labels.playing} ${labels.fromAll} ${tracks.length} ${labels.tracks}`,
+  //                 ToastAndroid.SHORT,
+  //               ),
+  //             )
+  //             .catch(err => {
+  //               ToastAndroid.show(
+  //                 `${labels.couldntPlayTracks} (${err.message}}`,
+  //                 ToastAndroid.LONG,
+  //               );
+  //               throw err;
+  //             });
+  //         }}
+  //         titleEllipsizeMode={'tail'}
+  //         titleNumberOfLines={1}
+  //         titleStyle={styles.listItemText}
+  //         // title={`[${index}] ${track.title}`}
+  //         title={track.title}
+  //         descriptionEllipsizeMode={'tail'}
+  //         descriptionNumberOfLines={1}
+  //         description={renderTrackDescription.bind(this, track)}
+  //         left={props => renderTrackItemLeftComponent(track, props)}
+  //         right={props => renderTrackItemRightComponent(track, props)}
+  //       />
+  //
+  //       {renderDivider()}
+  //     </>
+  //   );
+  // };
 
   const sortTracks = (list, by, order) => {
     const _sort = ({ keys, type = 'string' } = {}) => {
@@ -457,15 +450,18 @@ const Tracks = ({ navigation }) => {
               style={dynamicStyles.sortButton}>
               <Icon
                 name={
-                  sortOrder === SortingOrders.ASCENDING
-                    ? 'sort-amount-down-alt'
-                    : 'sort-amount-up-alt'
+                  IconUtils.getInfo(
+                    sortOrder === SortingOrders.ASCENDING
+                      ? keys.SORT_ASCENDING_ALT
+                      : keys.SORT_DESCENDING_ALT,
+                  ).name.filled
                 }
-                type="FontAwesome5"
+                type={IconUtils.getInfo(keys.SORT_ASCENDING_ALT).type}
                 size={wp(4)}
               />
               <Icon
-                {...getIconInfo(sortBy)}
+                name={IconUtils.getInfo(sortBy).name.outlined}
+                type={IconUtils.getInfo(sortBy).type}
                 size={wp(4.5)}
                 color={colors.lightGrey}
               />
@@ -474,7 +470,7 @@ const Tracks = ({ navigation }) => {
           {/*<Text>{sortOrder}</Text>*/}
           <View style={styles.sortOrderContainer}>
             <ToggleButton
-              icon="sort-ascending"
+              icon={IconUtils.getInfo(keys.SORT_ASCENDING).name.default}
               onPress={sortTracks.bind(
                 this,
                 [...tracks],
@@ -489,7 +485,7 @@ const Tracks = ({ navigation }) => {
               value={SortingOrders.ASCENDING}
             />
             <ToggleButton
-              icon="sort-descending"
+              icon={IconUtils.getInfo(keys.SORT_DESCENDING).name.default}
               onPress={sortTracks.bind(
                 this,
                 [...tracks],
@@ -512,7 +508,8 @@ const Tracks = ({ navigation }) => {
               onPress={sortTracks.bind(this, [...tracks], option, sortOrder)}>
               <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                 <Icon
-                  {...getIconInfo(option)}
+                  name={IconUtils.getInfo(option).name.outlined}
+                  type={IconUtils.getInfo(option).type}
                   size={wp(4.5)}
                   color={colors.lightGrey}
                 />
@@ -520,8 +517,8 @@ const Tracks = ({ navigation }) => {
               </View>
               {sortBy === option && (
                 <Icon
-                  name="check"
-                  type="Entypo"
+                  name={IconUtils.getInfo(keys.CHECK).name.filled}
+                  type={IconUtils.getInfo(keys.CHECK).type}
                   size={wp(4)}
                   color={colors.lightGrey}
                 />
@@ -535,33 +532,53 @@ const Tracks = ({ navigation }) => {
             disabled={tracks.length === 0}
             style={dynamicStyles.playerButton}
             onPress={onShuffleTracks}>
-            <Icon name="shuffle" type="Entypo" size={wp(4)} />
+            <Icon
+              name={IconUtils.getInfo(keys.SHUFFLE).name.filled}
+              type={IconUtils.getInfo(keys.SHUFFLE).type}
+              size={wp(4)}
+            />
           </TouchableOpacity>
           <TouchableOpacity
             disabled={tracks.length === 0}
             style={dynamicStyles.playerButton}
             onPress={onPlayWholePlayList}>
-            <Icon name="controller-play" type="Entypo" size={wp(4)} />
+            {/* FIXME: Check which icon should be used */}
+            {/*<Icon name="controller-play" type="Entypo" size={wp(4)} /> */}
+            <Icon
+              name={IconUtils.getInfo(keys.PLAY).name.filled}
+              type={IconUtils.getInfo(keys.PLAY).type}
+              size={wp(4)}
+            />
           </TouchableOpacity>
         </View>
       </View>
 
       {/*<Text>{`currentlyPlayingTrackId=${currentlyPlayingTrackId}`}</Text>*/}
-      <View>
-        {tracks.length === 0 ? (
-          <Text style={styles.noTracksText}>{labels.noTracksFound}</Text>
-        ) : (
-          <FlatList
-            contentContainerStyle={{
-              ...styles.musicList,
-              paddingBottom: hp(bottomSheetMiniPositionIndex === -1 ? 5 : 15),
-            }}
-            data={tracks}
-            keyExtractor={(_, index) => index.toString()}
-            renderItem={renderTrackItem}
-          />
-        )}
-      </View>
+      {/*<View>*/}
+      {/*  {tracks.length === 0 ? (*/}
+      {/*    <Text style={styles.noTracksText}>{labels.noTracksFound}</Text>*/}
+      {/*  ) : (*/}
+      {/*    <FlatList*/}
+      {/*      contentContainerStyle={{*/}
+      {/*        ...styles.musicList,*/}
+      {/*        paddingBottom: hp(bottomSheetMiniPositionIndex === 0 ? 15 : 5),*/}
+      {/*      }}*/}
+      {/*      data={tracks}*/}
+      {/*      keyExtractor={(_, index) => index.toString()}*/}
+      {/*      renderItem={renderTrackItem}*/}
+      {/*    />*/}
+      {/*  )}*/}
+      {/*</View>*/}
+
+      <TrackList
+        tracks={tracks}
+        sortBy={sortBy}
+        currentlyPlayingTrackId={currentlyPlayingTrackId}
+        playerOnCollapse={playerControls.collapse}
+        listStyle={{
+          paddingBottom: hp(bottomSheetMiniPositionIndex === 0 ? 15 : 5),
+        }}
+      />
     </ScreenContainer>
   );
 };
@@ -621,15 +638,15 @@ const styles = StyleSheet.create({
     marginTop: hp(8),
     color: colors.lightGrey,
   },
-  trackSubtitleText: {
-    fontSize: wp(3.2),
-    color: colors.lightGrey,
-    marginLeft: wp(0.5),
-  },
-  trackDescText: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
+  // trackSubtitleText: {
+  //   fontSize: wp(3.2),
+  //   color: colors.lightGrey,
+  //   marginLeft: wp(0.5),
+  // },
+  // trackDescText: {
+  //   flexDirection: 'row',
+  //   alignItems: 'center',
+  // },
   sortOrderRow: {
     alignItems: 'center',
     justifyContent: 'center',
@@ -656,9 +673,9 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     marginTop: hp(1),
   },
-  musicIcon: {
-    backgroundColor: colors.lightPurple,
-  },
+  // musicIcon: {
+  //   backgroundColor: colors.lightPurple,
+  // },
   trackItemContainer: {
     alignItems: 'center',
     borderRadius: wp(2),

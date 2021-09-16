@@ -23,6 +23,8 @@ import labels from '../../constants/labels';
 import Icons from '../../constants/icons';
 import Folders from '../../screens/folders';
 import { MusicContext } from '../../context/music';
+import IconUtils from '../../utils/icon';
+import keys from '../../constants/keys';
 
 const routeData = [
   {
@@ -31,11 +33,7 @@ const routeData = [
     screen: Favorites,
     icon: {
       color: colors.red,
-      type: 'MaterialCommunityIcons',
-      name: {
-        filled: 'heart',
-        outlined: 'heart-outline',
-      },
+      ...IconUtils.getInfo(keys.FAVORITE),
     },
   },
   {
@@ -44,11 +42,7 @@ const routeData = [
     screen: Playlists,
     icon: {
       color: colors.green1,
-      type: 'MaterialCommunityIcons',
-      name: {
-        filled: 'playlist-music',
-        outlined: 'playlist-music-outline',
-      },
+      ...IconUtils.getInfo(keys.PLAYLISTS),
     },
   },
   {
@@ -57,11 +51,7 @@ const routeData = [
     screen: Tracks,
     icon: {
       color: colors.lightPurple,
-      type: 'Ionicons',
-      name: {
-        filled: 'musical-notes',
-        outlined: 'musical-notes-outline',
-      },
+      ...IconUtils.getInfo(keys.TRACKS),
     },
   },
   {
@@ -70,11 +60,7 @@ const routeData = [
     screen: Albums,
     icon: {
       color: colors.lightBlue1,
-      type: 'Ionicons',
-      name: {
-        filled: 'disc',
-        outlined: 'disc-outline',
-      },
+      ...IconUtils.getInfo(keys.ALBUMS),
     },
   },
   {
@@ -83,11 +69,7 @@ const routeData = [
     screen: Artists,
     icon: {
       color: colors.darkGreen,
-      type: 'MaterialCommunityIcons',
-      name: {
-        filled: 'account-music',
-        outlined: 'account-music-outline',
-      },
+      ...IconUtils.getInfo(keys.ARTISTS),
     },
   },
   {
@@ -96,11 +78,7 @@ const routeData = [
     screen: Folders,
     icon: {
       color: colors.lightGreen,
-      type: 'MaterialCommunityIcons',
-      name: {
-        filled: 'folder-music',
-        outlined: 'folder-music-outline',
-      },
+      ...IconUtils.getInfo(keys.FOLDERS),
     },
   },
 ];
@@ -166,7 +144,7 @@ const TabbedView = ({ navigation }) => {
       <Image source={Icons.Logo} resizeMode="stretch" style={styles.logo} />
       <Appbar.Content title={labels.musicPlayer} />
       <Appbar.Action
-        icon="magnify"
+        icon={IconUtils.getInfo(keys.SEARCH).name.default}
         onPress={navigation.navigate.bind(this, screenNames.search)}
       />
       <Menu
@@ -174,13 +152,13 @@ const TabbedView = ({ navigation }) => {
         onDismiss={toggleMenuVisibility}
         anchor={
           <Appbar.Action
-            icon={Platform.OS === 'ios' ? 'dots-horizontal' : 'dots-vertical'}
+            icon={IconUtils.getInfo(keys.ELLIPSIS).name.default}
             color={colors.white}
             onPress={toggleMenuVisibility}
           />
         }>
         <Menu.Item
-          icon="sync"
+          icon={IconUtils.getInfo(keys.SYNC).name.default}
           title={labels.sync}
           onPress={() => {
             onDataSync();
@@ -188,7 +166,7 @@ const TabbedView = ({ navigation }) => {
           }}
         />
         <Menu.Item
-          icon="cog-outline"
+          icon={IconUtils.getInfo(keys.SETTINGS).name.default}
           title={labels.settings}
           onPress={() => {
             navigation.navigate(screenNames.settings);
@@ -196,7 +174,7 @@ const TabbedView = ({ navigation }) => {
           }}
         />
         <Menu.Item
-          icon="bug-outline"
+          icon={IconUtils.getInfo(keys.DEBUG).name.default}
           title={labels.appInfo}
           onPress={() => {
             navigation.navigate(screenNames.appInfo);
@@ -204,7 +182,7 @@ const TabbedView = ({ navigation }) => {
           }}
         />
         <Menu.Item
-          icon="information-outline"
+          icon={IconUtils.getInfo(keys.INFO).name.default}
           title={labels.about}
           onPress={() => {
             navigation.navigate(screenNames.about);

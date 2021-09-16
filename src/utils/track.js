@@ -3,8 +3,8 @@ import MusicFiles, {
 } from 'react-native-get-music-files-v3dev-test';
 import FileSystem from 'react-native-fs';
 
-export default class MusicUtils {
-  static fetchAllTracks = async ({ artworkFolderName = 'artworks' } = {}) => {
+export default class TrackUtils {
+  static fetchAll = async ({ artworkFolderName = 'artworks' } = {}) => {
     console.log('[fetchAllTracks] invoked');
 
     // const tracks = [];

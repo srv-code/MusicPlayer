@@ -16,6 +16,9 @@ import {
 import { BottomSheetScrollView } from '@gorhom/bottom-sheet';
 import Icon from '../../components/icon';
 import Colors from 'react-native/Libraries/NewAppScreen/components/Colors';
+import { useFocusEffect } from '@react-navigation/native';
+import IconUtils from '../../utils/icon';
+import { SortingOptions } from '../../constants/tracks';
 
 export const DisplayModes = {
   SCREEN: 'SCREEN',
@@ -39,6 +42,7 @@ export const getScreenTitle = type => {
   }
 };
 
+// FIXME I suspect the scrolling in MODAL mode is off
 const ItemInfo = ({ navigation, route, extraData }) => {
   const { enabledDarkTheme } = useContext(PreferencesContext);
 
@@ -68,9 +72,11 @@ const ItemInfo = ({ navigation, route, extraData }) => {
       case DisplayModes.MODAL:
         return (
           <BottomSheetScrollView
-            style={{
-              flex: 1,
-              paddingHorizontal: 16,
+            bounces={true}
+            focusHook={useFocusEffect}
+            contentContainerStyle={{
+              // flex: 1,
+              paddingHorizontal: wp(4),
               overflow: 'visible',
             }}>
             {children}
@@ -87,52 +93,40 @@ const ItemInfo = ({ navigation, route, extraData }) => {
       case keys.TRACKS:
         return [
           {
-            icon: { name: 'format-text', type: 'MaterialCommunityIcons' },
+            icon: IconUtils.getInfo(keys.TITLE),
             attr: { name: labels.title, value: data.title },
           },
           {
-            icon: { name: 'disc-outline', type: 'Ionicons' },
+            icon: IconUtils.getInfo(keys.ALBUMS),
             attr: { name: labels.album, value: data.album },
           },
           {
-            icon: {
-              name: 'account-music-outline',
-              type: 'MaterialCommunityIcons',
-            },
+            icon: IconUtils.getInfo(keys.ARTISTS),
             attr: { name: labels.artist, value: data.artist },
           },
           {
-            icon: {
-              name: 'clock-time-five-outline',
-              type: 'MaterialCommunityIcons',
-            },
+            icon: IconUtils.getInfo(keys.DURATION),
             attr: {
               name: labels.playDuration,
               value: DateTimeUtils.msToTime(data.duration),
             },
           },
           {
-            icon: { name: 'heart-outline', type: 'MaterialCommunityIcons' },
+            icon: IconUtils.getInfo(keys.FAVORITE),
             attr: {
               name: labels.markedFavorite,
               value: data.markedFavorite != null ? labels.yes : labels.no,
             },
           },
           {
-            icon: {
-              name: 'playlist-music-outline',
-              type: 'MaterialCommunityIcons',
-            },
+            icon: IconUtils.getInfo(keys.PLAYLISTS),
             attr: {
               name: labels.includedInPlaylists,
               value: 'None', // TODO calc
             },
           },
           {
-            icon: {
-              name: 'folder-music-outline',
-              type: 'MaterialCommunityIcons',
-            },
+            icon: IconUtils.getInfo(keys.FOLDERS),
             attr: {
               name: labels.location,
               value: data.folder.name,
@@ -144,11 +138,11 @@ const ItemInfo = ({ navigation, route, extraData }) => {
       case keys.ALBUMS:
         return [
           {
-            icon: { name: 'disc-outline', type: 'Ionicons' },
+            icon: IconUtils.getInfo(keys.ALBUMS),
             attr: { name: labels.name, value: data.name },
           },
           {
-            icon: { name: 'musical-notes-outline', type: 'Ionicons' },
+            icon: IconUtils.getInfo(keys.TRACKS),
             attr: { name: labels.trackCount, value: data.trackIds.length },
           },
         ];
@@ -156,14 +150,11 @@ const ItemInfo = ({ navigation, route, extraData }) => {
       case keys.ARTISTS:
         return [
           {
-            icon: {
-              name: 'account-music-outline',
-              type: 'MaterialCommunityIcons',
-            },
+            icon: IconUtils.getInfo(keys.ARTISTS),
             attr: { name: labels.name, value: data.name },
           },
           {
-            icon: { name: 'musical-notes-outline', type: 'Ionicons' },
+            icon: IconUtils.getInfo(keys.TRACKS),
             attr: { name: labels.trackCount, value: data.trackIds.length },
           },
         ];
@@ -179,58 +170,45 @@ const ItemInfo = ({ navigation, route, extraData }) => {
     }
   };
 
-  const renderArtwork = () => {
-    const getIconName = () => {
-      switch (type) {
-        case keys.TRACKS:
-          return 'music';
-        case keys.ALBUMS:
-          return 'album';
-        case keys.ARTISTS:
-          return 'account-music';
-        case keys.FOLDERS:
-          return 'folder-music';
-        case keys.PLAYLISTS:
-          return 'playlist-music';
-        default:
-          throw new Error(`Invalid type: ${type}`);
+  const renderArtwork = () => (
+    <LinearGradient
+      colors={
+        enabledDarkTheme
+          ? ['#767676', '#595959', '#323232'] // excluded: '#282828'
+          : ['#d4d4d4', '#999999', '#7b7b7b', '#373737']
       }
-    };
-
-    return (
-      <LinearGradient
-        colors={
-          enabledDarkTheme
-            ? ['#767676', '#595959', '#323232'] // excluded: '#282828'
-            : ['#d4d4d4', '#999999', '#7b7b7b', '#373737']
-        }
+      style={{
+        elevation: 10,
+        borderRadius: hp(20),
+        padding: wp(2),
+        marginVertical: hp(1),
+        alignItems: 'center',
+      }}>
+      <View
         style={{
-          elevation: 10,
           borderRadius: hp(20),
-          padding: wp(2),
-          marginVertical: hp(1),
-          alignItems: 'center',
         }}>
-        <View
-          style={{
-            borderRadius: hp(20),
-          }}>
-          {type === keys.TRACKS && data.artwork ? (
-            <Avatar.Image
-              size={hp(30)}
-              source={{ uri: `file://${data.artwork}` }}
-            />
-          ) : (
-            <Avatar.Icon
-              size={hp(30)}
-              icon={getIconName()}
-              style={styles.musicIcon}
-            />
-          )}
-        </View>
-      </LinearGradient>
-    );
-  };
+        {type === keys.TRACKS && data.artwork ? (
+          <Avatar.Image
+            size={hp(30)}
+            source={{ uri: `file://${data.artwork}` }}
+          />
+        ) : (
+          <Avatar.Icon
+            size={hp(30)}
+            icon={
+              IconUtils.getInfo(type).name[
+                type === keys.TRACKS || type === keys.ALBUMS
+                  ? 'default'
+                  : 'filled'
+              ]
+            }
+            style={styles.musicIcon}
+          />
+        )}
+      </View>
+    </LinearGradient>
+  );
 
   const renderContent = () => {
     if (data)
@@ -266,9 +244,8 @@ const ItemInfo = ({ navigation, route, extraData }) => {
               {/*</DataTable.Header>*/}
 
               {getSongTableData().map((data, index, array) => (
-                <>
+                <React.Fragment key={index}>
                   <View
-                    key={index}
                     style={{
                       flexDirection: 'row',
                       alignItems: 'flex-start',
@@ -282,7 +259,7 @@ const ItemInfo = ({ navigation, route, extraData }) => {
                         // backgroundColor: 'lightgreen',
                       }}>
                       <Icon
-                        name={data.icon.name}
+                        name={data.icon.name.outlined}
                         type={data.icon.type}
                         size={wp(4.5)}
                         color={colors.lightGrey}
@@ -331,7 +308,7 @@ const ItemInfo = ({ navigation, route, extraData }) => {
                       }}
                     />
                   )}
-                </>
+                </React.Fragment>
 
                 // <DataTable.Row key={index}>
                 //   <DataTable.Cell

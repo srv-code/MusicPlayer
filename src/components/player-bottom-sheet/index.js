@@ -8,9 +8,13 @@ import React, {
 import { StyleSheet } from 'react-native';
 import BottomSheet, {
   BottomSheetBackdrop,
+  BottomSheetScrollView,
   useBottomSheetSpringConfigs,
 } from '@gorhom/bottom-sheet';
-import { heightPercentageToDP as hp } from 'react-native-responsive-screen';
+import {
+  heightPercentageToDP as hp,
+  widthPercentageToDP as wp,
+} from 'react-native-responsive-screen';
 import Colors from 'react-native/Libraries/NewAppScreen/components/Colors';
 import { PreferencesContext } from '../../context/preferences';
 import { MusicContext } from '../../context/music';

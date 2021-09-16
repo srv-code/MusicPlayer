@@ -5,6 +5,9 @@ import screenNames from '../../constants/screen-names';
 import colors from '../../constants/colors';
 import { PreferencesContext } from '../../context/preferences';
 import { Text } from 'react-native-paper';
+import keys from '../../constants/keys';
+import IconUtils from '../../utils/icon';
+import labels from "../../constants/labels";
 
 // const Playlists = ({ navigation }) => {
 const Albums = () => {
@@ -22,8 +25,13 @@ const Albums = () => {
     <ScreenContainer
       showHeader
       title={screenNames.playlists}
-      subtitle="Select from your favorite playlists"
-      actionIcons={[{ name: 'magnify', onPress: toggleSearch }]}>
+      subtitle={labels.playlistSubtitle}
+      actionIcons={[
+        {
+          name: IconUtils.getInfo(keys.SEARCH).name.default,
+          onPress: toggleSearch,
+        },
+      ]}>
       <View style={styles.container}>
         <Text>Albums screen</Text>
       </View>

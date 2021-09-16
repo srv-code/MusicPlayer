@@ -34,11 +34,13 @@ import { PreferencesContext } from '../../context/preferences';
 import labels from '../../constants/labels';
 import keys from '../../constants/keys';
 import { DisplayModes as ItemInfoDisplayModes } from '../item-info';
+import IconUtils from '../../utils/icon';
 
 // TODO
 //  - Save the searched term in async-storage (avoid duplicates)
 //  - Fix bug: 'Synthetic reuse' on context menu press
 //  - Pressing space also returns search results (trim search term)
+//  - ** Apply TrackList here and remove duplicate codes
 
 const Search = ({ navigation }) => {
   const musicContext = useContext(MusicContext);
@@ -127,7 +129,7 @@ const Search = ({ navigation }) => {
             return (
               <Text style={styles.trackDescText}>
                 <Icon
-                  name={'clock-time-five-outline'}
+                  name={IconUtils.getInfo(keys.DURATION).name.default}
                   size={wp(3.2)}
                   color={colors.lightGrey}
                 />
@@ -137,13 +139,13 @@ const Search = ({ navigation }) => {
                 {data.artist && (
                   <>
                     <Icon
-                      name={'dot-single'}
-                      type={'Entypo'}
+                      name={IconUtils.getInfo(keys.TEXT_DOT).name.filled}
+                      type={IconUtils.getInfo(keys.TEXT_DOT).type}
                       size={wp(3.2)}
                       color={colors.lightGrey}
                     />
                     <Icon
-                      name={'account-music'}
+                      name={IconUtils.getInfo(keys.ARTISTS).name.filled}
                       size={wp(3.2)}
                       color={colors.lightGrey}
                     />
@@ -151,13 +153,13 @@ const Search = ({ navigation }) => {
                   </>
                 )}
                 <Icon
-                  name={'dot-single'}
-                  type={'Entypo'}
+                  name={IconUtils.getInfo(keys.TEXT_DOT).name.filled}
+                  type={IconUtils.getInfo(keys.TEXT_DOT).type}
                   size={wp(3.2)}
                   color={colors.lightGrey}
                 />
                 <Icon
-                  name={'folder-music'}
+                  name={IconUtils.getInfo(keys.FOLDERS).name.filled}
                   size={wp(3.2)}
                   color={colors.lightGrey}
                 />
@@ -170,7 +172,11 @@ const Search = ({ navigation }) => {
           case keys.FOLDERS:
             return (
               <Text style={styles.trackDescText}>
-                <Icon name={'music'} size={wp(3.2)} color={colors.lightGrey} />
+                <Icon
+                  name={IconUtils.getInfo(keys.TRACKS).name.default}
+                  size={wp(3.2)}
+                  color={colors.lightGrey}
+                />
                 <Text style={styles.trackSubtitleText}>
                   {data.trackIds.length}
                 </Text>
@@ -193,17 +199,13 @@ const Search = ({ navigation }) => {
                   source={{ uri: `file://${data.artwork}` }}
                 />
               );
-            else iconName = 'music';
-            break;
+
           case keys.ALBUMS:
-            iconName = 'disc';
-            break;
           case keys.ARTISTS:
-            iconName = 'account-music-outline';
-            break;
           case keys.FOLDERS:
-            iconName = 'folder-music-outline';
+            iconName = IconUtils.getInfo(type).name.default;
             break;
+
           default:
             new Error(`Invalid type: ${type}`);
         }
@@ -239,7 +241,9 @@ const Search = ({ navigation }) => {
                 anchor={
                   <IconButton
                     {...props}
-                    icon="dots-vertical"
+                    icon={
+                      IconUtils.getInfo(keys.VERTICAL_ELLIPSIS).name.default
+                    }
                     onPress={setShowMoreOptionFor.bind(this, {
                       type,
                       index: itemIndex,
@@ -247,7 +251,7 @@ const Search = ({ navigation }) => {
                   />
                 }>
                 <Menu.Item
-                  icon="skip-next-outline"
+                  icon={IconUtils.getInfo(keys.SKIP_NEXT).name.default}
                   title={labels.playNext}
                   onPress={() => {
                     alert(JSON.stringify(props));
@@ -255,7 +259,7 @@ const Search = ({ navigation }) => {
                   }}
                 />
                 <Menu.Item
-                  icon="playlist-plus"
+                  icon={IconUtils.getInfo(keys.ADD_TO_PLAYLIST).name.default}
                   title={labels.addToPlaylist}
                   onPress={() => {
                     setShowMoreOptionFor(null);
@@ -263,7 +267,7 @@ const Search = ({ navigation }) => {
                   }}
                 />
                 <Menu.Item
-                  icon="table-column-plus-after"
+                  icon={IconUtils.getInfo(keys.ADD_TO_QUEUE).name.default}
                   title={labels.addToQueue}
                   onPress={() => {
                     // alert(JSON.stringify(props));
@@ -272,7 +276,7 @@ const Search = ({ navigation }) => {
                   }}
                 />
                 <Menu.Item
-                  icon="information-variant"
+                  icon={IconUtils.getInfo(keys.INFO).name.filled}
                   title={labels.showInfo}
                   onPress={showItemInfo}
                 />
@@ -292,7 +296,9 @@ const Search = ({ navigation }) => {
                 anchor={
                   <IconButton
                     {...props}
-                    icon="dots-vertical"
+                    icon={
+                      IconUtils.getInfo(keys.VERTICAL_ELLIPSIS).name.default
+                    }
                     onPress={setShowMoreOptionFor.bind(this, {
                       type,
                       index: itemIndex,
@@ -300,7 +306,7 @@ const Search = ({ navigation }) => {
                   />
                 }>
                 <Menu.Item
-                  icon="skip-next-outline"
+                  icon={IconUtils.getInfo(keys.SKIP_NEXT).name.default}
                   title={labels.playAllNext}
                   onPress={() => {
                     alert(JSON.stringify(props));
@@ -308,7 +314,7 @@ const Search = ({ navigation }) => {
                   }}
                 />
                 <Menu.Item
-                  icon="playlist-plus"
+                  icon={IconUtils.getInfo(keys.ADD_TO_PLAYLIST).name.default}
                   title={labels.addAllToPlaylist}
                   onPress={() => {
                     setShowMoreOptionFor(null);
@@ -316,7 +322,7 @@ const Search = ({ navigation }) => {
                   }}
                 />
                 <Menu.Item
-                  icon="table-column-plus-after"
+                  icon={IconUtils.getInfo(keys.ADD_TO_QUEUE).name.default}
                   title={labels.addAllToQueue}
                   onPress={() => {
                     // alert(JSON.stringify(props));
@@ -325,7 +331,7 @@ const Search = ({ navigation }) => {
                   }}
                 />
                 <Menu.Item
-                  icon="information-variant"
+                  icon={IconUtils.getInfo(keys.INFO).name.default}
                   title={labels.showInfo}
                   onPress={showItemInfo}
                 />
@@ -345,7 +351,9 @@ const Search = ({ navigation }) => {
                 anchor={
                   <IconButton
                     {...props}
-                    icon="dots-vertical"
+                    icon={
+                      IconUtils.getInfo(keys.VERTICAL_ELLIPSIS).name.default
+                    }
                     onPress={setShowMoreOptionFor.bind(this, {
                       type,
                       index: itemIndex,
@@ -353,7 +361,7 @@ const Search = ({ navigation }) => {
                   />
                 }>
                 <Menu.Item
-                  icon="skip-next-outline"
+                  icon={IconUtils.getInfo(keys.SKIP_NEXT).name.default}
                   title={labels.playAllNext}
                   onPress={() => {
                     alert(JSON.stringify(props));
@@ -361,7 +369,7 @@ const Search = ({ navigation }) => {
                   }}
                 />
                 <Menu.Item
-                  icon="playlist-plus"
+                  icon={IconUtils.getInfo(keys.ADD_TO_PLAYLIST).name.default}
                   title={labels.addAllToPlaylist}
                   onPress={() => {
                     setShowMoreOptionFor(null);
@@ -369,7 +377,7 @@ const Search = ({ navigation }) => {
                   }}
                 />
                 <Menu.Item
-                  icon="table-column-plus-after"
+                  icon={IconUtils.getInfo(keys.ADD_TO_QUEUE).name.default}
                   title={labels.addAllToQueue}
                   onPress={() => {
                     // alert(JSON.stringify(props));
@@ -378,7 +386,7 @@ const Search = ({ navigation }) => {
                   }}
                 />
                 <Menu.Item
-                  icon="information-variant"
+                  icon={IconUtils.getInfo(keys.INFO).name.default}
                   title={labels.showInfo}
                   onPress={showItemInfo}
                 />
@@ -398,7 +406,9 @@ const Search = ({ navigation }) => {
                 anchor={
                   <IconButton
                     {...props}
-                    icon="dots-vertical"
+                    icon={
+                      IconUtils.getInfo(keys.VERTICAL_ELLIPSIS).name.default
+                    }
                     onPress={setShowMoreOptionFor.bind(this, {
                       type,
                       index: itemIndex,
@@ -406,7 +416,7 @@ const Search = ({ navigation }) => {
                   />
                 }>
                 <Menu.Item
-                  icon="skip-next-outline"
+                  icon={IconUtils.getInfo(keys.SKIP_NEXT).name.default}
                   title={labels.playAllNext}
                   onPress={() => {
                     alert(JSON.stringify(props));
@@ -414,7 +424,7 @@ const Search = ({ navigation }) => {
                   }}
                 />
                 <Menu.Item
-                  icon="playlist-plus"
+                  icon={IconUtils.getInfo(keys.ADD_TO_PLAYLIST).name.default}
                   title={labels.addAllToPlaylist}
                   onPress={() => {
                     setShowMoreOptionFor(null);
@@ -422,7 +432,7 @@ const Search = ({ navigation }) => {
                   }}
                 />
                 <Menu.Item
-                  icon="table-column-plus-after"
+                  icon={IconUtils.getInfo(keys.ADD_TO_QUEUE).name.default}
                   title={labels.addAllToQueue}
                   onPress={() => {
                     // alert(JSON.stringify(props));
@@ -431,7 +441,7 @@ const Search = ({ navigation }) => {
                   }}
                 />
                 <Menu.Item
-                  icon="information-variant"
+                  icon={IconUtils.getInfo(keys.INFO).name.default}
                   title={labels.showInfo}
                   onPress={showItemInfo}
                 />
@@ -443,20 +453,20 @@ const Search = ({ navigation }) => {
         }
       };
 
-      const renderAccordionIcon = () => {
-        switch (type) {
-          case keys.TRACKS:
-            return 'music';
-          case keys.ALBUMS:
-            return 'disc';
-          case keys.ARTISTS:
-            return 'account-music';
-          case keys.FOLDERS:
-            return 'folder-music';
-          default:
-            new Error(`Invalid type: ${type}`);
-        }
-      };
+      // const renderAccordionIcon = () => {
+      //   switch (type) {
+      //     case keys.TRACKS:
+      //       return 'music';
+      //     case keys.ALBUMS:
+      //       return 'disc';
+      //     case keys.ARTISTS:
+      //       return 'account-music';
+      //     case keys.FOLDERS:
+      //       return 'folder-music';
+      //     default:
+      //       new Error(`Invalid type: ${type}`);
+      //   }
+      // };
 
       const getTitleText = data => {
         switch (type) {
@@ -479,7 +489,9 @@ const Search = ({ navigation }) => {
           onPress={toggleAccordionExpansion.bind(this, type)}
           title={`${type} (${musicData[type].length})`}
           titleStyle={styles.accordionTitleText}
-          left={props => <List.Icon {...props} icon={renderAccordionIcon()} />}>
+          left={props => (
+            <List.Icon {...props} icon={IconUtils.getInfo(type).name.default} />
+          )}>
           <FlatList
             contentContainerStyle={styles.flatList}
             data={musicData[type]}
@@ -520,7 +532,7 @@ const Search = ({ navigation }) => {
         {resultCount ? (
           <>
             <Icon
-              name={'text-search'}
+              name={IconUtils.getInfo(keys.TEXT_SEARCH).name.default}
               size={wp(3.5)}
               color={colors.lightGrey}
               style={styles.resultIcon}
@@ -532,8 +544,8 @@ const Search = ({ navigation }) => {
         ) : (
           <>
             <Icon
-              name={'circle-with-cross'}
-              type={'Entypo'}
+              name={IconUtils.getInfo(keys.CROSS_WITH_CIRCLE).name.filled}
+              type={IconUtils.getInfo(keys.CROSS_WITH_CIRCLE).type}
               size={wp(3.5)}
               color={colors.red}
               style={styles.resultIcon}
@@ -580,7 +592,7 @@ const Search = ({ navigation }) => {
                 alignItems: 'center',
               }}>
               <Icon
-                name={'music'}
+                name={IconUtils.getInfo(keys.TRACKS).name.default}
                 size={wp(6)}
                 color={colors.lightPurple}
                 style={{ marginRight: wp(1) }}
@@ -646,11 +658,11 @@ const Search = ({ navigation }) => {
       <ScreenContainer
         showHeader
         title={screenNames.search}
-        iconName="text-search"
+        iconName={IconUtils.getInfo(keys.TEXT_SEARCH).name.default}
         onBackPress={navigation.goBack}
         actionIcons={[
           {
-            name: 'arrow-expand',
+            name: IconUtils.getInfo(keys.EXPAND).name.default,
             disabled: !musicData || expandedKeys.length === 4,
             onPress: setExpandedKeys.bind(this, [
               keys.TRACKS,
@@ -660,14 +672,14 @@ const Search = ({ navigation }) => {
             ]),
           },
           {
-            name: 'arrow-collapse',
+            name: IconUtils.getInfo(keys.COLLAPSE).name.default,
             disabled: !musicData || !expandedKeys.length,
             onPress: setExpandedKeys.bind(this, []),
           },
         ]}>
         <Searchbar
           ref={searchBar}
-          placeholder="Search within music"
+          placeholder={labels.searchSubtitle}
           onChangeText={setSearchedTerm}
           value={searchedTerm}
           style={styles.searchBar}
@@ -682,7 +694,10 @@ const Search = ({ navigation }) => {
 
         {!previousSearchedTerms.length && !searchedTerm && (
           <View style={styles.iconContainer}>
-            <Icon name="text-search" size={hp(20)} />
+            <Icon
+              name={IconUtils.getInfo(keys.TEXT_SEARCH).name.default}
+              size={hp(20)}
+            />
             <Text style={styles.screenTitleText}>{labels.searchMusic}</Text>
           </View>
         )}

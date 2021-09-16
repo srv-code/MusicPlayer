@@ -18,6 +18,8 @@
     - ❌ A static search box in playlist screen and a scrolling list below (see example APK: Footer)
     - ✅ Style the header title inside the modal
     - ✅ Show other stack screens in the background
+    - <WIP> Get all the icons from IconUtils.getInfo()
+
 
 
 [Player UI]

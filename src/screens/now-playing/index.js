@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { StyleSheet, ToastAndroid, TouchableOpacity, View } from 'react-native';
-import { BottomSheetView } from '@gorhom/bottom-sheet';
+import { BottomSheetScrollView, BottomSheetView } from '@gorhom/bottom-sheet';
 import { Avatar, Button, List, Text } from 'react-native-paper';
 import screenNames from '../../constants/screen-names';
 import globalStyles from '../../styles';
@@ -18,8 +18,6 @@ import TrackPlayer, {
   RepeatMode,
 } from 'react-native-track-player';
 import { MusicContext } from '../../context/music';
-// import { useTrackPlayerEvents as usePlayerEvents } from "react-native-track-player/lib/hooks";
-// import { Event as PlayerEvent } from "react-native-track-player/lib/interfaces";
 import PlayerUtils from '../../utils/player';
 import labels from '../../constants/labels';
 import DateTimeUtils from '../../utils/datetime';
@@ -33,6 +31,9 @@ import MarqueeText from 'react-native-marquee';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import keys from '../../constants/keys';
 import { DisplayModes as ItemInfoDisplayModes } from '../item-info';
+import { useBackHandler } from '@react-native-community/hooks';
+import { useFocusEffect, useIsFocused } from '@react-navigation/native';
+import IconUtils from '../../utils/icon';
 
 const playSpeeds = [0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2];
 
@@ -50,6 +51,15 @@ const NowPlaying = ({ navigation, extraData: { snapIndex, setSnapIndex } }) => {
   const [repeatMode, setRepeatMode] = useState(PlayerRepeatMode.Off);
 
   const trackProgress = usePlayerProgress();
+
+  const isFocused = useIsFocused();
+  useBackHandler(() => {
+    if (isFocused && (snapIndex === 1 || snapIndex === 2)) {
+      setSnapIndex(0);
+      return true; /* custom handling */
+    }
+    return false; /* default handling */
+  });
 
   // console.log(`>> Progress: ${JSON.stringify(trackProgress)}`);
 
@@ -92,7 +102,7 @@ const NowPlaying = ({ navigation, extraData: { snapIndex, setSnapIndex } }) => {
     async event => {
       console.log(
         `[NowPlaying] Player: Event: type=${event.type}, state=${JSON.stringify(
-          PlayerUtils.getPlayerStateInfo(event.state),
+          PlayerUtils.getStateInfo(event.state),
         )}, event=${JSON.stringify(event)}`,
       );
 
@@ -181,26 +191,23 @@ const NowPlaying = ({ navigation, extraData: { snapIndex, setSnapIndex } }) => {
     const info = [
       {
         text: track.artist,
-        icon: { name: 'account-music-outline', type: 'MaterialCommunityIcons' },
+        icon: IconUtils.getInfo(keys.ARTISTS),
       },
     ];
     if (snapIndex === 2) {
       info.push({
         text: track.album,
-        icon: { name: 'disc-outline', type: 'Ionicons' },
+        icon: IconUtils.getInfo(keys.ALBUMS),
       });
       info.push({
         text: track.folder.name,
-        icon: { name: 'folder-music-outline', type: 'MaterialCommunityIcons' },
+        icon: IconUtils.getInfo(keys.FOLDERS),
       });
 
       if (track.playlistName)
         info.push({
           text: track.playlistName,
-          icon: {
-            name: 'playlist-music-outline',
-            type: 'MaterialCommunityIcons',
-          },
+          icon: IconUtils.getInfo(keys.PLAYLISTS),
         });
     }
 
@@ -209,8 +216,8 @@ const NowPlaying = ({ navigation, extraData: { snapIndex, setSnapIndex } }) => {
         {info.map((data, index) => (
           <View key={index} style={styles.trackDescText}>
             <Icon
-              name={data.icon.name}
               type={data.icon.type}
+              name={data.icon.name.outlined}
               size={wp(snapIndex === 2 ? 4 : 3.5)}
               color={colors.lightGrey}
               style={{ marginRight: wp(1) }}
@@ -282,7 +289,7 @@ const NowPlaying = ({ navigation, extraData: { snapIndex, setSnapIndex } }) => {
     return (
       <Avatar.Icon
         size={hp(iconSizes[snapIndex])}
-        icon="music"
+        icon={IconUtils.getInfo(keys.TRACKS).name.default}
         style={styles.musicIcon}
       />
     );
@@ -325,7 +332,7 @@ const NowPlaying = ({ navigation, extraData: { snapIndex, setSnapIndex } }) => {
               screenNames.currentPlaylist,
             )}>
             <Icon
-              name="playlist-music-outline"
+              name={IconUtils.getInfo(keys.PLAYLISTS).name.outlined}
               // TODO update the button colors
               size={wp(6)}
               // style={{ opacity: hasPreviousTrack ? 1 : 0.2 }}
@@ -394,7 +401,11 @@ const NowPlaying = ({ navigation, extraData: { snapIndex, setSnapIndex } }) => {
                 });
             }}>
             <Icon
-              name={trackInfo.markedFavorite ? 'heart' : 'heart-outline'}
+              name={
+                trackInfo.markedFavorite
+                  ? IconUtils.getInfo(keys.FAVORITE).name.filled
+                  : IconUtils.getInfo(keys.FAVORITE).name.outlined
+              }
               // TODO update the button colors
               size={wp(6)}
               // style={{ opacity: hasPreviousTrack ? 1 : 0.2 }}
@@ -415,10 +426,10 @@ const NowPlaying = ({ navigation, extraData: { snapIndex, setSnapIndex } }) => {
             <Icon
               name={
                 repeatMode === RepeatMode.Off
-                  ? 'repeat-off'
+                  ? IconUtils.getInfo(keys.REPEAT_OFF).name.default
                   : repeatMode === RepeatMode.Track
-                  ? 'repeat-once'
-                  : 'repeat'
+                  ? IconUtils.getInfo(keys.REPEAT_ONCE).name.default
+                  : IconUtils.getInfo(keys.REPEAT).name.default
               }
               // TODO update the button colors
               size={wp(6)}
@@ -436,7 +447,7 @@ const NowPlaying = ({ navigation, extraData: { snapIndex, setSnapIndex } }) => {
               data: trackInfo,
             })}>
             <Icon
-              name="information-outline"
+              name={IconUtils.getInfo(keys.INFO).name.default}
               // TODO update the button colors
               size={wp(6)}
               // style={{ opacity: hasPreviousTrack ? 1 : 0.2 }}
@@ -460,9 +471,9 @@ const NowPlaying = ({ navigation, extraData: { snapIndex, setSnapIndex } }) => {
           activeOpacity={hasPreviousTrack ? 0.2 : 1}
           onPress={skipBack}>
           <Icon
-            name="ios-play-skip-back"
             // TODO update the button colors
-            type="Ionicons"
+            name={IconUtils.getInfo(keys.SKIP_BACK).name.filled}
+            type={IconUtils.getInfo(keys.SKIP_BACK).type}
             size={wp(snapIndex === 2 ? 11 : 7)}
             style={{ opacity: hasPreviousTrack ? 1 : 0.2 }}
           />
@@ -471,18 +482,18 @@ const NowPlaying = ({ navigation, extraData: { snapIndex, setSnapIndex } }) => {
         {isPlaying ? (
           <TouchableOpacity style={styles.playerButton} onPress={pause}>
             <Icon
-              name="pause"
-              type="FontAwesome5"
               // TODO update the button colors, add spring animation
+              name={IconUtils.getInfo(keys.PAUSE).name.filled}
+              type={IconUtils.getInfo(keys.PAUSE).type}
               size={wp(snapIndex === 2 ? 12.4 : 8.4)}
             />
           </TouchableOpacity>
         ) : (
           <TouchableOpacity style={styles.playerButton} onPress={play}>
             <Icon
-              name="play"
-              type="FontAwesome5"
               // TODO update the button colors, add spring animation
+              name={IconUtils.getInfo(keys.PLAY).name.filled}
+              type={IconUtils.getInfo(keys.PLAY).type}
               size={wp(snapIndex === 2 ? 12 : 8)}
             />
           </TouchableOpacity>
@@ -493,10 +504,10 @@ const NowPlaying = ({ navigation, extraData: { snapIndex, setSnapIndex } }) => {
           activeOpacity={hasNextTrack ? 0.2 : 1}
           onPress={skipForward}>
           <Icon
-            style={{ opacity: hasNextTrack ? 1 : 0.2 }}
-            name="ios-play-skip-forward"
-            type="Ionicons"
             // TODO update the button colors
+            name={IconUtils.getInfo(keys.SKIP_NEXT).name.filled}
+            type={IconUtils.getInfo(keys.SKIP_NEXT).type}
+            style={{ opacity: hasNextTrack ? 1 : 0.2 }}
             size={wp(snapIndex === 2 ? 11 : 7)}
           />
         </TouchableOpacity>
@@ -574,7 +585,6 @@ const NowPlaying = ({ navigation, extraData: { snapIndex, setSnapIndex } }) => {
           width: wp(90),
           // backgroundColor: 'lightgreen',
         }}>
-        {/*TODO Apply marquee effect*/}
         {renderMarqueeTrackTitle(trackInfo.title)}
         {/*<Text*/}
         {/*  numberOfLines={snapIndex === 1 ? 1 : 2}*/}
@@ -724,9 +734,11 @@ const NowPlaying = ({ navigation, extraData: { snapIndex, setSnapIndex } }) => {
   };
 
   return (
-    <BottomSheetView
-      style={{
-        flex: 1,
+    <BottomSheetScrollView
+      bounces={true}
+      focusHook={useFocusEffect}
+      contentContainerStyle={{
+        // flex: 1,
         paddingHorizontal: wp(2),
         overflow: 'visible',
       }}>
@@ -745,7 +757,7 @@ const NowPlaying = ({ navigation, extraData: { snapIndex, setSnapIndex } }) => {
       {/*<Player style={{ borderWidth: 1, marginTop: hp(1) }} />*/}
 
       {renderContent()}
-    </BottomSheetView>
+    </BottomSheetScrollView>
   );
 };
 

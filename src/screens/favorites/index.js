@@ -6,6 +6,9 @@ import colors from '../../constants/colors';
 import { PreferencesContext } from '../../context/preferences';
 import { Text } from 'react-native-paper';
 import Colors from 'react-native/Libraries/NewAppScreen/components/Colors';
+import keys from '../../constants/keys';
+import IconUtils from '../../utils/icon';
+import labels from "../../constants/labels";
 
 // const Playlists = ({ navigation }) => {
 const Favorites = () => {
@@ -23,8 +26,13 @@ const Favorites = () => {
     <ScreenContainer
       showHeader
       title={screenNames.playlists}
-      subtitle="Select from your favorite playlists"
-      actionIcons={[{ name: 'magnify', onPress: toggleSearch }]}>
+      subtitle={labels.playlistSubtitle}
+      actionIcons={[
+        {
+          name: IconUtils.getInfo(keys.SEARCH).name.default,
+          onPress: toggleSearch,
+        },
+      ]}>
       <View style={styles.container}>
         <Text>Favorites screen</Text>
       </View>

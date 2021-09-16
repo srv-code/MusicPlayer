@@ -47,6 +47,14 @@ const labels = {
   name: 'Name',
   trackCount: 'Track Count',
   playlist: 'Playlist',
+  untitledPlaylist: 'Untitled Playlist',
+  playlistName: 'Playlist Name',
+  save: 'Save',
+  shuffle: 'Shuffle',
+  play: 'Play',
+  playlistSubtitle: 'Select from your favorite playlists',
+  searchSubtitle: 'Search within music',
+  na: 'N/A',
 };
 
 export default labels;

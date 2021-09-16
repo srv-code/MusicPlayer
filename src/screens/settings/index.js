@@ -11,6 +11,8 @@ import {
 import { PreferencesContext } from '../../context/preferences';
 import { useBackHandler } from '@react-native-community/hooks';
 import labels from '../../constants/labels';
+import keys from '../../constants/keys';
+import IconUtils from '../../utils/icon';
 
 const Settings = ({ navigation }) => {
   const { enabledDarkTheme, setEnabledDarkTheme } =
@@ -36,11 +38,19 @@ const Settings = ({ navigation }) => {
     <ScreenContainer
       showHeader
       title={screenNames.appInfo}
-      iconName="cog-outline"
+      iconName={IconUtils.getInfo(keys.SETTINGS).name.default}
       onBackPress={navigation.goBack}
-      actionIcons={[{ name: 'magnify', onPress: toggleSearch }]}>
+      actionIcons={[
+        {
+          name: IconUtils.getInfo(keys.SEARCH).name.default,
+          onPress: toggleSearch,
+        },
+      ]}>
       <View style={styles.iconContainer}>
-        <Icon name="cog-outline" size={hp(20)} />
+        <Icon
+          name={IconUtils.getInfo(keys.SETTINGS).name.default}
+          size={hp(20)}
+        />
         <Text style={{ fontSize: wp(7) }}>Settings</Text>
       </View>
 
@@ -79,13 +89,13 @@ const Settings = ({ navigation }) => {
           <View style={styles.themeToggleContainer}>
             {/* TODO Add system option also */}
             <ToggleButton
-              icon="white-balance-sunny"
+              icon={IconUtils.getInfo(keys.LIGHT_MODE).name.default}
               onPress={setEnabledDarkTheme.bind(this, false)}
               status={enabledDarkTheme ? 'unchecked' : 'checked'}
               value={false}
             />
             <ToggleButton
-              icon="moon-waning-crescent"
+              icon={IconUtils.getInfo(keys.DARK_MODE).name.default}
               onPress={setEnabledDarkTheme.bind(this, true)}
               status={enabledDarkTheme ? 'checked' : 'unchecked'}
               value={true}
