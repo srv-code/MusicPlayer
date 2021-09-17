@@ -53,14 +53,14 @@ const Tracks = ({ navigation }) => {
   const [currentlyPlayingTrackId, setCurrentlyPlayingTrackId] = useState(null);
 
   useEffect(() => {
-    if (musicInfo.tracks?.length)
+    if (musicInfo[keys.TRACKS]?.length)
       // console.log(`[Tracks] Populating tracks for first time`);
       sortTracks(
-        [...musicInfo.tracks],
+        [...musicInfo[keys.TRACKS]],
         SortingOptions.TITLE,
         SortingOrders.ASCENDING,
       );
-  }, [musicInfo.tracks]);
+  }, [musicInfo[keys.TRACKS]]);
 
   useEffect(() => {
     // console.log(
@@ -542,12 +542,10 @@ const Tracks = ({ navigation }) => {
             disabled={tracks.length === 0}
             style={dynamicStyles.playerButton}
             onPress={onPlayWholePlayList}>
-            {/* FIXME: Check which icon should be used */}
-            {/*<Icon name="controller-play" type="Entypo" size={wp(4)} /> */}
             <Icon
               name={IconUtils.getInfo(keys.PLAY).name.filled}
               type={IconUtils.getInfo(keys.PLAY).type}
-              size={wp(4)}
+              size={wp(3)}
             />
           </TouchableOpacity>
         </View>
@@ -611,7 +609,10 @@ const styles = StyleSheet.create({
   playerButton: {
     elevation: 2,
     borderRadius: hp(10),
-    padding: hp(1),
+    // padding: hp(1),
+    height: hp(4),
+    width: hp(4),
+    overflow: 'hidden',
     alignItems: 'center',
     justifyContent: 'center',
     marginLeft: wp(2),

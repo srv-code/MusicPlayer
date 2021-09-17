@@ -55,6 +55,7 @@ const labels = {
   playlistSubtitle: 'Select from your favorite playlists',
   searchSubtitle: 'Search within music',
   na: 'N/A',
+  resultsFound: 'results found',
 };
 
 export default labels;

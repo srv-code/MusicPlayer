@@ -114,10 +114,10 @@ const TabbedView = ({ navigation }) => {
       setTabItemCounts({
         [screenNames.favorites]: null,
         [screenNames.playlists]: null,
-        [screenNames.tracks]: musicInfo?.tracks?.length,
-        [screenNames.albums]: musicInfo?.albums?.length,
-        [screenNames.artists]: musicInfo?.artists?.length,
-        [screenNames.folders]: musicInfo?.folders?.length,
+        [screenNames.tracks]: musicInfo?.[keys.TRACKS]?.length,
+        [screenNames.albums]: musicInfo?.[keys.ALBUMS]?.length,
+        [screenNames.artists]: musicInfo?.[keys.ARTISTS]?.length,
+        [screenNames.folders]: musicInfo?.[keys.FOLDERS]?.length,
       });
     }
   }, [musicInfo]);

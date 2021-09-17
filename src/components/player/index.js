@@ -12,6 +12,7 @@ import {
 import globalStyles from '../../styles';
 import { MusicContext } from '../../context/music';
 import PlayerUtils from '../../utils/player';
+import keys from '../../constants/keys';
 
 // TODO To be removed, for testing purpose only
 const Player = ({ style }) => {
@@ -53,7 +54,7 @@ const Player = ({ style }) => {
           uppercase={false}
           style={globalStyles.button}
           onPress={async () => {
-            const tracks = musicInfo.tracks.slice(0, 3);
+            const tracks = musicInfo[keys.TRACKS].slice(0, 3);
             console.log(
               `[Player] Adding ${tracks.length} tracks, tracks=${JSON.stringify(
                 tracks.map(info => `[${info.id}] ${info.title}`),

@@ -57,24 +57,24 @@ const AppInfo = ({ navigation }) => {
     if (musicContext.musicInfo) {
       setMusicData({
         // matches with: tracks { id, title }
-        tracks: musicContext.musicInfo?.tracks?.filter(
+        tracks: musicContext.musicInfo?.[keys.TRACKS]?.filter(
           x =>
             x.id?.toLowerCase().includes(searchedTerm.toLowerCase()) ||
             x.title?.toLowerCase().includes(searchedTerm.toLowerCase()),
         ),
 
         // matches with: albums: <string>
-        albums: musicContext.musicInfo?.albums?.filter(x =>
+        albums: musicContext.musicInfo?.[keys.ALBUMS]?.filter(x =>
           x.name.toLowerCase().includes(searchedTerm.toLowerCase()),
         ),
 
         // matches with: artists: <string>
-        artists: musicContext.musicInfo?.artists?.filter(x =>
+        artists: musicContext.musicInfo?.[keys.ARTISTS]?.filter(x =>
           x.name.toLowerCase().includes(searchedTerm.toLowerCase()),
         ),
 
         // matches with: folders { name, path }
-        folders: musicContext.musicInfo?.folders?.filter(
+        folders: musicContext.musicInfo?.[keys.FOLDERS]?.filter(
           x =>
             x.name?.toLowerCase().includes(searchedTerm.toLowerCase()) ||
             x.path?.toLowerCase().includes(searchedTerm.toLowerCase()),
@@ -143,7 +143,7 @@ const AppInfo = ({ navigation }) => {
             id={keys.TRACKS}
             expanded={isAccordionExpanded(keys.TRACKS)}
             onPress={toggleAccordionExpansion.bind(this, keys.TRACKS)}
-            title={`${keys.TRACKS} (${musicData?.tracks?.length || 0})`}
+            title={`${keys.TRACKS} (${musicData?.[keys.TRACKS]?.length || 0})`}
             titleStyle={styles.accordionTitleText}
             left={props => (
               <List.Icon
@@ -151,9 +151,9 @@ const AppInfo = ({ navigation }) => {
                 icon={IconUtils.getInfo(keys.TRACKS).name.default}
               />
             )}>
-            {musicData?.tracks?.length ? (
+            {musicData?.[keys.TRACKS]?.length ? (
               <FlatList
-                data={musicData.tracks}
+                data={musicData[keys.TRACKS]}
                 keyExtractor={(_, index) => index.toString()}
                 renderItem={({ item: track }) => (
                   <View
@@ -184,7 +184,7 @@ const AppInfo = ({ navigation }) => {
             id={keys.ALBUMS}
             expanded={isAccordionExpanded(keys.ALBUMS)}
             onPress={toggleAccordionExpansion.bind(this, keys.ALBUMS)}
-            title={`${keys.ALBUMS} (${musicData?.albums?.length || 0})`}
+            title={`${keys.ALBUMS} (${musicData?.[keys.ALBUMS]?.length || 0})`}
             titleStyle={styles.accordionTitleText}
             left={props => (
               <List.Icon
@@ -192,9 +192,9 @@ const AppInfo = ({ navigation }) => {
                 icon={IconUtils.getInfo(keys.ALBUMS).name.default}
               />
             )}>
-            {musicData?.albums?.length ? (
+            {musicData?.[keys.ALBUMS]?.length ? (
               <FlatList
-                data={musicData.albums}
+                data={musicData[keys.ALBUMS]}
                 keyExtractor={(_, index) => index.toString()}
                 renderItem={({ item: album }) => (
                   <View
@@ -237,16 +237,16 @@ const AppInfo = ({ navigation }) => {
             id={keys.ARTISTS}
             expanded={isAccordionExpanded(keys.ARTISTS)}
             onPress={toggleAccordionExpansion.bind(this, keys.ARTISTS)}
-            title={`Artists (${musicData?.artists?.length || 0})`}
+            title={`Artists (${musicData?.[keys.ARTISTS]?.length || 0})`}
             left={props => (
               <List.Icon
                 {...props}
                 icon={IconUtils.getInfo(keys.ARTISTS).name.filled}
               />
             )}>
-            {musicData?.artists?.length ? (
+            {musicData?.[keys.ARTISTS]?.length ? (
               <FlatList
-                data={musicData.artists}
+                data={musicData[keys.ARTISTS]}
                 keyExtractor={(_, index) => index.toString()}
                 renderItem={({ item: artist }) => (
                   <View
@@ -289,7 +289,7 @@ const AppInfo = ({ navigation }) => {
             id={keys.FOLDERS}
             expanded={isAccordionExpanded(keys.FOLDERS)}
             onPress={toggleAccordionExpansion.bind(this, keys.FOLDERS)}
-            title={`${keys.FOLDERS} (${musicData?.folders?.length || 0})`}
+            title={`${keys.FOLDERS} (${musicData?.[keys.FOLDERS]?.length || 0})`}
             titleStyle={styles.accordionTitleText}
             left={props => (
               <List.Icon
@@ -297,9 +297,9 @@ const AppInfo = ({ navigation }) => {
                 icon={IconUtils.getInfo(keys.FOLDERS).name.filled}
               />
             )}>
-            {musicData?.folders?.length ? (
+            {musicData?.[keys.FOLDERS]?.length ? (
               <FlatList
-                data={musicData.folders}
+                data={musicData[keys.FOLDERS]}
                 keyExtractor={(_, index) => index.toString()}
                 renderItem={({ item: folder }) => (
                   <View

@@ -107,7 +107,14 @@ const Splash = ({ setShow, setMusicInfo }) => {
     //   })}`,
     // );
 
-    return { tracks, albums, artists, folders, favoriteIds: [], playlists: [] };
+    return {
+      [keys.TRACKS]: tracks,
+      [keys.ALBUMS]: albums,
+      [keys.ARTISTS]: artists,
+      [keys.FOLDERS]: folders,
+      [keys.FAVORITE_IDS]: [],
+      [keys.PLAYLISTS]: [],
+    };
   };
 
   useEffect(() => {

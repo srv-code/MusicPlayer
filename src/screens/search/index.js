@@ -36,26 +36,27 @@ import keys from '../../constants/keys';
 import { DisplayModes as ItemInfoDisplayModes } from '../item-info';
 import IconUtils from '../../utils/icon';
 
-// TODO
-//  - Save the searched term in async-storage (avoid duplicates)
-//  - Fix bug: 'Synthetic reuse' on context menu press
-//  - Pressing space also returns search results (trim search term)
-//  - ** Apply TrackList here and remove duplicate codes
+// TODO Save the searched term in async-storage (avoid duplicates)
+// TODO Pressing space also returns search results (trim search term)
+// TODO ** Apply TrackList here and remove duplicate codes
+// FIXME 'Synthetic reuse' on context menu press
+// FIXME Inputting space shows all results
 
 const Search = ({ navigation }) => {
-  const musicContext = useContext(MusicContext);
+  const { musicInfo } = useContext(MusicContext);
   const { enabledDarkTheme } = useContext(PreferencesContext);
 
   const [searchedTerm, setSearchedTerm] = useState('');
   const [previousSearchedTerms, setPreviousSearchedTerms] = useState([]);
-  const [musicData, setMusicData] = useState(null);
+  const [localMusicInfo, setLocalMusicInfo] = useState(null);
   const [expandedKeys, setExpandedKeys] = useState([]);
   const [showMoreOptionFor, setShowMoreOptionFor] = useState(null);
   // const [showInfoInSnackBar, setShowInfoInSnackBar] = useState(null);
   const searchBar = useRef(null);
 
   console.log('[Search]', {
-    musicData,
+    localMusicInfo: JSON.stringify(localMusicInfo),
+    type: typeof localMusicInfo,
     searchedTerm,
     previousSearchedTerms,
     // showInfoInSnackBar,
@@ -70,35 +71,35 @@ const Search = ({ navigation }) => {
   }, [isFocused]);
 
   useEffect(() => {
-    setMusicData(musicContext.musicInfo);
-  }, [musicContext.musicInfo]);
+    setLocalMusicInfo(musicInfo);
+  }, [musicInfo]);
 
   useEffect(() => {
-    if (musicContext.musicInfo && searchedTerm) {
-      setMusicData({
+    if (musicInfo && searchedTerm) {
+      setLocalMusicInfo({
         // matches with: tracks { title }
-        tracks: musicContext.musicInfo?.tracks?.filter(x =>
+        [keys.TRACKS]: musicInfo?.[keys.TRACKS]?.filter(x =>
           x.title?.toLowerCase().includes(searchedTerm.toLowerCase()),
         ),
 
         // matches with: albums: <string>
-        albums: musicContext.musicInfo?.albums?.filter(x =>
+        [keys.ALBUMS]: musicInfo?.[keys.ALBUMS]?.filter(x =>
           x.name.toLowerCase().includes(searchedTerm.toLowerCase()),
         ),
 
         // matches with: artists: <string>
-        artists: musicContext.musicInfo?.artists?.filter(x =>
+        [keys.ARTISTS]: musicInfo?.[keys.ARTISTS]?.filter(x =>
           x.name.toLowerCase().includes(searchedTerm.toLowerCase()),
         ),
 
         // matches with: folders { name, path }
-        folders: musicContext.musicInfo?.folders?.filter(
+        [keys.FOLDERS]: musicInfo?.[keys.FOLDERS]?.filter(
           x =>
             x.name?.toLowerCase().includes(searchedTerm.toLowerCase()) ||
             x.path?.toLowerCase().includes(searchedTerm.toLowerCase()),
         ),
       });
-    } else setMusicData(null);
+    } else setLocalMusicInfo(null);
   }, [searchedTerm]);
 
   const isAccordionExpanded = id => expandedKeys.includes(id);
@@ -111,13 +112,21 @@ const Search = ({ navigation }) => {
 
   const renderData = () => {
     const resultCount =
-      (musicData?.tracks?.length || 0) +
-      (musicData?.albums?.length || 0) +
-      (musicData?.artists?.length || 0) +
-      (musicData?.folders?.length || 0);
+      (localMusicInfo?.[keys.TRACKS]?.length || 0) +
+      (localMusicInfo?.[keys.ALBUMS]?.length || 0) +
+      (localMusicInfo?.[keys.ARTISTS]?.length || 0) +
+      (localMusicInfo?.[keys.FOLDERS]?.length || 0);
 
     const renderList = (type, index) => {
-      if (!musicData || !musicData[type]?.length) return null;
+      console.log(
+        `[Search/renderList] cond=${
+          !localMusicInfo || !localMusicInfo[type]?.length
+        }, type=${type}, type data=${JSON.stringify(
+          localMusicInfo[type],
+        )}, length=${localMusicInfo[type]?.length}`,
+      );
+
+      if (!localMusicInfo || !localMusicInfo[type]?.length) return null;
 
       // let description, left, right;
 
@@ -487,14 +496,14 @@ const Search = ({ navigation }) => {
           id={type}
           expanded={isAccordionExpanded(type)}
           onPress={toggleAccordionExpansion.bind(this, type)}
-          title={`${type} (${musicData[type].length})`}
+          title={`${type} (${localMusicInfo[type].length})`}
           titleStyle={styles.accordionTitleText}
           left={props => (
             <List.Icon {...props} icon={IconUtils.getInfo(type).name.default} />
           )}>
           <FlatList
             contentContainerStyle={styles.flatList}
-            data={musicData[type]}
+            data={localMusicInfo[type]}
             keyExtractor={(_, index) => index.toString()}
             renderItem={({ item, index: itemIndex }) => (
               <>
@@ -515,7 +524,7 @@ const Search = ({ navigation }) => {
                   left={props => renderLeftComponent(item, props)}
                   right={props => renderRightComponent(item, props, itemIndex)}
                 />
-                {index === musicData[type].length - 1 ? (
+                {index === localMusicInfo[type].length - 1 ? (
                   <View style={styles.listItemEndSmallBar} />
                 ) : (
                   <Divider inset />
@@ -538,7 +547,7 @@ const Search = ({ navigation }) => {
               style={styles.resultIcon}
             />
             <Text style={styles.resultCountText}>
-              {`${resultCount} results found`}
+              {`${resultCount} ${labels.resultsFound}`}
             </Text>
           </>
         ) : (
@@ -663,7 +672,7 @@ const Search = ({ navigation }) => {
         actionIcons={[
           {
             name: IconUtils.getInfo(keys.EXPAND).name.default,
-            disabled: !musicData || expandedKeys.length === 4,
+            disabled: !localMusicInfo || expandedKeys.length === 4,
             onPress: setExpandedKeys.bind(this, [
               keys.TRACKS,
               keys.ALBUMS,
@@ -673,7 +682,7 @@ const Search = ({ navigation }) => {
           },
           {
             name: IconUtils.getInfo(keys.COLLAPSE).name.default,
-            disabled: !musicData || !expandedKeys.length,
+            disabled: !localMusicInfo || !expandedKeys.length,
             onPress: setExpandedKeys.bind(this, []),
           },
         ]}>
@@ -685,13 +694,6 @@ const Search = ({ navigation }) => {
           style={styles.searchBar}
         />
 
-        <Text
-          onPress={() => {
-            sheetRef.current.snapTo(0);
-          }}>
-          Show bottom sheet
-        </Text>
-
         {!previousSearchedTerms.length && !searchedTerm && (
           <View style={styles.iconContainer}>
             <Icon
@@ -702,7 +704,9 @@ const Search = ({ navigation }) => {
           </View>
         )}
 
-        {musicData && <View style={styles.dataContainer}>{renderData()}</View>}
+        {localMusicInfo && (
+          <View style={styles.dataContainer}>{renderData()}</View>
+        )}
 
         {/*<BottomSheet*/}
         {/*  ref={sheetRef}*/}
