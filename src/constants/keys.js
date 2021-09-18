@@ -41,6 +41,7 @@ const keys = {
   ACTION: 'ACTION',
   SORT_ASCENDING_ALT: 'SORT_ASCENDING_ALT',
   SORT_DESCENDING_ALT: 'SORT_DESCENDING_ALT',
+  SAVE: 'SAVE',
 };
 
 export default keys;

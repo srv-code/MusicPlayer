@@ -1,17 +1,25 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import {
   heightPercentageToDP as hp,
   widthPercentageToDP as wp,
 } from 'react-native-responsive-screen';
 import screenNames from '../../constants/screen-names';
 import { BottomSheetScrollView, BottomSheetView } from '@gorhom/bottom-sheet';
-import { Button, Text, FAB, TextInput, Portal } from 'react-native-paper';
+import {
+  Button,
+  Text,
+  FAB,
+  TextInput,
+  Portal,
+  Snackbar,
+} from 'react-native-paper';
 import globalStyles from '../../styles';
 import {
   FlatList,
   Platform,
   ScrollView,
   StyleSheet,
+  ToastAndroid,
   TouchableOpacity,
   View,
 } from 'react-native';
@@ -23,60 +31,142 @@ import colors from '../../constants/colors';
 import TrackPlayer from 'react-native-track-player';
 import IconUtils from '../../utils/icon';
 import keys from '../../constants/keys';
+import { MusicContext } from '../../context/music';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useBackHandler } from '@react-native-community/hooks';
+import createPerformanceLogger from 'react-native/Libraries/Utilities/createPerformanceLogger';
 
 const maxPlaylistNameLength = 25;
 
-const CurrentPlaylist = ({ navigation, extraData: { snapIndex } }) => {
+const CurrentPlaylist = ({ navigation, route, extraData: { snapIndex } }) => {
+  const { musicInfo, setMusicInfo } = useContext(MusicContext);
+
   if (snapIndex < 2) navigation.navigate(screenNames.nowPlaying);
 
   const [isFABOpened, setIsFABOpened] = useState(false);
   const [isFABVisible, setIsFABVisible] = useState(true);
   const [playlistName, setPlaylistName] = useState('');
-  const [isPlaylistSaved, setIsPlaylistSaved] = useState(false);
+  // const [isPlaylistSaved, setIsPlaylistSaved] = useState(false);
   const [fabActions, setFABActions] = useState([]);
-  const [isRenamingInProgress, setIsRenamingInProgress] = useState(true);
+  // const [isRenamingInProgress, setIsRenamingInProgress] = useState(true);
+  const [isEditingPlaylistName, setIsEditingPlaylistName] = useState(false);
   const [tracks, setTracks] = useState([]);
+  const [snackbarError, setSnackbarError] = useState(null);
+  const [playlistId, setPlaylistId] = useState(null);
+  const playlistInput = useRef(null);
 
   const isFocused = useIsFocused();
 
-  useEffect(async () => {
-    if (isFocused) {
-      setTracks(await TrackPlayer.getQueue());
+  useBackHandler(() => {
+    if (isEditingPlaylistName) {
+      setIsEditingPlaylistName(false);
+      setPlaylistName('');
+      return true;
     }
+    return false;
+  });
+
+  useEffect(async () => {
+    setIsFABVisible(isFocused);
+    if (isFocused) setTracks(await TrackPlayer.getQueue());
   }, [isFocused]);
+
+  useEffect(() => {
+    if (route.params.playlistId) {
+      setPlaylistId(route.params.playlistId);
+      setPlaylistName(
+        musicInfo[keys.PLAYLISTS].find(pl => pl.id === route.params.playlistId)
+          .name,
+      );
+    }
+  }, [route.params.playlistId]);
 
   useEffect(() => {
     const actions = [
       {
-        icon: 'shuffle-variant',
+        icon: IconUtils.getInfo(keys.SHUFFLE).name.default,
         label: labels.shuffle,
         onPress: () => console.log('Pressed star'),
       },
       {
-        icon: 'play',
+        icon: IconUtils.getInfo(keys.PLAY).name.default,
         label: labels.play,
         onPress: () => console.log('Pressed email'),
       },
     ];
 
-    if (!isPlaylistSaved)
+    if (!playlistId)
       actions.push({
-        icon: 'content-save',
+        icon: IconUtils.getInfo(keys.SAVE).name.default,
         label: labels.save,
-        onPress: onSavePlaylist,
+        onPress: () => {
+          setIsEditingPlaylistName(true);
+          // playlistInput.current?.focus();
+          console.log(
+            `[Current-Playlist] playlistTextInput.current=${playlistInput.current}`,
+          );
+          // playlistTextInput.current.clear();
+          setIsFABOpened(false);
+        },
         // small: false,
         color: colors.red,
       });
 
     setFABActions(actions);
-  }, [isPlaylistSaved]);
+  }, [playlistId]);
 
   useEffect(() => {
-    setIsFABVisible(isFocused);
-  }, [isFocused]);
+    // console.log(
+    //   `[Current-Playlist] focusing on playlist input... cond=${Boolean(
+    //     isEditingPlaylistName && playlistInput.current,
+    //   )}`,
+    // );
+    if (isEditingPlaylistName) {
+      playlistInput.current?.focus();
+    }
+  }, [isEditingPlaylistName]);
+
+  // console.log(`[Current-Playlist] playlistInput=${playlistInput.current}`);
 
   const onSavePlaylist = () => {
-    return undefined;
+    console.log(
+      `[Current-Playlist] playlists=${JSON.stringify(
+        musicInfo[keys.PLAYLISTS],
+      )}`,
+    );
+
+    const name = playlistName.trim();
+    if (name === '') setSnackbarError(labels.emptyPlaylistName);
+    else if (musicInfo[keys.PLAYLISTS].some(info => info.name === name))
+      setSnackbarError(labels.sameNamePlaylist);
+    else {
+      const newPlaylists = [...musicInfo[keys.PLAYLISTS]];
+      AsyncStorage.setItem(keys.PLAYLISTS, JSON.stringify(newPlaylists))
+        .then(() => {
+          const createdOn = new Date().getTime();
+          newPlaylists.push({
+            id: createdOn,
+            name,
+            track_ids: tracks.map(t => t.id),
+            created: createdOn,
+            last_updated: new Date().getTime(),
+          });
+          setMusicInfo(info => ({
+            ...info,
+            [keys.PLAYLISTS]: newPlaylists,
+          }));
+          setPlaylistId(createdOn);
+          setIsEditingPlaylistName(false);
+          ToastAndroid.show(labels.playlistSaved, ToastAndroid.SHORT);
+        })
+        .catch(err => {
+          ToastAndroid.show(
+            `${labels.couldntSavePlaylist}: ${err.message}`,
+            ToastAndroid.LONG,
+          );
+          throw err;
+        });
+    }
   };
 
   return (
@@ -89,40 +179,63 @@ const CurrentPlaylist = ({ navigation, extraData: { snapIndex } }) => {
         paddingHorizontal: wp(4),
         overflow: 'visible',
       }}>
-      <TextInput
-        // multiline
-        mode="outlined"
-        placeholder={labels.playlistName}
-        label={labels.playlistName}
-        value={playlistName}
-        onChangeText={name => {
-          if (name.length <= maxPlaylistNameLength) setPlaylistName(name);
-        }}
-        right={
-          <TextInput.Affix
-            text={`/${maxPlaylistNameLength - playlistName.length}`}
-          />
-        }
-        left={<TextInput.Icon name={IconUtils.getInfo(keys.PLAYLIST_EDIT)} />}
-      />
-      <Text style={{ fontSize: wp(4) }}>{playlistName}</Text>
-      {/*<View*/}
-      {/*  style={{*/}
-      {/*    // flex: 0.5,*/}
-      {/*    borderWidth: 1,*/}
-      {/*  }}>*/}
-      {/*  <Text>{`all tracks=${tracks.length}`}</Text>*/}
-      {/*  {tracks.map((track, index) => (*/}
-      {/*    <Text*/}
-      {/*      key={index}*/}
-      {/*      style={{*/}
-      {/*        backgroundColor: 'lightgrey',*/}
-      {/*        marginVertical: hp(0.5),*/}
-      {/*      }}>*/}
-      {/*      {`[${index}] ${JSON.stringify(track)}`}*/}
-      {/*    </Text>*/}
-      {/*  ))}*/}
-      {/*</View>*/}
+      {isEditingPlaylistName ? (
+        <TextInput
+          // // multiline
+          // ref={_ref => {
+          //   console.log(`djfjdsjfslsdlj `, _ref);
+          // }}
+          ref={playlistInput}
+          dense
+          autoFocus
+          mode="outlined"
+          placeholder={labels.playlistName}
+          label={labels.playlistName}
+          value={playlistName}
+          onBlur={onSavePlaylist}
+          onChangeText={name => {
+            // console.log(`[Current-Playlist/onChangeText] text=${name}, ASCII=`);
+            if (name.length <= maxPlaylistNameLength) setPlaylistName(name);
+          }}
+          right={
+            <TextInput.Affix
+              text={`/${maxPlaylistNameLength - playlistName.length}`}
+            />
+          }
+          left={<TextInput.Icon name={IconUtils.getInfo(keys.PLAYLIST_EDIT)} />}
+        />
+      ) : (
+        <Text style={{ fontSize: wp(4) }}>
+          {playlistName || labels.untitledPlaylist}
+        </Text>
+      )}
+
+      <View
+        style={{
+          // flex: 0.5,
+          borderWidth: 1,
+        }}>
+        <Text>{`Track Count: ${tracks.length}`}</Text>
+        {tracks.map((track, index) => (
+          <Text
+            key={index}
+            style={{
+              color:
+                musicInfo.currentlyPlaying.track.id === track.id
+                  ? 'white'
+                  : 'black',
+              backgroundColor:
+                musicInfo.currentlyPlaying.track.id === track.id
+                  ? 'blue'
+                  : 'lightgrey',
+              marginVertical: hp(0.5),
+            }}>
+            {`[${index}] ${
+              musicInfo.currentlyPlaying.track.id === track.id ? '->' : ''
+            } ${JSON.stringify(track.title)}`}
+          </Text>
+        ))}
+      </View>
 
       {/*<View>*/}
       {/*  {tracks.length === 0 ? (*/}
@@ -152,6 +265,17 @@ const CurrentPlaylist = ({ navigation, extraData: { snapIndex } }) => {
           }}
           onPress={setIsFABOpened.bind(this, val => !val)}
         />
+
+        <Snackbar
+          visible={Boolean(snackbarError)}
+          onDismiss={setSnackbarError.bind(this, null)}
+          duration={4000}
+          action={{
+            label: labels.dismiss,
+            onPress: setSnackbarError.bind(this, null),
+          }}>
+          {snackbarError}
+        </Snackbar>
       </Portal>
     </BottomSheetScrollView>
   );

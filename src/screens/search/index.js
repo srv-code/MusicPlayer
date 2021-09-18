@@ -52,7 +52,7 @@ const Search = ({ navigation }) => {
   const [expandedKeys, setExpandedKeys] = useState([]);
   const [showMoreOptionFor, setShowMoreOptionFor] = useState(null);
   // const [showInfoInSnackBar, setShowInfoInSnackBar] = useState(null);
-  const searchBar = useRef(null);
+  const searchInput = useRef(null);
 
   console.log('[Search]', {
     localMusicInfo: JSON.stringify(localMusicInfo),
@@ -60,13 +60,13 @@ const Search = ({ navigation }) => {
     searchedTerm,
     previousSearchedTerms,
     // showInfoInSnackBar,
-    searchBar,
+    searchInput,
   });
 
   const isFocused = useIsFocused();
 
   useEffect(() => {
-    if (isFocused) searchBar.current?.focus();
+    if (isFocused) searchInput.current?.focus();
     else Keyboard.dismiss();
   }, [isFocused]);
 
@@ -687,7 +687,7 @@ const Search = ({ navigation }) => {
           },
         ]}>
         <Searchbar
-          ref={searchBar}
+          ref={searchInput}
           placeholder={labels.searchSubtitle}
           onChangeText={setSearchedTerm}
           value={searchedTerm}

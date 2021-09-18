@@ -8,6 +8,7 @@ import {
   View,
 } from 'react-native';
 import ScreenContainer from '../../components/screen-container';
+import { MusicContext } from '../../context/music';
 import { PreferencesContext } from '../../context/preferences';
 import {
   Avatar,
@@ -19,7 +20,6 @@ import {
   Text,
   ToggleButton,
 } from 'react-native-paper';
-import { MusicContext } from '../../context/music';
 import Colors from 'react-native/Libraries/NewAppScreen/components/Colors';
 import {
   heightPercentageToDP as hp,
@@ -377,19 +377,19 @@ const Tracks = ({ navigation }) => {
 
     switch (by) {
       case SortingOptions.ARTIST:
-        _sort({ keys: [keys.ARTISTS] });
+        _sort({ keys: ['artist'] });
         break;
       case SortingOptions.TITLE:
-        _sort({ keys: [keys.TITLE] });
+        _sort({ keys: ['title'] });
         break;
       case SortingOptions.DURATION:
-        _sort({ keys: [keys.DURATION], type: 'number' });
+        _sort({ keys: ['duration'], type: 'number' });
         break;
       case SortingOptions.ALBUM:
-        _sort({ keys: [keys.ALBUMS] });
+        _sort({ keys: ['album'] });
         break;
       case SortingOptions.FOLDER:
-        _sort({ keys: [keys.FOLDERS, 'path'] });
+        _sort({ keys: ['folder', 'path'] });
         break;
     }
 

@@ -158,6 +158,7 @@ export default class IconUtils {
           type: 'FontAwesome5',
           name: {
             filled: 'play',
+            default: 'play',
           },
         };
 
@@ -198,6 +199,7 @@ export default class IconUtils {
           type: 'Entypo',
           name: {
             filled: 'shuffle',
+            default: 'shuffle-variant',
           },
         };
 
@@ -328,6 +330,13 @@ export default class IconUtils {
           name: {
             outlined: 'rocket-launch-outline',
             filled: 'rocket-launch',
+          },
+        };
+
+      case keys.SAVE:
+        return {
+          name: {
+            default: 'content-save',
           },
         };
 

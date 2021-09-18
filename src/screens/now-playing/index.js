@@ -330,6 +330,7 @@ const NowPlaying = ({ navigation, extraData: { snapIndex, setSnapIndex } }) => {
             onPress={navigation.navigate.bind(
               this,
               screenNames.currentPlaylist,
+              { playlistId: null },
             )}>
             <Icon
               name={IconUtils.getInfo(keys.PLAYLISTS).name.outlined}

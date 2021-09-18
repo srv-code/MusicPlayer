@@ -56,6 +56,10 @@ const labels = {
   searchSubtitle: 'Search within music',
   na: 'N/A',
   resultsFound: 'results found',
+  emptyPlaylistName: 'Playlist name cannot be empty',
+  sameNamePlaylist: 'Already have a playlist with the same name',
+  playlistSaved: 'Playlist Saved',
+  couldntSavePlaylist: "Couldn't save playlist",
 };
 
 export default labels;
