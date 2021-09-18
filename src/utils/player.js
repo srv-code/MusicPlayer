@@ -72,7 +72,7 @@ export default class PlayerUtils {
     }
   };
 
-  static playTracks = async (onCollapse, tracks, index = 0) => {
+  static playTracks = async (tracks, index = 0) => {
     console.log(
       `[PlayerUtils/playTracks] track to play=${JSON.stringify(tracks[index])}`,
     );
@@ -80,7 +80,6 @@ export default class PlayerUtils {
     await TrackPlayer.reset();
     await TrackPlayer.add(tracks);
     await TrackPlayer.skip(index);
-    onCollapse();
     // playerControls.collapse();
     await TrackPlayer.play();
 
