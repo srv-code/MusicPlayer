@@ -38,6 +38,8 @@ import keys from '../../constants/keys';
 import PlayerUtils from '../../utils/player';
 
 // TODO Scroll to the currently playing track automatically
+// TODO Add a go up button (same as in Samsung Music)
+// TODO Add a scroll handle (same as in Samsung Music)
 // FIXME When shuffling the playlist skip to previous & next tracks player buttons are not correctly disabled
 const Tracks = ({ navigation }) => {
   const { enabledDarkTheme } = useContext(PreferencesContext);

@@ -24,6 +24,7 @@ import {
 import { useTrackPlayerEvents as usePlayerEvents } from 'react-native-track-player/lib/hooks';
 import PlayerUtils from './src/utils/player';
 import useColorScheme from 'react-native/Libraries/Utilities/useColorScheme';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 const App = () => {
   console.log('App loaded');
@@ -249,7 +250,7 @@ const App = () => {
   // );
 
   return (
-    <>
+    <GestureHandlerRootView style={{ flex: 1 }}>
       <PaperProvider theme={theme}>
         <PreferencesContext.Provider value={preferencesContextValue}>
           <MusicContext.Provider value={musicContextValue}>
@@ -267,7 +268,7 @@ const App = () => {
           </MusicContext.Provider>
         </PreferencesContext.Provider>
       </PaperProvider>
-    </>
+    </GestureHandlerRootView>
   );
 };
 

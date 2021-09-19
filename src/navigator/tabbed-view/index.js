@@ -109,15 +109,23 @@ const TabbedView = ({ navigation }) => {
     return false;
   });
 
+  console.log(
+    `[Tabbed-View] playlist count=${
+      musicInfo?.[keys.PLAYLISTS]?.length
+    }, fav count=${musicInfo?.[keys.FAVORITE_IDS]?.length}, track count=${
+      musicInfo?.[keys.TRACKS]?.length
+    }`,
+  );
+
   useEffect(() => {
     if (musicInfo) {
       setTabItemCounts({
-        [screenNames.favorites]: null,
-        [screenNames.playlists]: null,
-        [screenNames.tracks]: musicInfo?.[keys.TRACKS]?.length,
-        [screenNames.albums]: musicInfo?.[keys.ALBUMS]?.length,
-        [screenNames.artists]: musicInfo?.[keys.ARTISTS]?.length,
-        [screenNames.folders]: musicInfo?.[keys.FOLDERS]?.length,
+        [screenNames.favorites]: musicInfo?.[keys.FAVORITE_IDS]?.length || null,
+        [screenNames.playlists]: musicInfo?.[keys.PLAYLISTS]?.length || null,
+        [screenNames.tracks]: musicInfo?.[keys.TRACKS]?.length || null,
+        [screenNames.albums]: musicInfo?.[keys.ALBUMS]?.length || null,
+        [screenNames.artists]: musicInfo?.[keys.ARTISTS]?.length || null,
+        [screenNames.folders]: musicInfo?.[keys.FOLDERS]?.length || null,
       });
     }
   }, [musicInfo]);

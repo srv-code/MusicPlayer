@@ -34,10 +34,11 @@ import keys from '../../constants/keys';
 import { MusicContext } from '../../context/music';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useBackHandler } from '@react-native-community/hooks';
-import createPerformanceLogger from 'react-native/Libraries/Utilities/createPerformanceLogger';
+import DraggableFlatList from 'react-native-draggable-flatlist';
 
 const maxPlaylistNameLength = 25;
 
+// TODO Can reorder the tracks by dragging items
 const CurrentPlaylist = ({ navigation, route, extraData: { snapIndex } }) => {
   const { musicInfo, setMusicInfo } = useContext(MusicContext);
 
@@ -54,6 +55,8 @@ const CurrentPlaylist = ({ navigation, route, extraData: { snapIndex } }) => {
   const [snackbarError, setSnackbarError] = useState(null);
   const [playlistId, setPlaylistId] = useState(null);
   const playlistInput = useRef(null);
+  const bottomScrollView = useRef(null);
+  const draggableFlatList = useRef(null);
 
   const isFocused = useIsFocused();
 
@@ -169,8 +172,49 @@ const CurrentPlaylist = ({ navigation, route, extraData: { snapIndex } }) => {
     }
   };
 
+  const renderTrackItem = ({ item: track, index, drag, isActive }) => {
+    return (
+      <View
+        style={{
+          borderWidth: 1,
+          borderColor: 'yellow',
+          flexDirection: 'row',
+          alignItems: 'center',
+          backgroundColor: isActive ? 'red' : track.backgroundColor,
+          // alignItems: 'center',
+          justifyContent: 'space-between',
+          height: hp(10),
+        }}>
+        {/*<TouchableOpacity*/}
+        {/*  style={{*/}
+        {/*  }}>*/}
+        <Text
+          style={{
+            marginVertical: hp(0.5),
+            width: wp(80),
+          }}>
+          {`(${index + 1}/${tracks.length}) ID=${track.id}, title=${
+            track.title
+          }, isActive=${isActive}`}
+        </Text>
+        {/*</TouchableOpacity>*/}
+        <TouchableOpacity
+          style={{
+            backgroundColor: 'blue',
+            height: hp(10),
+            width: wp(10),
+          }}
+          onLongPress={drag}>
+          {/*<Icon name={'play'} />*/}
+        </TouchableOpacity>
+      </View>
+    );
+  };
+
   return (
     <BottomSheetScrollView
+      ref={bottomScrollView}
+      // simultaneousHandlers={[bottomScrollView, draggableFlatList]}
       bounces={true}
       focusHook={useFocusEffect}
       contentContainerStyle={{
@@ -205,7 +249,12 @@ const CurrentPlaylist = ({ navigation, route, extraData: { snapIndex } }) => {
           left={<TextInput.Icon name={IconUtils.getInfo(keys.PLAYLIST_EDIT)} />}
         />
       ) : (
-        <Text style={{ fontSize: wp(4) }}>
+        <Text
+          style={{
+            fontSize: wp(5),
+            textAlign: 'center',
+            marginVertical: hp(1.5),
+          }}>
           {playlistName || labels.untitledPlaylist}
         </Text>
       )}
@@ -215,26 +264,41 @@ const CurrentPlaylist = ({ navigation, route, extraData: { snapIndex } }) => {
           // flex: 0.5,
           borderWidth: 1,
         }}>
-        <Text>{`Track Count: ${tracks.length}`}</Text>
-        {tracks.map((track, index) => (
-          <Text
-            key={index}
-            style={{
-              color:
-                musicInfo.currentlyPlaying.track.id === track.id
-                  ? 'white'
-                  : 'black',
-              backgroundColor:
-                musicInfo.currentlyPlaying.track.id === track.id
-                  ? 'blue'
-                  : 'lightgrey',
-              marginVertical: hp(0.5),
-            }}>
-            {`[${index}] ${
-              musicInfo.currentlyPlaying.track.id === track.id ? '->' : ''
-            } ${JSON.stringify(track.title)}`}
-          </Text>
-        ))}
+        {/*<Text>{`Track Count: ${tracks.length}`}</Text>*/}
+        {/*{tracks.map((track, index) => (*/}
+        {/*  <Text*/}
+        {/*    key={index}*/}
+        {/*    style={{*/}
+        {/*      color:*/}
+        {/*        musicInfo.currentlyPlaying.track.id === track.id*/}
+        {/*          ? 'white'*/}
+        {/*          : 'black',*/}
+        {/*      backgroundColor:*/}
+        {/*        musicInfo.currentlyPlaying.track.id === track.id*/}
+        {/*          ? 'blue'*/}
+        {/*          : 'lightgrey',*/}
+        {/*      marginVertical: hp(0.5),*/}
+
+        {/*    }}>*/}
+        {/*    {`[${index}] ${*/}
+        {/*      musicInfo.currentlyPlaying.track.id === track.id ? '->' : ''*/}
+        {/*    } ${JSON.stringify(track.title)}`}*/}
+        {/*  </Text>*/}
+        {/*))}*/}
+
+        <DraggableFlatList
+          // onRef={draggableFlatList}
+          // simultaneousHandlers={[bottomScrollView, draggableFlatList]}
+          simultaneousHandlers={bottomScrollView}
+          data={tracks}
+          renderItem={renderTrackItem}
+          keyExtractor={(_, index) => index.toString()}
+          onDragEnd={({ data }) => setTracks(data)}
+          dragHitSlop={
+            // 1 ? { right: -(width * 0.95 - 20) } : { right: -width }
+            -200
+          }
+        />
       </View>
 
       {/*<View>*/}

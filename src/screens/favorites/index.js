@@ -1,5 +1,9 @@
 import React, { useContext, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
+import {
+  heightPercentageToDP as hp,
+  widthPercentageToDP as wp,
+} from 'react-native-responsive-screen';
 import ScreenContainer from '../../components/screen-container';
 import screenNames from '../../constants/screen-names';
 import colors from '../../constants/colors';
@@ -8,11 +12,13 @@ import { Text } from 'react-native-paper';
 import Colors from 'react-native/Libraries/NewAppScreen/components/Colors';
 import keys from '../../constants/keys';
 import IconUtils from '../../utils/icon';
-import labels from "../../constants/labels";
+import labels from '../../constants/labels';
+import { MusicContext } from '../../context/music';
 
 // const Playlists = ({ navigation }) => {
 const Favorites = () => {
   const { enabledDarkTheme } = useContext(PreferencesContext);
+  const { musicInfo, setMusicInfo } = useContext(MusicContext);
 
   const [showSearch, setShowSearch] = useState(false);
   const [searchedTerm, setSearchedTerm] = useState('');
@@ -35,6 +41,17 @@ const Favorites = () => {
       ]}>
       <View style={styles.container}>
         <Text>Favorites screen</Text>
+
+        {musicInfo[keys.FAVORITE_IDS].map((id, index) => (
+          <Text
+            key={index}
+            style={{
+              backgroundColor: 'lightblue',
+              marginVertical: hp(0.5),
+            }}>
+            {`[${id}] ${musicInfo[keys.TRACKS].find(t => t.id === id).title}`}
+          </Text>
+        ))}
       </View>
     </ScreenContainer>
   );

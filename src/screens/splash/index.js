@@ -165,8 +165,8 @@ const Splash = ({ setShow, setMusicInfo }) => {
 
           musicInfo = {
             ...musicInfo,
-            favoriteIds: favs ? JSON.parse(favs) : [],
-            playlists: pl ? JSON.parse(pl) : [],
+            [keys.FAVORITE_IDS]: favs ? JSON.parse(favs) : [],
+            [keys.PLAYLISTS]: pl ? JSON.parse(pl) : [],
           };
 
           console.log(

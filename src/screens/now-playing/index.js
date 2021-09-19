@@ -120,7 +120,9 @@ const NowPlaying = ({ navigation, extraData: { snapIndex, setSnapIndex } }) => {
             setTrackInfo({
               ...track,
               playlistName: null,
-              markedFavorite: musicInfo.favoriteIds.find(id => id === track.id),
+              markedFavorite: musicInfo[keys.FAVORITE_IDS]?.find(
+                id => id === track.id,
+              ),
             });
             setMusicInfo(data => ({
               ...data,
@@ -376,8 +378,10 @@ const NowPlaying = ({ navigation, extraData: { snapIndex, setSnapIndex } }) => {
             onPress={() => {
               const newFavoriteValue = !trackInfo.markedFavorite;
               const newFavoriteIds = newFavoriteValue
-                ? [...musicInfo.favoriteIds, trackInfo.id]
-                : musicInfo.favoriteIds.filter(id => id !== trackInfo.id);
+                ? [...musicInfo[keys.FAVORITE_IDS], trackInfo.id]
+                : musicInfo[keys.FAVORITE_IDS].filter(
+                    id => id !== trackInfo.id,
+                  );
 
               AsyncStorage.setItem(
                 keys.FAVORITE_IDS,
@@ -386,7 +390,7 @@ const NowPlaying = ({ navigation, extraData: { snapIndex, setSnapIndex } }) => {
                 .then(() => {
                   setMusicInfo(data => ({
                     ...data,
-                    favoriteIds: newFavoriteIds,
+                    [keys.FAVORITE_IDS]: newFavoriteIds,
                   }));
                   setTrackInfo(data => ({
                     ...data,
