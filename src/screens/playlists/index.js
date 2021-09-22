@@ -13,9 +13,9 @@ import IconUtils from '../../utils/icon';
 import keys from '../../constants/keys';
 import labels from '../../constants/labels';
 import { MusicContext } from '../../context/music';
+import PlaylistCover from '../../components/playlist-cover';
 
-// const Playlists = ({ navigation }) => {
-const Playlists = () => {
+const Playlists = ({ navigation }) => {
   const { enabledDarkTheme } = useContext(PreferencesContext);
   const { musicInfo, setMusicInfo } = useContext(MusicContext);
 
@@ -41,26 +41,40 @@ const Playlists = () => {
       <View style={styles.container}>
         <Text>Playlists screen</Text>
 
-        {musicInfo[keys.PLAYLISTS].map((info, playlistIndex) => (
-          <View
-            key={playlistIndex}
-            style={{ backgroundColor: 'lightblue', marginVertical: hp(1) }}>
-            <Text>ID: {info.id}</Text>
-            <Text>Name: {info.name}</Text>
-            <Text>Created On: {new Date(info.created).toString()}</Text>
-            <Text>
-              Last Updated On: {new Date(info.last_updated).toString()}
-            </Text>
-            <Text>{`Tracks (${musicInfo[keys.TRACKS].length}):`}</Text>
-            {info.track_ids.map((id, trackIndex) => (
-              <Text key={trackIndex}>
-                {`  [${id}] ${
-                  musicInfo[keys.TRACKS].find(t => t.id === id).title
-                }`}
-              </Text>
-            ))}
-          </View>
-        ))}
+        <View
+          style={{
+            flexDirection: 'row',
+            flexWrap: 'wrap',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            // alignContents: 'center',
+          }}>
+          {musicInfo?.[keys.PLAYLISTS].map((info, playlistIndex) => (
+            <PlaylistCover
+              key={playlistIndex}
+              id={info.id}
+              // style={{
+              //   backgroundColor: 'lightblue',
+              //   // marginVertical: hp(1)
+              // }}
+            />
+
+            // <Text>ID: {info.id}</Text>
+            // <Text>Name: {info.name}</Text>
+            // <Text>Created On: {new Date(info.created).toString()}</Text>
+            // <Text>
+            //   Last Updated On: {new Date(info.last_updated).toString()}
+            // </Text>
+            // <Text>{`Tracks (${musicInfo[keys.TRACKS].length}):`}</Text>
+            // {info.track_ids.map((id, trackIndex) => (
+            //   <Text key={trackIndex}>
+            //     {`  [${id}] ${
+            //       musicInfo[keys.TRACKS].find(t => t.id === id).title
+            //     }`}
+            //   </Text>
+            // ))}
+          ))}
+        </View>
       </View>
     </ScreenContainer>
   );

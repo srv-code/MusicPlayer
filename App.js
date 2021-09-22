@@ -7,6 +7,7 @@ import {
   Provider as PaperProvider,
   DefaultTheme as PaperDefaultTheme,
   DarkTheme as PaperDarkTheme,
+  Text,
 } from 'react-native-paper';
 import {
   DefaultTheme as NavigationDefaultTheme,
@@ -25,6 +26,8 @@ import { useTrackPlayerEvents as usePlayerEvents } from 'react-native-track-play
 import PlayerUtils from './src/utils/player';
 import useColorScheme from 'react-native/Libraries/Utilities/useColorScheme';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import keys from './src/constants/keys';
 
 const App = () => {
   console.log('App loaded');
@@ -263,6 +266,43 @@ const App = () => {
               barStyle="light-content"
             />
             <SafeAreaProvider>
+              {/*<Text*/}
+              {/*  onPress={() => {*/}
+              {/*    const data = {*/}
+              {/*      name: ['ds', 'gdf'],*/}
+              {/*      ROLL: { a: 'dfs', b: 'dsf' },*/}
+              {/*    };*/}
+              {/*    const toWrite = JSON.stringify(data);*/}
+              {/*    AsyncStorage.setItem('TEST_DATA', toWrite)*/}
+              {/*      .then(() => {*/}
+              {/*        console.log(*/}
+              {/*          `[Test] written, data=${data}, toWrite=${toWrite}`,*/}
+              {/*        );*/}
+              {/*      })*/}
+              {/*      .catch(err => {*/}
+              {/*        console.log(`[Test] write err=${err.message}`);*/}
+              {/*      });*/}
+              {/*  }}>*/}
+              {/*  WRITE*/}
+              {/*</Text>*/}
+
+              {/*<Text*/}
+              {/*  onPress={() => {*/}
+              {/*    AsyncStorage.getItem(keys.MUSIC_INFO)*/}
+              {/*      .then(res => {*/}
+              {/*        console.log(*/}
+              {/*          `[Test] read, res=${JSON.stringify(*/}
+              {/*            res,*/}
+              {/*          )}, parsed=${Object.keys(JSON.parse(res))}`,*/}
+              {/*        );*/}
+              {/*      })*/}
+              {/*      .catch(err => {*/}
+              {/*        console.log(`[Test] read err=${err.message}}`);*/}
+              {/*      });*/}
+              {/*  }}>*/}
+              {/*  READ*/}
+              {/*</Text>*/}
+
               <Navigator theme={theme} />
             </SafeAreaProvider>
           </MusicContext.Provider>

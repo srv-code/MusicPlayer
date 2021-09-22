@@ -7,6 +7,7 @@ import {
   PermissionsAndroid,
   Platform,
   BackHandler,
+  Alert,
 } from 'react-native';
 import * as Animatable from 'react-native-animatable';
 import appColors from '../../constants/colors';
@@ -29,6 +30,7 @@ const requiredPermissions = [
   PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
 ];
 
+// FIXME Sometimes the keys of music-info are in lowercase so no data is shown in the app
 // const Splash = ({ navigation }) => {
 const Splash = ({ setShow, setMusicInfo }) => {
   const [loadingInfo, setLoadingInfo] = useState({
@@ -153,7 +155,9 @@ const Splash = ({ setShow, setMusicInfo }) => {
         console.log(`[Splash] Loading track info from cache...`);
         let musicInfo = JSON.parse(await AsyncStorage.getItem(keys.MUSIC_INFO));
         console.log(
-          `[Splash] musicInfo (from cache)=${JSON.stringify(musicInfo)}`,
+          `[Splash] musicInfo (from cache)=${JSON.stringify(
+            Object.keys(musicInfo || {}),
+          )}`,
         );
 
         if (musicInfo) {
@@ -173,7 +177,7 @@ const Splash = ({ setShow, setMusicInfo }) => {
             `[Splash] favoriteIds=${JSON.stringify(
               favs,
             )}, playlists=${JSON.stringify(pl)}, musicInfo=${JSON.stringify(
-              musicInfo,
+              Object.keys(musicInfo),
             )}`,
           );
         } else {
@@ -193,7 +197,9 @@ const Splash = ({ setShow, setMusicInfo }) => {
           );
           await AsyncStorage.setItem(keys.MUSIC_INFO, JSON.stringify(tracks));
           console.log(
-            `[Splash] musicInfo(recalculated)=${JSON.stringify(tracks)}`,
+            `[Splash] musicInfo(recalculated)=${Object.keys(
+              tracks,
+            )}, ${JSON.stringify(tracks)}`,
           );
 
           musicInfo = tracks;

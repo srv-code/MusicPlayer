@@ -158,6 +158,7 @@ export default class IconUtils {
           type: 'FontAwesome5',
           name: {
             filled: 'play',
+            outlined: 'play-circle',
             default: 'play',
           },
         };
@@ -166,6 +167,7 @@ export default class IconUtils {
         return {
           type: 'FontAwesome5',
           name: {
+            outlined: 'pause-circle',
             filled: 'pause',
           },
         };

@@ -26,6 +26,7 @@ import { MusicContext } from '../../context/music';
 import IconUtils from '../../utils/icon';
 import keys from '../../constants/keys';
 
+// FIXME The tab labels and icons are getting cut off when focused
 const routeData = [
   {
     key: screenNames.favorites,

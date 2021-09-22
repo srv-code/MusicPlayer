@@ -128,7 +128,7 @@ const NowPlaying = ({ navigation, extraData: { snapIndex, setSnapIndex } }) => {
               ...data,
               currentlyPlaying: {
                 track: track,
-                indexInPlaylist: event.nextTrack,
+                // indexInPlaylist: event.nextTrack,
                 playlistId: null,
                 markedFavorite: false,
               },

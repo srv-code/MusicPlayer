@@ -142,23 +142,32 @@ const CurrentPlaylist = ({ navigation, route, extraData: { snapIndex } }) => {
     else if (musicInfo[keys.PLAYLISTS].some(info => info.name === name))
       setSnackbarError(labels.sameNamePlaylist);
     else {
-      const newPlaylists = [...musicInfo[keys.PLAYLISTS]];
+      const createdOn = new Date().getTime();
+      const newPlaylists = [
+        ...musicInfo[keys.PLAYLISTS],
+        {
+          id: createdOn,
+          name,
+          track_ids: tracks.map(t => t.id),
+          created: createdOn,
+          last_updated: new Date().getTime(),
+        },
+      ];
       AsyncStorage.setItem(keys.PLAYLISTS, JSON.stringify(newPlaylists))
         .then(() => {
-          const createdOn = new Date().getTime();
-          newPlaylists.push({
-            id: createdOn,
-            name,
-            track_ids: tracks.map(t => t.id),
-            created: createdOn,
-            last_updated: new Date().getTime(),
-          });
           setMusicInfo(info => ({
             ...info,
             [keys.PLAYLISTS]: newPlaylists,
           }));
           setPlaylistId(createdOn);
           setIsEditingPlaylistName(false);
+          setMusicInfo(data => ({
+            ...data,
+            currentlyPlaying: {
+              ...data.currentlyPlaying,
+              playlistId: createdOn,
+            },
+          }));
           ToastAndroid.show(labels.playlistSaved, ToastAndroid.SHORT);
         })
         .catch(err => {
@@ -170,6 +179,8 @@ const CurrentPlaylist = ({ navigation, route, extraData: { snapIndex } }) => {
         });
     }
   };
+
+  console.log(`[Current-Playlist] musicInfo=${JSON.stringify(musicInfo)}`);
 
   // TODO Add a transparent background when dragging
   const renderTrackItem = ({ item: track, index, drag, isActive }) => {
@@ -250,7 +261,11 @@ const CurrentPlaylist = ({ navigation, route, extraData: { snapIndex } }) => {
               text={`/${maxPlaylistNameLength - playlistName.length}`}
             />
           }
-          left={<TextInput.Icon name={IconUtils.getInfo(keys.PLAYLIST_EDIT)} />}
+          left={
+            <TextInput.Icon
+              name={IconUtils.getInfo(keys.PLAYLIST_EDIT).name.default}
+            />
+          }
         />
       ) : (
         <Text

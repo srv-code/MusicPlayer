@@ -20,7 +20,8 @@
     - ✅ Show other stack screens in the background
     - <WIP> Get all the icons from IconUtils.getInfo()
 
-
+[Pending]
+    - 🔥 Change the rendering of the icon, call the IconUtils.getInfo() inside the Icon component only
 
 [Player UI]
   - Find for a good quality progress bar (may be available inside the react-native-track-player package)
