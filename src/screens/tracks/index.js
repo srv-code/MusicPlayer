@@ -239,12 +239,12 @@ const Tracks = ({ navigation }) => {
       anchor={
         <IconButton
           {...props}
-          icon="dots-vertical"
+          icon={IconUtils.getInfo(keys.VERTICAL_ELLIPSIS).name.default}
           onPress={setShowMoreOptionForTrackId.bind(this, track.id)}
         />
       }>
       <Menu.Item
-        icon="skip-next-outline"
+        icon={IconUtils.getInfo(keys.SKIP_NEXT).name.default}
         title={labels.playNext}
         onPress={() => {
           alert(JSON.stringify(props));
@@ -252,7 +252,7 @@ const Tracks = ({ navigation }) => {
         }}
       />
       <Menu.Item
-        icon="playlist-plus"
+        icon={IconUtils.getInfo(keys.ADD_TO_PLAYLIST).name.default}
         title={labels.addToPlaylist}
         onPress={() => {
           setShowMoreOptionForTrackId(null);
@@ -260,7 +260,7 @@ const Tracks = ({ navigation }) => {
         }}
       />
       <Menu.Item
-        icon="table-column-plus-after"
+        icon={IconUtils.getInfo(keys.ADD_TO_QUEUE).name.default}
         title={labels.addToQueue}
         onPress={() => {
           // alert(JSON.stringify(props));
@@ -269,7 +269,7 @@ const Tracks = ({ navigation }) => {
         }}
       />
       <Menu.Item
-        icon="information-variant"
+        icon={IconUtils.getInfo(keys.INFO).name.filled}
         title={labels.showInfo}
         onPress={() => {
           // alert(JSON.stringify(props));

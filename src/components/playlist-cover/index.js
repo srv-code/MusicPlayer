@@ -4,7 +4,7 @@ import {
   widthPercentageToDP as wp,
 } from 'react-native-responsive-screen';
 import { Image, StyleSheet, TouchableOpacity, View } from 'react-native';
-import { Text, Avatar } from 'react-native-paper';
+import { Text, Menu, IconButton } from 'react-native-paper';
 import { MusicContext } from '../../context/music';
 import keys from '../../constants/keys';
 import Icon from '../icon';
@@ -12,6 +12,7 @@ import colors from '../../constants/colors';
 import IconUtils from '../../utils/icon';
 import { PreferencesContext } from '../../context/preferences';
 import Colors from 'react-native/Libraries/NewAppScreen/components/Colors';
+import labels from '../../constants/labels';
 
 const COVER_ROW_CELL_COUNT = 4;
 const MAX_ACRONYM_COUNT = 2;
@@ -34,18 +35,20 @@ const TEXT_BG_COLORS = [
   '#cd00cd',
 ];
 
-const PlaylistCover = ({ id, isPlaying, onPlay, style }) => {
+const PlaylistCover = ({ id, style }) => {
   const { musicInfo } = useContext(MusicContext);
+  const { enabledDarkTheme } = useContext(PreferencesContext);
 
+  const [isPlaying, setIsPlaying] = useState(false);
   const [info, setInfo] = useState({});
   const [coverContents, setCoverContents] = useState([]);
-
-  const { enabledDarkTheme } = useContext(PreferencesContext);
+  const [showMenu, setShowMenu] = useState(false);
 
   useEffect(() => {
     if (id && musicInfo?.[keys.TRACKS]?.length) {
       const _info = musicInfo[keys.PLAYLISTS].find(pl => pl.id === id);
       setInfo(_info);
+      setIsPlaying(musicInfo.currentlyPlaying?.playlistId === id);
 
       TEXT_BG_COLORS.sort(() => 0.5 - Math.random());
       const artworks = [];
@@ -272,44 +275,143 @@ const PlaylistCover = ({ id, isPlaying, onPlay, style }) => {
               IconUtils.getInfo(isPlaying ? keys.PAUSE : keys.PLAY).name
                 .outlined
             }
+            // name="ios-play-circle"
             // name="pause-circle"
             // name="play-circle"
             // name="md-play-circle-outline"
             // name="md-pause-circle-outline"
-            // type="FontAwesome5"
             // type="Ionicons"
+            // type="FontAwesome5"
             type={IconUtils.getInfo(keys.PLAY).type}
             color={colors.white1}
-            size={hp(15)}
+            size={hp(5)}
+            // size={hp(15)}
           />
         </TouchableOpacity>
       </View>
     );
   };
 
+  const onPlay = playNext => {};
+  const onShuffle = () => {};
+  const onAddToQueue = () => {};
+  const onShowInfo = () => {};
+  const onDelete = () => {};
+  const onEdit = () => {};
+
   if (!id) return null;
   return (
-    <View
+    <TouchableOpacity
+      onPress={onEdit}
       style={{
         ...styles.container,
         backgroundColor: enabledDarkTheme ? Colors.darker : Colors.lighter,
         ...style,
       }}>
       {renderCoverArt()}
-      <Text
-        titleEllipsizeMode="tail"
+
+      <View
         style={{
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'space-between',
           zIndex: 2,
-          fontSize: wp(4),
-          marginVertical: hp(0.3),
-          textAlign: 'center',
-          width: wp(
-            coverContents.length === COVER_ROW_CELL_COUNT * 2 ? 90 : 40,
-          ),
+          marginVertical: hp(0.5),
         }}>
-        {info.name}
-      </Text>
-    </View>
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+          }}>
+          <Icon
+            size={wp(4)}
+            name={IconUtils.getInfo(keys.PLAYLISTS).name.filled}
+            color={colors.lightGrey}
+          />
+          <Text style={{ fontSize: wp(3), color: colors.lightGrey }}>
+            {info?.track_ids?.length}
+          </Text>
+        </View>
+
+        <Text
+          titleEllipsizeMode="tail"
+          style={{
+            fontSize: wp(4),
+            textAlign: 'center',
+            width: wp(
+              coverContents.length === COVER_ROW_CELL_COUNT * 2 ? 90 : 28,
+            ),
+          }}>
+          {info.name}
+        </Text>
+
+        <Menu
+          visible={showMenu}
+          onDismiss={setShowMenu.bind(this, false)}
+          anchor={
+            <IconButton
+              style={{
+                padding: 0,
+                margin: 0,
+              }}
+              icon={IconUtils.getInfo(keys.VERTICAL_ELLIPSIS).name.default}
+              size={wp(4)}
+              color={colors.lightGrey}
+              onPress={setShowMenu.bind(this, true)}
+            />
+          }>
+          <Menu.Item
+            icon={IconUtils.getInfo(keys.PLAY).name.default}
+            title={labels.play}
+            onPress={() => {
+              onPlay(false);
+              setShowMenu(false);
+            }}
+          />
+          <Menu.Item
+            icon={IconUtils.getInfo(keys.SHUFFLE).name.default}
+            title={labels.shuffleAndPlay}
+            onPress={() => {
+              onShuffle();
+              onPlay(false);
+              setShowMenu(false);
+            }}
+          />
+          <Menu.Item
+            icon={IconUtils.getInfo(keys.ADD_TO_QUEUE).name.default}
+            title={labels.addToQueue}
+            onPress={() => {
+              onAddToQueue();
+              setShowMenu(false);
+            }}
+          />
+          <Menu.Item
+            icon={IconUtils.getInfo(keys.PLAYLIST_EDIT).name.default}
+            title={labels.edit}
+            onPress={() => {
+              onEdit();
+              setShowMenu(false);
+            }}
+          />
+          <Menu.Item
+            icon={IconUtils.getInfo(keys.DELETE).name.default}
+            title={labels.delete}
+            onPress={() => {
+              onDelete();
+              setShowMenu(false);
+            }}
+          />
+          <Menu.Item
+            icon={IconUtils.getInfo(keys.INFO).name.default}
+            title={labels.showInfo}
+            onPress={() => {
+              onShowInfo();
+              setShowMenu(false);
+            }}
+          />
+        </Menu>
+      </View>
+    </TouchableOpacity>
   );
 };
 

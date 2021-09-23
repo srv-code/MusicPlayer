@@ -21,6 +21,8 @@ import ItemInfo, {
 import About from '../../screens/about';
 import NowPlaying from '../../screens/now-playing';
 import CurrentPlaylist from '../../screens/current-playlist';
+import Playlists from '../../screens/playlists';
+import EditPlaylist from '../../screens/edit-playlist';
 
 const BottomSheetStack = createStackNavigator();
 const BottomSheetNavigator = ({
@@ -118,6 +120,19 @@ const SearchStackNavigator = () => (
     <SearchStack.Screen name={screenNames.search} component={Search} />
     <SearchStack.Screen name={screenNames.itemInfo} component={ItemInfo} />
   </SearchStack.Navigator>
+);
+
+const PlaylistStack = createStackNavigator();
+export const PlaylistStackNavigator = () => (
+  <PlaylistStack.Navigator
+    initialRouteName={screenNames.playlists}
+    screenOptions={{ headerShown: false }}>
+    <PlaylistStack.Screen name={screenNames.playlists} component={Playlists} />
+    <PlaylistStack.Screen
+      name={screenNames.editPlaylist}
+      component={EditPlaylist}
+    />
+  </PlaylistStack.Navigator>
 );
 
 const RootStack = createStackNavigator();

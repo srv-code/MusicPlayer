@@ -15,7 +15,8 @@ import labels from '../../constants/labels';
 import { MusicContext } from '../../context/music';
 import PlaylistCover from '../../components/playlist-cover';
 
-const Playlists = ({ navigation }) => {
+// const Playlists = ({ navigation }) => {
+const Playlists = ({}) => {
   const { enabledDarkTheme } = useContext(PreferencesContext);
   const { musicInfo, setMusicInfo } = useContext(MusicContext);
 
@@ -40,6 +41,10 @@ const Playlists = ({ navigation }) => {
       ]}>
       <View style={styles.container}>
         <Text>Playlists screen</Text>
+
+        {/*<Text onPress={navigation.navigate.bind(this, 'test')}>*/}
+        {/*  Go to info screen*/}
+        {/*</Text>*/}
 
         <View
           style={{

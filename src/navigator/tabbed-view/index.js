@@ -3,7 +3,6 @@ import { useBackHandler } from '@react-native-community/hooks';
 import { Image, View, StyleSheet } from 'react-native';
 import { SceneMap, TabBar, TabView } from 'react-native-tab-view';
 import { Appbar, Badge, Menu, Text } from 'react-native-paper';
-import { Platform } from 'react-native';
 import screenNames from '../../constants/screen-names';
 import Playlists from '../../screens/playlists';
 import Tracks from '../../screens/tracks';
@@ -25,6 +24,10 @@ import Folders from '../../screens/folders';
 import { MusicContext } from '../../context/music';
 import IconUtils from '../../utils/icon';
 import keys from '../../constants/keys';
+import Search from '../../screens/search';
+import ItemInfo from '../../screens/item-info';
+import { createStackNavigator } from '@react-navigation/stack';
+import { PlaylistStackNavigator } from '../stacks';
 
 // FIXME The tab labels and icons are getting cut off when focused
 const routeData = [
@@ -41,6 +44,7 @@ const routeData = [
     key: screenNames.playlists,
     title: screenNames.playlists,
     screen: Playlists,
+    // screen: PlaylistStackNavigator,
     icon: {
       color: colors.green1,
       ...IconUtils.getInfo(keys.PLAYLISTS),
@@ -110,23 +114,23 @@ const TabbedView = ({ navigation }) => {
     return false;
   });
 
-  console.log(
-    `[Tabbed-View] playlist count=${
-      musicInfo?.[keys.PLAYLISTS]?.length
-    }, fav count=${musicInfo?.[keys.FAVORITE_IDS]?.length}, track count=${
-      musicInfo?.[keys.TRACKS]?.length
-    }`,
-  );
+  // console.log(
+  //   `[Tabbed-View] playlist count=${
+  //     musicInfo?.[keys.PLAYLISTS]?.length
+  //   }, fav count=${musicInfo?.[keys.FAVORITE_IDS]?.length}, track count=${
+  //     musicInfo?.[keys.TRACKS]?.length
+  //   }`,
+  // );
 
   useEffect(() => {
     if (musicInfo) {
       setTabItemCounts({
-        [screenNames.favorites]: musicInfo?.[keys.FAVORITE_IDS]?.length || null,
-        [screenNames.playlists]: musicInfo?.[keys.PLAYLISTS]?.length || null,
-        [screenNames.tracks]: musicInfo?.[keys.TRACKS]?.length || null,
-        [screenNames.albums]: musicInfo?.[keys.ALBUMS]?.length || null,
-        [screenNames.artists]: musicInfo?.[keys.ARTISTS]?.length || null,
-        [screenNames.folders]: musicInfo?.[keys.FOLDERS]?.length || null,
+        [screenNames.favorites]: musicInfo[keys.FAVORITE_IDS]?.length || null,
+        [screenNames.playlists]: musicInfo[keys.PLAYLISTS]?.length || null,
+        [screenNames.tracks]: musicInfo[keys.TRACKS]?.length || null,
+        [screenNames.albums]: musicInfo[keys.ALBUMS]?.length || null,
+        [screenNames.artists]: musicInfo[keys.ARTISTS]?.length || null,
+        [screenNames.folders]: musicInfo[keys.FOLDERS]?.length || null,
       });
     }
   }, [musicInfo]);
@@ -226,7 +230,8 @@ const TabbedView = ({ navigation }) => {
               }}>
               {route.title}
             </Text>
-            {tabItemCounts[route.key] && (
+
+            {tabItemCounts[route.key] ? (
               <Badge
                 size={focused ? 20 : 15}
                 style={{
@@ -238,6 +243,13 @@ const TabbedView = ({ navigation }) => {
                 }}>
                 {tabItemCounts[route.key]}
               </Badge>
+            ) : (
+              <View
+                style={{
+                  width: wp(5),
+                  backgroundColor: 'transparent',
+                }}
+              />
             )}
           </View>
         )}
@@ -277,10 +289,10 @@ const styles = StyleSheet.create({
     marginRight: wp(-2),
   },
   tabBarItemLabelContainer: {
-    height: hp(3.5),
+    height: hp(4),
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
+    justifyContent: 'center',
   },
   tabBarItemLabelTextBase: {
     paddingHorizontal: wp(1),

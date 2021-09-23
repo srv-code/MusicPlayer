@@ -60,6 +60,9 @@ const labels = {
   sameNamePlaylist: 'Already have a playlist with the same name',
   playlistSaved: 'Playlist Saved',
   couldntSavePlaylist: "Couldn't save playlist",
+  delete: 'Delete',
+  shuffleAndPlay: 'Shuffle & Play',
+  edit: 'Edit',
 };
 
 export default labels;
