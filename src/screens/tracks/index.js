@@ -36,6 +36,7 @@ import { SortingOptions, SortingOrders } from '../../constants/tracks';
 import IconUtils from '../../utils/icon';
 import keys from '../../constants/keys';
 import PlayerUtils from '../../utils/player';
+import PlaylistControls from '../../components/playlist-controls';
 
 // TODO Scroll to the currently playing track automatically
 // TODO Add a go up button (same as in Samsung Music)
@@ -46,7 +47,7 @@ const Tracks = ({ navigation }) => {
   const { playerControls, musicInfo, bottomSheetMiniPositionIndex } =
     useContext(MusicContext);
 
-  const [showSortingMenu, setShowSortingMenu] = useState(false);
+  // const [showSortingMenu, setShowSortingMenu] = useState(false);
   const [sortBy, setSortBy] = useState(SortingOptions.TITLE);
   const [sortOrder, setSortOrder] = useState(SortingOrders.ASCENDING);
   const [showMoreOptionForTrackId, setShowMoreOptionForTrackId] =
@@ -88,15 +89,15 @@ const Tracks = ({ navigation }) => {
       ...styles.container,
       backgroundColor: enabledDarkTheme ? colors.darkest : colors.light,
     },
-    playerButton: {
-      ...styles.playerButton,
-      backgroundColor: enabledDarkTheme ? colors.darker : colors.lighter,
-      opacity: tracks.length ? 1 : 0.8,
-    },
-    sortButton: {
-      ...styles.sortButton,
-      opacity: tracks.length ? 1 : 0.8,
-    },
+    // playerButton: {
+    //   ...styles.playerButton,
+    //   backgroundColor: enabledDarkTheme ? colors.darker : colors.lighter,
+    //   opacity: tracks.length ? 1 : 0.8,
+    // },
+    // sortButton: {
+    //   ...styles.sortButton,
+    //   opacity: tracks.length ? 1 : 0.8,
+    // },
   };
 
   // console.log(`colors:${JSON.stringify({ colors })}`);
@@ -349,7 +350,7 @@ const Tracks = ({ navigation }) => {
   };
 
   const sortTracks = (list, by, order) => {
-    const _sort = ({ keys, type = 'string' } = {}) => {
+    const _sort = (keys, type = 'string') => {
       let compare;
       const getKeyValue = x => {
         let val = { ...x };
@@ -382,19 +383,19 @@ const Tracks = ({ navigation }) => {
 
     switch (by) {
       case SortingOptions.ARTIST:
-        _sort({ keys: ['artist'] });
+        _sort(['artist']);
         break;
       case SortingOptions.TITLE:
-        _sort({ keys: ['title'] });
+        _sort(['title']);
         break;
       case SortingOptions.DURATION:
-        _sort({ keys: ['duration'], type: 'number' });
+        _sort(['duration'], 'number');
         break;
       case SortingOptions.ALBUM:
-        _sort({ keys: ['album'] });
+        _sort(['album']);
         break;
       case SortingOptions.FOLDER:
-        _sort({ keys: ['folder', 'path'] });
+        _sort(['folder', 'path']);
         break;
     }
 
@@ -452,121 +453,135 @@ const Tracks = ({ navigation }) => {
         {/*</View>*/}
 
         {/* Player Controls */}
-        <View style={styles.playerControlsContainer}>
-          <Menu
-            visible={showSortingMenu}
-            onDismiss={setShowSortingMenu.bind(this, false)}
-            anchor={
-              <TouchableOpacity
-                disabled={tracks.length === 0}
-                onPress={setShowSortingMenu.bind(this, true)}
-                style={dynamicStyles.sortButton}>
-                <Icon
-                  name={
-                    IconUtils.getInfo(
-                      sortOrder === SortingOrders.ASCENDING
-                        ? keys.SORT_ASCENDING_ALT
-                        : keys.SORT_DESCENDING_ALT,
-                    ).name.filled
-                  }
-                  type={IconUtils.getInfo(keys.SORT_ASCENDING_ALT).type}
-                  size={wp(4)}
-                />
-                <Icon
-                  name={IconUtils.getInfo(sortBy).name.outlined}
-                  type={IconUtils.getInfo(sortBy).type}
-                  size={wp(4.5)}
-                  color={colors.lightGrey}
-                />
-              </TouchableOpacity>
-            }>
-            {/*<Text>{sortOrder}</Text>*/}
-            <View style={styles.sortOrderContainer}>
-              <ToggleButton
-                icon={IconUtils.getInfo(keys.SORT_ASCENDING).name.default}
-                onPress={sortTracks.bind(
-                  this,
-                  [...tracks],
-                  sortBy,
-                  SortingOrders.ASCENDING,
-                )}
-                style={styles.sortOrderButton}
-                size={wp(4.5)}
-                status={
-                  sortOrder === SortingOrders.ASCENDING
-                    ? 'checked'
-                    : 'unchecked'
-                }
-                value={SortingOrders.ASCENDING}
-              />
-              <ToggleButton
-                icon={IconUtils.getInfo(keys.SORT_DESCENDING).name.default}
-                onPress={sortTracks.bind(
-                  this,
-                  [...tracks],
-                  sortBy,
-                  SortingOrders.DECREASING,
-                )}
-                style={styles.sortOrderButton}
-                size={wp(4.5)}
-                status={
-                  sortOrder === SortingOrders.DECREASING
-                    ? 'checked'
-                    : 'unchecked'
-                }
-                value={SortingOrders.DECREASING}
-              />
-            </View>
+        <PlaylistControls
+          enabledDarkTheme={enabledDarkTheme}
+          disabled={!tracks.length}
+          sortKeys={[
+            SortingOptions.TITLE,
+            SortingOptions.ARTIST,
+            SortingOptions.ALBUM,
+            SortingOptions.DURATION,
+            SortingOptions.FOLDER,
+          ]}
+          sortOrder={sortOrder}
+          onChangeSortOrder={order => sortTracks([...tracks], sortBy, order)}
+          sortBy={sortBy}
+          onChangeSortBy={by => sortTracks([...tracks], by, sortOrder)}
+          onShuffle={onShuffleTracks}
+          onPlay={onPlayWholePlayList}
+        />
 
-            {Object.values(SortingOptions).map((option, index) => (
-              <TouchableOpacity
-                key={index}
-                style={styles.sortOptionButton}
-                onPress={sortTracks.bind(this, [...tracks], option, sortOrder)}>
-                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                  <Icon
-                    name={IconUtils.getInfo(option).name.outlined}
-                    type={IconUtils.getInfo(option).type}
-                    size={wp(4.5)}
-                    color={colors.lightGrey}
-                  />
-                  <Text style={styles.sortOptionText}>{option}</Text>
-                </View>
-                {sortBy === option && (
-                  <Icon
-                    name={IconUtils.getInfo(keys.CHECK).name.filled}
-                    type={IconUtils.getInfo(keys.CHECK).type}
-                    size={wp(4)}
-                    color={colors.lightGrey}
-                  />
-                )}
-              </TouchableOpacity>
-            ))}
-          </Menu>
+        {/*<View style={styles.playerControlsContainer}>*/}
+        {/*  <Menu*/}
+        {/*    visible={showSortingMenu}*/}
+        {/*    onDismiss={setShowSortingMenu.bind(this, false)}*/}
+        {/*    anchor={*/}
+        {/*      <TouchableOpacity*/}
+        {/*        disabled={tracks.length === 0}*/}
+        {/*        onPress={setShowSortingMenu.bind(this, true)}*/}
+        {/*        style={dynamicStyles.sortButton}>*/}
+        {/*        <Icon*/}
+        {/*          name={*/}
+        {/*            IconUtils.getInfo(*/}
+        {/*              sortOrder === SortingOrders.ASCENDING*/}
+        {/*                ? keys.SORT_ASCENDING_ALT*/}
+        {/*                : keys.SORT_DESCENDING_ALT,*/}
+        {/*            ).name.filled*/}
+        {/*          }*/}
+        {/*          type={IconUtils.getInfo(keys.SORT_ASCENDING_ALT).type}*/}
+        {/*          size={wp(4)}*/}
+        {/*        />*/}
+        {/*        <Icon*/}
+        {/*          name={IconUtils.getInfo(sortBy).name.outlined}*/}
+        {/*          type={IconUtils.getInfo(sortBy).type}*/}
+        {/*          size={wp(4.5)}*/}
+        {/*          color={colors.lightGrey}*/}
+        {/*        />*/}
+        {/*      </TouchableOpacity>*/}
+        {/*    }>*/}
+        {/*    /!*<Text>{sortOrder}</Text>*!/*/}
+        {/*    <View style={styles.sortOrderContainer}>*/}
+        {/*      <ToggleButton*/}
+        {/*        icon={IconUtils.getInfo(keys.SORT_ASCENDING).name.default}*/}
+        {/*        onPress={sortTracks.bind(*/}
+        {/*          this,*/}
+        {/*          [...tracks],*/}
+        {/*          sortBy,*/}
+        {/*          SortingOrders.ASCENDING,*/}
+        {/*        )}*/}
+        {/*        style={styles.sortOrderButton}*/}
+        {/*        size={wp(4.5)}*/}
+        {/*        status={*/}
+        {/*          sortOrder === SortingOrders.ASCENDING ? 'checked' : 'unchecked'*/}
+        {/*        }*/}
+        {/*        value={SortingOrders.ASCENDING}*/}
+        {/*      />*/}
+        {/*      <ToggleButton*/}
+        {/*        icon={IconUtils.getInfo(keys.SORT_DESCENDING).name.default}*/}
+        {/*        onPress={sortTracks.bind(*/}
+        {/*          this,*/}
+        {/*          [...tracks],*/}
+        {/*          sortBy,*/}
+        {/*          SortingOrders.DECREASING,*/}
+        {/*        )}*/}
+        {/*        style={styles.sortOrderButton}*/}
+        {/*        size={wp(4.5)}*/}
+        {/*        status={*/}
+        {/*          sortOrder === SortingOrders.DECREASING ? 'checked' : 'unchecked'*/}
+        {/*        }*/}
+        {/*        value={SortingOrders.DECREASING}*/}
+        {/*      />*/}
+        {/*    </View>*/}
 
-          <View style={styles.playerRightButtonContainer}>
-            <TouchableOpacity
-              disabled={tracks.length === 0}
-              style={dynamicStyles.playerButton}
-              onPress={onShuffleTracks}>
-              <Icon
-                name={IconUtils.getInfo(keys.SHUFFLE).name.filled}
-                type={IconUtils.getInfo(keys.SHUFFLE).type}
-                size={wp(4)}
-              />
-            </TouchableOpacity>
-            <TouchableOpacity
-              disabled={tracks.length === 0}
-              style={dynamicStyles.playerButton}
-              onPress={onPlayWholePlayList}>
-              <Icon
-                name={IconUtils.getInfo(keys.PLAY).name.filled}
-                type={IconUtils.getInfo(keys.PLAY).type}
-                size={wp(3)}
-              />
-            </TouchableOpacity>
-          </View>
-        </View>
+        {/*    {Object.values(SortingOptions).map((option, index) => (*/}
+        {/*      <TouchableOpacity*/}
+        {/*        key={index}*/}
+        {/*        style={styles.sortOptionButton}*/}
+        {/*        onPress={sortTracks.bind(this, [...tracks], option, sortOrder)}>*/}
+        {/*        <View style={{ flexDirection: 'row', alignItems: 'center' }}>*/}
+        {/*          <Icon*/}
+        {/*            name={IconUtils.getInfo(option).name.outlined}*/}
+        {/*            type={IconUtils.getInfo(option).type}*/}
+        {/*            size={wp(4.5)}*/}
+        {/*            color={colors.lightGrey}*/}
+        {/*          />*/}
+        {/*          <Text style={styles.sortOptionText}>{option}</Text>*/}
+        {/*        </View>*/}
+        {/*        {sortBy === option && (*/}
+        {/*          <Icon*/}
+        {/*            name={IconUtils.getInfo(keys.CHECK).name.filled}*/}
+        {/*            type={IconUtils.getInfo(keys.CHECK).type}*/}
+        {/*            size={wp(4)}*/}
+        {/*            color={colors.lightGrey}*/}
+        {/*          />*/}
+        {/*        )}*/}
+        {/*      </TouchableOpacity>*/}
+        {/*    ))}*/}
+        {/*  </Menu>*/}
+
+        {/*  <View style={styles.playerRightButtonContainer}>*/}
+        {/*    <TouchableOpacity*/}
+        {/*      disabled={tracks.length === 0}*/}
+        {/*      style={dynamicStyles.playerButton}*/}
+        {/*      onPress={onShuffleTracks}>*/}
+        {/*      <Icon*/}
+        {/*        name={IconUtils.getInfo(keys.SHUFFLE).name.filled}*/}
+        {/*        type={IconUtils.getInfo(keys.SHUFFLE).type}*/}
+        {/*        size={wp(4)}*/}
+        {/*      />*/}
+        {/*    </TouchableOpacity>*/}
+        {/*    <TouchableOpacity*/}
+        {/*      disabled={tracks.length === 0}*/}
+        {/*      style={dynamicStyles.playerButton}*/}
+        {/*      onPress={onPlayWholePlayList}>*/}
+        {/*      <Icon*/}
+        {/*        name={IconUtils.getInfo(keys.PLAY).name.filled}*/}
+        {/*        type={IconUtils.getInfo(keys.PLAY).type}*/}
+        {/*        size={wp(3)}*/}
+        {/*      />*/}
+        {/*    </TouchableOpacity>*/}
+        {/*  </View>*/}
+        {/*</View>*/}
 
         {/*<Text>{`currentlyPlayingTrackId=${currentlyPlayingTrackId}`}</Text>*/}
         <View>
@@ -619,40 +634,40 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  playerControlsContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: hp(1),
-    paddingHorizontal: wp(2),
-  },
-  playerRightButtonContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  playerButton: {
-    elevation: 2,
-    borderRadius: hp(10),
-    // padding: hp(1),
-    height: hp(4),
-    width: hp(4),
-    overflow: 'hidden',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginLeft: wp(2),
-  },
-  sortOptionButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingVertical: hp(0.7),
-    paddingHorizontal: wp(4),
-    width: wp(37),
-  },
-  sortOptionText: {
-    fontSize: wp(4),
-    marginLeft: wp(1.8),
-  },
+  // playerControlsContainer: {
+  //   flexDirection: 'row',
+  //   justifyContent: 'space-between',
+  //   alignItems: 'center',
+  //   marginBottom: hp(1),
+  //   paddingHorizontal: wp(2),
+  // },
+  // playerRightButtonContainer: {
+  //   flexDirection: 'row',
+  //   alignItems: 'center',
+  // },
+  // playerButton: {
+  //   elevation: 2,
+  //   borderRadius: hp(10),
+  //   // padding: hp(1),
+  //   height: hp(4),
+  //   width: hp(4),
+  //   overflow: 'hidden',
+  //   alignItems: 'center',
+  //   justifyContent: 'center',
+  //   marginLeft: wp(2),
+  // },
+  // sortOptionButton: {
+  //   flexDirection: 'row',
+  //   alignItems: 'center',
+  //   justifyContent: 'space-between',
+  //   paddingVertical: hp(0.7),
+  //   paddingHorizontal: wp(4),
+  //   width: wp(37),
+  // },
+  // sortOptionText: {
+  //   fontSize: wp(4),
+  //   marginLeft: wp(1.8),
+  // },
   listItemText: {
     fontSize: wp(4),
   },
@@ -676,19 +691,19 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  sortOrderContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  sortOrderButton: {
-    height: hp(4),
-    width: wp(15),
-  },
-  sortButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
+  // sortOrderContainer: {
+  //   flexDirection: 'row',
+  //   alignItems: 'center',
+  //   justifyContent: 'center',
+  // },
+  // sortOrderButton: {
+  //   height: hp(4),
+  //   width: wp(15),
+  // },
+  // sortButton: {
+  //   flexDirection: 'row',
+  //   alignItems: 'center',
+  // },
   listItemEndSmallBar: {
     paddingVertical: hp(0.3),
     width: wp(12),

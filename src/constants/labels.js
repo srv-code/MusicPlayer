@@ -45,7 +45,6 @@ const labels = {
   location: 'Location',
   noInfoFound: 'No Information Found',
   name: 'Name',
-  trackCount: 'Track Count',
   playlist: 'Playlist',
   untitledPlaylist: 'Untitled Playlist',
   playlistName: 'Playlist Name',
@@ -63,6 +62,8 @@ const labels = {
   delete: 'Delete',
   shuffleAndPlay: 'Shuffle & Play',
   edit: 'Edit',
+  createdOn: 'Created On',
+  updatedOn: 'Updated On',
 };
 
 export default labels;

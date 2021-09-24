@@ -74,8 +74,6 @@ const App = () => {
     ...PaperDarkTheme,
   };
 
-  // console.log(`MergedDarkTheme: ${JSON.stringify(MergedDarkTheme)}`);
-
   const theme = enabledDarkTheme ? MergedDarkTheme : MergedDefaultTheme;
 
   const initPlayer = async () => {

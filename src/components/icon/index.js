@@ -1,5 +1,6 @@
 import React from 'react';
 import Entypo from 'react-native-vector-icons/Entypo';
+import Feather from 'react-native-vector-icons/Feather';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
@@ -59,6 +60,9 @@ const Icon = ({
       break;
     case 'FontAwesome5':
       _Icon = FontAwesome5;
+      break;
+    case 'Feather':
+      _Icon = Feather;
       break;
     default:
       throw new Error(`Invalid type: ${type}`);

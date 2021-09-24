@@ -3,7 +3,6 @@ import keys from '../constants/keys';
 import { Platform } from 'react-native';
 
 export default class IconUtils {
-  // TODO Apply this everywhere applicable
   static getInfo = type => {
     switch (type) {
       case keys.FAVORITE:
@@ -49,6 +48,26 @@ export default class IconUtils {
         return {
           type: 'MaterialCommunityIcons',
           name: { outlined: 'format-text', default: 'format-text' },
+        };
+
+      case SortingOptions.CREATED_ON:
+        return {
+          type: 'Ionicons',
+          name: { outlined: 'create-outline' },
+        };
+
+      case SortingOptions.UPDATED_ON:
+        return {
+          type: 'MaterialCommunityIcons',
+          name: { outlined: 'update' },
+        };
+
+      case SortingOptions.TRACKS:
+        return {
+          type: 'Feather',
+          name: {
+            outlined: 'hash',
+          },
         };
 
       case keys.DURATION:
@@ -343,7 +362,7 @@ export default class IconUtils {
         };
 
       default:
-        throw new Error(`Invalid type: ${type}`);
+        throw new Error(`Invalid type: ${JSON.stringify(type)}`);
     }
   };
 }

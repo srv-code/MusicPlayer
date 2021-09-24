@@ -16,27 +16,35 @@ import { MusicContext } from '../../context/music';
 import PlaylistCover from '../../components/playlist-cover';
 import Modal from 'react-native-modal';
 import Playlist from '../../components/playlist';
+import PlaylistControls from '../../components/playlist-controls';
+import { SortingOptions, SortingOrders } from '../../constants/tracks';
 
 const Playlists = ({ navigation }) => {
-  // const Playlists = ({}) => {
   const { enabledDarkTheme } = useContext(PreferencesContext);
   const { musicInfo, setMusicInfo } = useContext(MusicContext);
 
-  const [showSearch, setShowSearch] = useState(false);
-  const [searchedTerm, setSearchedTerm] = useState('');
   const [showEditingModalForId, setShowEditingModalForId] = useState(null);
+  const [sortBy, setSortBy] = useState(SortingOptions.TITLE);
+  const [sortOrder, setSortOrder] = useState(SortingOrders.ASCENDING);
 
-  const toggleSearch = () => {
-    setShowSearch(!showSearch);
-    setSearchedTerm('');
+  const onEditPlaylist = id => setShowEditingModalForId(id);
+
+  const onPlayPlaylist = (id, playNext) => {};
+
+  const onShufflePlaylist = id => {};
+
+  const onAddPlaylistToQueue = id => {};
+
+  const onShowPlaylistInfo = id => {};
+
+  const onDeletePlaylist = id => {};
+
+  const sortAllPlaylists = (by, order) => {
+    setSortBy(by);
+    setSortOrder(order);
   };
 
-  const onEdit = id => setShowEditingModalForId(id);
-  const onPlay = (id, playNext) => {};
-  const onShuffle = id => {};
-  const onAddToQueue = id => {};
-  const onShowInfo = id => {};
-  const onDelete = id => {};
+  const onPlayAllPlaylists = () => {};
 
   const dynamicStyles = {
     screen: {
@@ -60,6 +68,24 @@ const Playlists = ({ navigation }) => {
           {/*  Go to info screen*/}
           {/*</Text>*/}
 
+          <PlaylistControls
+            enabledDarkTheme={enabledDarkTheme}
+            disabled={!musicInfo?.[keys.PLAYLISTS]?.length}
+            sortKeys={[
+              SortingOptions.TITLE,
+              SortingOptions.TRACKS,
+              SortingOptions.DURATION,
+              SortingOptions.CREATED_ON,
+              SortingOptions.UPDATED_ON,
+            ]}
+            sortOrder={sortOrder}
+            onChangeSortOrder={order => sortAllPlaylists(sortBy, order)}
+            sortBy={sortBy}
+            onChangeSortBy={by => sortAllPlaylists(by, sortOrder)}
+            onShuffle={onShufflePlaylist}
+            onPlay={onPlayAllPlaylists}
+          />
+
           <View
             style={{
               flexDirection: 'row',
@@ -72,12 +98,12 @@ const Playlists = ({ navigation }) => {
               <PlaylistCover
                 key={playlistIndex}
                 id={info.id}
-                onEdit={onEdit}
-                onPlay={onPlay}
-                onShuffle={onShuffle}
-                onAddToQueue={onAddToQueue}
-                onShowInfo={onShowInfo}
-                onDelete={onDelete}
+                onEdit={onEditPlaylist}
+                onPlay={onPlayPlaylist}
+                onShuffle={onShufflePlaylist}
+                onAddToQueue={onAddPlaylistToQueue}
+                onShowInfo={onShowPlaylistInfo}
+                onDelete={onDeletePlaylist}
                 // style={{
                 //   backgroundColor: 'lightblue',
                 //   // marginVertical: hp(1)
