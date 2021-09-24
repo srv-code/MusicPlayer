@@ -5,13 +5,13 @@ import {
 } from 'react-native-responsive-screen';
 import { Image, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { Text, Menu, IconButton } from 'react-native-paper';
+import Modal from 'react-native-modal';
 import { MusicContext } from '../../context/music';
 import keys from '../../constants/keys';
 import Icon from '../icon';
 import colors from '../../constants/colors';
 import IconUtils from '../../utils/icon';
 import { PreferencesContext } from '../../context/preferences';
-import Colors from 'react-native/Libraries/NewAppScreen/components/Colors';
 import labels from '../../constants/labels';
 
 const COVER_ROW_CELL_COUNT = 4;
@@ -35,7 +35,16 @@ const TEXT_BG_COLORS = [
   '#cd00cd',
 ];
 
-const PlaylistCover = ({ id, style }) => {
+const PlaylistCover = ({
+  id,
+  onEdit,
+  onPlay,
+  onShuffle,
+  onAddToQueue,
+  onShowInfo,
+  onDelete,
+  style,
+}) => {
   const { musicInfo } = useContext(MusicContext);
   const { enabledDarkTheme } = useContext(PreferencesContext);
 
@@ -43,6 +52,7 @@ const PlaylistCover = ({ id, style }) => {
   const [info, setInfo] = useState({});
   const [coverContents, setCoverContents] = useState([]);
   const [showMenu, setShowMenu] = useState(false);
+  const [showEditingModal, setShowEditingModal] = useState(false);
 
   useEffect(() => {
     if (id && musicInfo?.[keys.TRACKS]?.length) {
@@ -292,24 +302,16 @@ const PlaylistCover = ({ id, style }) => {
     );
   };
 
-  const onPlay = playNext => {};
-  const onShuffle = () => {};
-  const onAddToQueue = () => {};
-  const onShowInfo = () => {};
-  const onDelete = () => {};
-  const onEdit = () => {};
-
   if (!id) return null;
   return (
     <TouchableOpacity
-      onPress={onEdit}
+      onPress={onEdit.bind(this, id)}
       style={{
         ...styles.container,
-        backgroundColor: enabledDarkTheme ? Colors.darker : Colors.lighter,
+        backgroundColor: enabledDarkTheme ? colors.darker : colors.lighter,
         ...style,
       }}>
       {renderCoverArt()}
-
       <View
         style={{
           flexDirection: 'row',
@@ -389,7 +391,7 @@ const PlaylistCover = ({ id, style }) => {
             icon={IconUtils.getInfo(keys.PLAYLIST_EDIT).name.default}
             title={labels.edit}
             onPress={() => {
-              onEdit();
+              onEdit(id);
               setShowMenu(false);
             }}
           />

@@ -1,5 +1,9 @@
 import React, { useMemo } from 'react';
 import { StyleSheet, Text } from 'react-native';
+import {
+  heightPercentageToDP as hp,
+  widthPercentageToDP as wp,
+} from 'react-native-responsive-screen';
 import Animated, {
   Extrapolate,
   interpolate,
@@ -10,7 +14,7 @@ import { toRad } from 'react-native-redash';
 import colors from '../../../constants/colors';
 import { transformOrigin } from './transform-origin';
 
-const CustomHandle = ({ style, animatedIndex }) => {
+const CustomHandle = ({ style, animatedIndex, enabledDarkTheme }) => {
   //#region animations
   const indicatorTransformOriginY = useDerivedValue(() =>
     interpolate(animatedIndex.value, [0, 1, 2], [-1, 0, 1], Extrapolate.CLAMP),
@@ -18,7 +22,14 @@ const CustomHandle = ({ style, animatedIndex }) => {
   //#endregion
 
   //#region styles
-  const containerStyle = useMemo(() => [styles.container, style], [style]);
+  const containerStyle = useMemo(
+    () => [
+      styles.container,
+      style,
+      { borderColor: enabledDarkTheme ? colors.darker : colors.lighter },
+    ],
+    [style, enabledDarkTheme],
+  );
   const containerAnimatedStyle = useAnimatedStyle(() => {
     const borderTopRadius = interpolate(
       animatedIndex.value,
@@ -102,14 +113,12 @@ const styles = StyleSheet.create({
   container: {
     alignContent: 'center',
     alignItems: 'center',
-    // paddingBottom: hp(2.7),  20,
-    paddingBottom: 20,
+    paddingBottom: hp(2.7), // 20,
+    // paddingBottom: 20,
     // paddingHorizontal: wp(10),// 16,
     zIndex: 99999,
-
-    // borderWidth: 1,
-    // borderWidth: 1,
-    // borderColor: 'blue',
+    borderBottomWidth: 1,
+    // borderColor: colors.white,
   },
   indicator: {
     // marginTop: hp(1), // 10,

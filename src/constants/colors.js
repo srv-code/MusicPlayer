@@ -1,4 +1,12 @@
+import Colors from 'react-native/Libraries/NewAppScreen/components/Colors';
+
 const colors = {
+  light: Colors.light,
+  lighter: Colors.lighter,
+  lightest: '#f6f6f6',
+  dark: Colors.dark,
+  darker: Colors.darker,
+  darkest: '#121212',
   white: '#fff',
   white1: '#f2f2f2',
   red: '#f00',

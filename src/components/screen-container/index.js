@@ -1,5 +1,4 @@
 import React, { useContext } from 'react';
-import Colors from 'react-native/Libraries/NewAppScreen/components/Colors';
 import { PreferencesContext } from '../../context/preferences';
 import { StyleSheet, SafeAreaView, ScrollView, View } from 'react-native';
 import { Appbar, Text } from 'react-native-paper';
@@ -29,7 +28,7 @@ const ScreenContainer = ({
         <Appbar.Header
           style={{
             backgroundColor: enabledDarkTheme
-              ? Colors.darker
+              ? colors.darker
               : colors.darkBlue2,
           }}>
           {onBackPress && <Appbar.BackAction onPress={onBackPress} />}
@@ -73,6 +72,7 @@ const ScreenContainer = ({
 const styles = StyleSheet.create({
   background: {
     flex: 1,
+    // backgroundColor: colors.darker,
   },
   titleText: {
     textTransform: 'capitalize',

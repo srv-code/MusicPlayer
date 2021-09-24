@@ -14,7 +14,6 @@ import {
   DarkTheme as NavigationDarkTheme,
 } from '@react-navigation/native';
 import { SafeAreaProvider } from 'react-native-safe-area-context/src/SafeAreaContext';
-import Colors from 'react-native/Libraries/NewAppScreen/components/Colors';
 import colors from './src/constants/colors';
 import Splash from './src/screens/splash';
 import TrackPlayer from 'react-native-track-player';
@@ -74,6 +73,8 @@ const App = () => {
     ...NavigationDarkTheme,
     ...PaperDarkTheme,
   };
+
+  // console.log(`MergedDarkTheme: ${JSON.stringify(MergedDarkTheme)}`);
 
   const theme = enabledDarkTheme ? MergedDarkTheme : MergedDefaultTheme;
 
@@ -261,7 +262,7 @@ const App = () => {
               style="auto"
               animated
               backgroundColor={
-                enabledDarkTheme ? Colors.darker : colors.darkBlue2
+                enabledDarkTheme ? colors.darker : colors.darkBlue2
               }
               barStyle="light-content"
             />

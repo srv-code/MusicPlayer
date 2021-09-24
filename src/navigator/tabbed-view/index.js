@@ -16,7 +16,6 @@ import {
   widthPercentageToDP as wp,
 } from 'react-native-responsive-screen';
 import { PreferencesContext } from '../../context/preferences';
-import Colors from 'react-native/Libraries/NewAppScreen/components/Colors';
 import Icon from '../../components/icon';
 import labels from '../../constants/labels';
 import Icons from '../../constants/icons';
@@ -24,12 +23,7 @@ import Folders from '../../screens/folders';
 import { MusicContext } from '../../context/music';
 import IconUtils from '../../utils/icon';
 import keys from '../../constants/keys';
-import Search from '../../screens/search';
-import ItemInfo from '../../screens/item-info';
-import { createStackNavigator } from '@react-navigation/stack';
-import { PlaylistStackNavigator } from '../stacks';
 
-// FIXME The tab labels and icons are getting cut off when focused
 const routeData = [
   {
     key: screenNames.favorites,
@@ -44,7 +38,6 @@ const routeData = [
     key: screenNames.playlists,
     title: screenNames.playlists,
     screen: Playlists,
-    // screen: PlaylistStackNavigator,
     icon: {
       color: colors.green1,
       ...IconUtils.getInfo(keys.PLAYLISTS),
@@ -151,7 +144,7 @@ const TabbedView = ({ navigation }) => {
   const renderAppbar = () => (
     <Appbar.Header
       style={{
-        backgroundColor: enabledDarkTheme ? Colors.darker : colors.darkBlue2,
+        backgroundColor: enabledDarkTheme ? colors.darker : colors.darkBlue2,
         elevation: 0,
       }}>
       <Image source={Icons.Logo} resizeMode="stretch" style={styles.logo} />
@@ -212,6 +205,19 @@ const TabbedView = ({ navigation }) => {
         {...props}
         scrollEnabled
         bounces
+        // tabStyle={
+        //   {
+        //     // height: hp(6),
+        //     // backgroundColor: enabledDarkTheme ? colors.darker : colors.lighter,
+        //     // height: hp(10),
+        //     // justifyContent: 'flex-start',
+        //     // zIndex: -1,
+        //   }
+        // }
+        style={{
+          ...styles.tabBar,
+          backgroundColor: enabledDarkTheme ? colors.darker : colors.lighter,
+        }}
         renderLabel={({ route, focused, color }) => (
           <View style={styles.tabBarItemLabelContainer}>
             <Icon
@@ -254,11 +260,6 @@ const TabbedView = ({ navigation }) => {
           </View>
         )}
         renderIndicator={() => null}
-        tabStyle={{
-          height: hp(6),
-          backgroundColor: enabledDarkTheme ? Colors.darker : Colors.lighter,
-        }}
-        style={styles.tabBar}
       />
     );
 
@@ -301,6 +302,8 @@ const styles = StyleSheet.create({
   },
   tabBar: {
     elevation: 0,
+    height: hp(6),
+    justifyContent: 'flex-start',
   },
 });
 

@@ -26,7 +26,6 @@ import colors from '../../constants/colors';
 import { PreferencesContext } from '../../context/preferences';
 import Slider from 'react-native-slider';
 import LinearGradient from 'react-native-linear-gradient';
-import Colors from 'react-native/Libraries/NewAppScreen/components/Colors';
 import MarqueeText from 'react-native-marquee';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import keys from '../../constants/keys';
@@ -257,7 +256,7 @@ const NowPlaying = ({ navigation, extraData: { snapIndex, setSnapIndex } }) => {
         style={{
           fontSize: wp(fontSizes[snapIndex]),
           marginBottom: snapIndex === 2 ? hp(1) : 0,
-          color: enabledDarkTheme ? Colors.light : Colors.darker,
+          color: enabledDarkTheme ? colors.light : colors.darker,
           // color: enabledDarkTheme ? 'white' : 'black',
           // backgroundColor: 'lightgreen',
           // width:
@@ -649,7 +648,7 @@ const NowPlaying = ({ navigation, extraData: { snapIndex, setSnapIndex } }) => {
             width: hp(snapIndex === 1 ? 2.5 : 4),
             height: hp(snapIndex === 1 ? 2.5 : 4),
             borderRadius: hp(3),
-            backgroundColor: enabledDarkTheme ? Colors.dark : Colors.lighter,
+            backgroundColor: enabledDarkTheme ? colors.dark : colors.lighter,
             elevation: 2,
             shadowColor: 'black',
             shadowOffset: { width: 0, height: 2 },

@@ -15,13 +15,14 @@ import {
   heightPercentageToDP as hp,
   widthPercentageToDP as wp,
 } from 'react-native-responsive-screen';
-import Colors from 'react-native/Libraries/NewAppScreen/components/Colors';
 import { PreferencesContext } from '../../context/preferences';
 import { MusicContext } from '../../context/music';
 import colors from '../../constants/colors';
 import CustomHandle from './sub-components/custom-handle';
 
 const PlayerBottomSheet = ({ navigator: Navigator }) => {
+  const { enabledDarkTheme } = useContext(PreferencesContext);
+
   const startSnapIndex = -1; // TODO: 0 indicates minimized, to hide pass -1 (when there's no currently playing)
   const snapPoints = ['10%', '45%', '92%'];
   const [snapIndex, setSnapIndex] = useState(startSnapIndex);
@@ -78,16 +79,14 @@ const PlayerBottomSheet = ({ navigator: Navigator }) => {
   }, []);
 
   const renderCustomHandle = useCallback(
-    props => <CustomHandle {...props} />,
-    [],
+    props => <CustomHandle {...props} enabledDarkTheme={enabledDarkTheme} />,
+    [enabledDarkTheme],
   );
 
   const renderBackdrop = useCallback(
     props => <BottomSheetBackdrop {...props} pressBehavior={'collapse'} />,
     [],
   );
-
-  const { enabledDarkTheme } = useContext(PreferencesContext);
 
   return (
     <BottomSheet
@@ -102,7 +101,7 @@ const PlayerBottomSheet = ({ navigator: Navigator }) => {
       handleComponent={renderCustomHandle}
       backgroundStyle={{
         marginTop: hp(0.3),
-        backgroundColor: enabledDarkTheme ? Colors.darker : Colors.lighter,
+        backgroundColor: enabledDarkTheme ? colors.darker : colors.lighter,
       }}
       handleIndicatorStyle={styles.bottomSheetHandleIndicator}
       keyboardBehavior="interactive"
@@ -125,6 +124,7 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 10,
     borderTopRightRadius: 10,
     elevation: 2,
+    // backgroundColor: 'red'
   },
   bottomSheetHandleIndicator: {
     backgroundColor: colors.white,

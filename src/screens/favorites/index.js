@@ -6,10 +6,8 @@ import {
 } from 'react-native-responsive-screen';
 import ScreenContainer from '../../components/screen-container';
 import screenNames from '../../constants/screen-names';
-import colors from '../../constants/colors';
 import { PreferencesContext } from '../../context/preferences';
 import { Text } from 'react-native-paper';
-import Colors from 'react-native/Libraries/NewAppScreen/components/Colors';
 import keys from '../../constants/keys';
 import IconUtils from '../../utils/icon';
 import labels from '../../constants/labels';

@@ -15,10 +15,8 @@ import {
 } from 'react-native-responsive-screen';
 import { BottomSheetScrollView } from '@gorhom/bottom-sheet';
 import Icon from '../../components/icon';
-import Colors from 'react-native/Libraries/NewAppScreen/components/Colors';
 import { useFocusEffect } from '@react-navigation/native';
 import IconUtils from '../../utils/icon';
-import { SortingOptions } from '../../constants/tracks';
 
 export const DisplayModes = {
   SCREEN: 'SCREEN',

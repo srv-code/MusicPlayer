@@ -17,10 +17,10 @@ import {
   IconButton,
   List,
   Menu,
+  Surface,
   Text,
   ToggleButton,
 } from 'react-native-paper';
-import Colors from 'react-native/Libraries/NewAppScreen/components/Colors';
 import {
   heightPercentageToDP as hp,
   widthPercentageToDP as wp,
@@ -80,26 +80,29 @@ const Tracks = ({ navigation }) => {
 
   // TODO apply useMemo later
   const dynamicStyles = {
-    container: [
-      styles.container,
-      {
-        backgroundColor: enabledDarkTheme ? Colors.dark : Colors.light,
-      },
-    ],
-    playerButton: [
-      styles.playerButton,
-      {
-        backgroundColor: enabledDarkTheme ? Colors.darker : Colors.lighter,
-        opacity: tracks.length ? 1 : 0.8,
-      },
-    ],
-    sortButton: [
-      styles.sortButton,
-      {
-        opacity: tracks.length ? 1 : 0.8,
-      },
-    ],
+    screen: {
+      ...styles.screen,
+      backgroundColor: enabledDarkTheme ? colors.darker : colors.lighter,
+    },
+    container: {
+      ...styles.container,
+      backgroundColor: enabledDarkTheme ? colors.darkest : colors.light,
+    },
+    playerButton: {
+      ...styles.playerButton,
+      backgroundColor: enabledDarkTheme ? colors.darker : colors.lighter,
+      opacity: tracks.length ? 1 : 0.8,
+    },
+    sortButton: {
+      ...styles.sortButton,
+      opacity: tracks.length ? 1 : 0.8,
+    },
   };
+
+  // console.log(`colors:${JSON.stringify({ colors })}`);
+
+  // const { colors } = useTheme();
+  // console.log(`theme=${JSON.stringify(useTheme())}`);
 
   // console.log(`[Tracks] sortBy=${sortBy}, sortOrder=${sortOrder}`);
 
@@ -306,8 +309,8 @@ const Tracks = ({ navigation }) => {
             backgroundColor:
               currentlyPlayingTrackId === track.id
                 ? enabledDarkTheme
-                  ? Colors.darker
-                  : Colors.lighter
+                  ? colors.darker
+                  : colors.lighter
                 : null,
             elevation: currentlyPlayingTrackId === track.id ? 2 : 0,
           }}
@@ -400,197 +403,208 @@ const Tracks = ({ navigation }) => {
   };
 
   return (
-    <ScreenContainer noScroll style={dynamicStyles.container}>
-      {/*<Text>{`bottomSheetMiniPositionIndex=${bottomSheetMiniPositionIndex}`}</Text>*/}
-      {/*<View style={styles.container}>*/}
-      {/*{playerControls && (*/}
-      {/*  <View>*/}
-      {/*    <Text>Player Controls</Text>*/}
-      {/*    <View style={{ flexDirection: 'row' }}>*/}
-      {/*      <Button*/}
-      {/*        onPress={playerControls.close}*/}
-      {/*        uppercase={false}*/}
-      {/*        mode="outlined"*/}
-      {/*        style={globalStyles.button}>*/}
-      {/*        Close*/}
-      {/*      </Button>*/}
-      {/*      <Button*/}
-      {/*        onPress={playerControls.expand}*/}
-      {/*        uppercase={false}*/}
-      {/*        mode="outlined"*/}
-      {/*        style={globalStyles.button}>*/}
-      {/*        Expand*/}
-      {/*      </Button>*/}
-      {/*      <Button*/}
-      {/*        onPress={playerControls.collapse}*/}
-      {/*        uppercase={false}*/}
-      {/*        mode="outlined"*/}
-      {/*        style={globalStyles.button}>*/}
-      {/*        Collapse*/}
-      {/*      </Button>*/}
-      {/*    </View>*/}
-      {/*  </View>*/}
-      {/*)}*/}
+    <ScreenContainer noScroll style={dynamicStyles.screen}>
+      <View style={dynamicStyles.container}>
+        {/*<Text>{`bottomSheetMiniPositionIndex=${bottomSheetMiniPositionIndex}`}</Text>*/}
+        {/*<View style={styles.container}>*/}
+        {/*{playerControls && (*/}
+        {/*  <View>*/}
+        {/*    <Text>Player Controls</Text>*/}
+        {/*    <View style={{ flexDirection: 'row' }}>*/}
+        {/*      <Button*/}
+        {/*        onPress={playerControls.close}*/}
+        {/*        uppercase={false}*/}
+        {/*        mode="outlined"*/}
+        {/*        style={globalStyles.button}>*/}
+        {/*        Close*/}
+        {/*      </Button>*/}
+        {/*      <Button*/}
+        {/*        onPress={playerControls.expand}*/}
+        {/*        uppercase={false}*/}
+        {/*        mode="outlined"*/}
+        {/*        style={globalStyles.button}>*/}
+        {/*        Expand*/}
+        {/*      </Button>*/}
+        {/*      <Button*/}
+        {/*        onPress={playerControls.collapse}*/}
+        {/*        uppercase={false}*/}
+        {/*        mode="outlined"*/}
+        {/*        style={globalStyles.button}>*/}
+        {/*        Collapse*/}
+        {/*      </Button>*/}
+        {/*    </View>*/}
+        {/*  </View>*/}
+        {/*)}*/}
 
-      {/*{Array(50)*/}
-      {/*  .fill()*/}
-      {/*  .map((_, index) => (*/}
-      {/*    <View*/}
-      {/*      key={index}*/}
-      {/*      style={{*/}
-      {/*        backgroundColor: index % 2 ? 'lightblue' : 'lightgreen',*/}
-      {/*        padding: 10,*/}
-      {/*        marginBottom: 2,*/}
-      {/*      }}>*/}
-      {/*      <Text>Song {index + 1}</Text>*/}
-      {/*    </View>*/}
-      {/*  ))}*/}
-      {/*</View>*/}
+        {/*{Array(50)*/}
+        {/*  .fill()*/}
+        {/*  .map((_, index) => (*/}
+        {/*    <View*/}
+        {/*      key={index}*/}
+        {/*      style={{*/}
+        {/*        backgroundColor: index % 2 ? 'lightblue' : 'lightgreen',*/}
+        {/*        padding: 10,*/}
+        {/*        marginBottom: 2,*/}
+        {/*      }}>*/}
+        {/*      <Text>Song {index + 1}</Text>*/}
+        {/*    </View>*/}
+        {/*  ))}*/}
+        {/*</View>*/}
 
-      {/* Player Controls */}
-      <View style={styles.playerControlsContainer}>
-        <Menu
-          visible={showSortingMenu}
-          onDismiss={setShowSortingMenu.bind(this, false)}
-          anchor={
-            <TouchableOpacity
-              disabled={tracks.length === 0}
-              onPress={setShowSortingMenu.bind(this, true)}
-              style={dynamicStyles.sortButton}>
-              <Icon
-                name={
-                  IconUtils.getInfo(
-                    sortOrder === SortingOrders.ASCENDING
-                      ? keys.SORT_ASCENDING_ALT
-                      : keys.SORT_DESCENDING_ALT,
-                  ).name.filled
-                }
-                type={IconUtils.getInfo(keys.SORT_ASCENDING_ALT).type}
-                size={wp(4)}
-              />
-              <Icon
-                name={IconUtils.getInfo(sortBy).name.outlined}
-                type={IconUtils.getInfo(sortBy).type}
-                size={wp(4.5)}
-                color={colors.lightGrey}
-              />
-            </TouchableOpacity>
-          }>
-          {/*<Text>{sortOrder}</Text>*/}
-          <View style={styles.sortOrderContainer}>
-            <ToggleButton
-              icon={IconUtils.getInfo(keys.SORT_ASCENDING).name.default}
-              onPress={sortTracks.bind(
-                this,
-                [...tracks],
-                sortBy,
-                SortingOrders.ASCENDING,
-              )}
-              style={styles.sortOrderButton}
-              size={wp(4.5)}
-              status={
-                sortOrder === SortingOrders.ASCENDING ? 'checked' : 'unchecked'
-              }
-              value={SortingOrders.ASCENDING}
-            />
-            <ToggleButton
-              icon={IconUtils.getInfo(keys.SORT_DESCENDING).name.default}
-              onPress={sortTracks.bind(
-                this,
-                [...tracks],
-                sortBy,
-                SortingOrders.DECREASING,
-              )}
-              style={styles.sortOrderButton}
-              size={wp(4.5)}
-              status={
-                sortOrder === SortingOrders.DECREASING ? 'checked' : 'unchecked'
-              }
-              value={SortingOrders.DECREASING}
-            />
-          </View>
-
-          {Object.values(SortingOptions).map((option, index) => (
-            <TouchableOpacity
-              key={index}
-              style={styles.sortOptionButton}
-              onPress={sortTracks.bind(this, [...tracks], option, sortOrder)}>
-              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+        {/* Player Controls */}
+        <View style={styles.playerControlsContainer}>
+          <Menu
+            visible={showSortingMenu}
+            onDismiss={setShowSortingMenu.bind(this, false)}
+            anchor={
+              <TouchableOpacity
+                disabled={tracks.length === 0}
+                onPress={setShowSortingMenu.bind(this, true)}
+                style={dynamicStyles.sortButton}>
                 <Icon
-                  name={IconUtils.getInfo(option).name.outlined}
-                  type={IconUtils.getInfo(option).type}
+                  name={
+                    IconUtils.getInfo(
+                      sortOrder === SortingOrders.ASCENDING
+                        ? keys.SORT_ASCENDING_ALT
+                        : keys.SORT_DESCENDING_ALT,
+                    ).name.filled
+                  }
+                  type={IconUtils.getInfo(keys.SORT_ASCENDING_ALT).type}
+                  size={wp(4)}
+                />
+                <Icon
+                  name={IconUtils.getInfo(sortBy).name.outlined}
+                  type={IconUtils.getInfo(sortBy).type}
                   size={wp(4.5)}
                   color={colors.lightGrey}
                 />
-                <Text style={styles.sortOptionText}>{option}</Text>
-              </View>
-              {sortBy === option && (
-                <Icon
-                  name={IconUtils.getInfo(keys.CHECK).name.filled}
-                  type={IconUtils.getInfo(keys.CHECK).type}
-                  size={wp(4)}
-                  color={colors.lightGrey}
-                />
-              )}
+              </TouchableOpacity>
+            }>
+            {/*<Text>{sortOrder}</Text>*/}
+            <View style={styles.sortOrderContainer}>
+              <ToggleButton
+                icon={IconUtils.getInfo(keys.SORT_ASCENDING).name.default}
+                onPress={sortTracks.bind(
+                  this,
+                  [...tracks],
+                  sortBy,
+                  SortingOrders.ASCENDING,
+                )}
+                style={styles.sortOrderButton}
+                size={wp(4.5)}
+                status={
+                  sortOrder === SortingOrders.ASCENDING
+                    ? 'checked'
+                    : 'unchecked'
+                }
+                value={SortingOrders.ASCENDING}
+              />
+              <ToggleButton
+                icon={IconUtils.getInfo(keys.SORT_DESCENDING).name.default}
+                onPress={sortTracks.bind(
+                  this,
+                  [...tracks],
+                  sortBy,
+                  SortingOrders.DECREASING,
+                )}
+                style={styles.sortOrderButton}
+                size={wp(4.5)}
+                status={
+                  sortOrder === SortingOrders.DECREASING
+                    ? 'checked'
+                    : 'unchecked'
+                }
+                value={SortingOrders.DECREASING}
+              />
+            </View>
+
+            {Object.values(SortingOptions).map((option, index) => (
+              <TouchableOpacity
+                key={index}
+                style={styles.sortOptionButton}
+                onPress={sortTracks.bind(this, [...tracks], option, sortOrder)}>
+                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                  <Icon
+                    name={IconUtils.getInfo(option).name.outlined}
+                    type={IconUtils.getInfo(option).type}
+                    size={wp(4.5)}
+                    color={colors.lightGrey}
+                  />
+                  <Text style={styles.sortOptionText}>{option}</Text>
+                </View>
+                {sortBy === option && (
+                  <Icon
+                    name={IconUtils.getInfo(keys.CHECK).name.filled}
+                    type={IconUtils.getInfo(keys.CHECK).type}
+                    size={wp(4)}
+                    color={colors.lightGrey}
+                  />
+                )}
+              </TouchableOpacity>
+            ))}
+          </Menu>
+
+          <View style={styles.playerRightButtonContainer}>
+            <TouchableOpacity
+              disabled={tracks.length === 0}
+              style={dynamicStyles.playerButton}
+              onPress={onShuffleTracks}>
+              <Icon
+                name={IconUtils.getInfo(keys.SHUFFLE).name.filled}
+                type={IconUtils.getInfo(keys.SHUFFLE).type}
+                size={wp(4)}
+              />
             </TouchableOpacity>
-          ))}
-        </Menu>
-
-        <View style={styles.playerRightButtonContainer}>
-          <TouchableOpacity
-            disabled={tracks.length === 0}
-            style={dynamicStyles.playerButton}
-            onPress={onShuffleTracks}>
-            <Icon
-              name={IconUtils.getInfo(keys.SHUFFLE).name.filled}
-              type={IconUtils.getInfo(keys.SHUFFLE).type}
-              size={wp(4)}
-            />
-          </TouchableOpacity>
-          <TouchableOpacity
-            disabled={tracks.length === 0}
-            style={dynamicStyles.playerButton}
-            onPress={onPlayWholePlayList}>
-            <Icon
-              name={IconUtils.getInfo(keys.PLAY).name.filled}
-              type={IconUtils.getInfo(keys.PLAY).type}
-              size={wp(3)}
-            />
-          </TouchableOpacity>
+            <TouchableOpacity
+              disabled={tracks.length === 0}
+              style={dynamicStyles.playerButton}
+              onPress={onPlayWholePlayList}>
+              <Icon
+                name={IconUtils.getInfo(keys.PLAY).name.filled}
+                type={IconUtils.getInfo(keys.PLAY).type}
+                size={wp(3)}
+              />
+            </TouchableOpacity>
+          </View>
         </View>
-      </View>
 
-      {/*<Text>{`currentlyPlayingTrackId=${currentlyPlayingTrackId}`}</Text>*/}
-      <View>
-        {tracks.length === 0 ? (
-          <Text style={styles.noTracksText}>{labels.noTracksFound}</Text>
-        ) : (
-          <FlatList
-            contentContainerStyle={{
-              ...styles.musicList,
-              paddingBottom: hp(bottomSheetMiniPositionIndex === 0 ? 15 : 5),
-            }}
-            data={tracks}
-            keyExtractor={(_, index) => index.toString()}
-            renderItem={renderTrackItem}
-          />
-        )}
-      </View>
+        {/*<Text>{`currentlyPlayingTrackId=${currentlyPlayingTrackId}`}</Text>*/}
+        <View>
+          {tracks.length === 0 ? (
+            <Text style={styles.noTracksText}>{labels.noTracksFound}</Text>
+          ) : (
+            <FlatList
+              contentContainerStyle={{
+                ...styles.musicList,
+                paddingBottom: hp(bottomSheetMiniPositionIndex === 0 ? 15 : 5),
+              }}
+              data={tracks}
+              keyExtractor={(_, index) => index.toString()}
+              renderItem={renderTrackItem}
+            />
+          )}
+        </View>
 
-      {/*<List*/}
-      {/*  tracks={tracks}*/}
-      {/*  sortBy={sortBy}*/}
-      {/*  currentlyPlayingTrackId={currentlyPlayingTrackId}*/}
-      {/*  playerOnCollapse={playerControls.collapse}*/}
-      {/*  listStyle={{*/}
-      {/*    paddingBottom: hp(bottomSheetMiniPositionIndex === 0 ? 15 : 5),*/}
-      {/*  }}*/}
-      {/*/>*/}
+        {/*<List*/}
+        {/*  tracks={tracks}*/}
+        {/*  sortBy={sortBy}*/}
+        {/*  currentlyPlayingTrackId={currentlyPlayingTrackId}*/}
+        {/*  playerOnCollapse={playerControls.collapse}*/}
+        {/*  listStyle={{*/}
+        {/*    paddingBottom: hp(bottomSheetMiniPositionIndex === 0 ? 15 : 5),*/}
+        {/*  }}*/}
+        {/*/>*/}
+      </View>
     </ScreenContainer>
   );
 };
 
 const styles = StyleSheet.create({
+  screen: {
+    flex: 1,
+    paddingHorizontal: 0,
+    paddingVertical: 0,
+  },
   container: {
     flex: 1,
     borderTopStartRadius: 25,
@@ -598,6 +612,7 @@ const styles = StyleSheet.create({
     elevation: 4,
     marginTop: hp(0.4),
     paddingHorizontal: wp(3),
+    paddingVertical: hp(2),
   },
   iconButton: {
     alignSelf: 'flex-start',

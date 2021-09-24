@@ -6,7 +6,6 @@ import {
 } from '@react-navigation/stack';
 import { NavigationContainer } from '@react-navigation/native';
 import PlayerBottomSheet from '../../components/player-bottom-sheet';
-import Colors from 'react-native/Libraries/NewAppScreen/components/Colors';
 import colors from '../../constants/colors';
 import labels from '../../constants/labels';
 import screenNames from '../../constants/screen-names';
@@ -21,8 +20,6 @@ import ItemInfo, {
 import About from '../../screens/about';
 import NowPlaying from '../../screens/now-playing';
 import CurrentPlaylist from '../../screens/current-playlist';
-import Playlists from '../../screens/playlists';
-import EditPlaylist from '../../screens/edit-playlist';
 
 const BottomSheetStack = createStackNavigator();
 const BottomSheetNavigator = ({
@@ -37,20 +34,22 @@ const BottomSheetNavigator = ({
       headerShown: snapIndex === 2,
       safeAreaInsets: { top: 0 },
       cardStyle: {
-        backgroundColor: enabledDarkTheme ? Colors.darker : Colors.lighter,
+        backgroundColor: enabledDarkTheme ? colors.darker : colors.lighter,
         overflow: 'visible',
+        // elevation: 0,
       },
       headerStyle: {
-        backgroundColor: enabledDarkTheme ? Colors.darker : Colors.lighter,
+        backgroundColor: enabledDarkTheme ? colors.darker : colors.lighter,
         elevation: 0,
+        // borderWidth: 1, borderColor: 'white',
       },
-      headerTintColor: enabledDarkTheme ? Colors.lighter : Colors.darker,
+      headerTintColor: enabledDarkTheme ? colors.lighter : colors.darker,
       headerTitleStyle: {
         fontSize: 16,
         color: enabledDarkTheme ? colors.white : colors.black,
       },
     }),
-    [snapIndex],
+    [snapIndex, enabledDarkTheme],
   );
 
   return (
@@ -120,19 +119,6 @@ const SearchStackNavigator = () => (
     <SearchStack.Screen name={screenNames.search} component={Search} />
     <SearchStack.Screen name={screenNames.itemInfo} component={ItemInfo} />
   </SearchStack.Navigator>
-);
-
-const PlaylistStack = createStackNavigator();
-export const PlaylistStackNavigator = () => (
-  <PlaylistStack.Navigator
-    initialRouteName={screenNames.playlists}
-    screenOptions={{ headerShown: false }}>
-    <PlaylistStack.Screen name={screenNames.playlists} component={Playlists} />
-    <PlaylistStack.Screen
-      name={screenNames.editPlaylist}
-      component={EditPlaylist}
-    />
-  </PlaylistStack.Navigator>
 );
 
 const RootStack = createStackNavigator();
