@@ -56,7 +56,7 @@ const Tracks = ({ navigation }) => {
   const [currentlyPlayingTrackId, setCurrentlyPlayingTrackId] = useState(null);
 
   useEffect(() => {
-    if (musicInfo[keys.TRACKS]?.length) {
+    if (musicInfo?.[keys.TRACKS]?.length) {
       console.log(
         `[Tracks] Populating tracks for first time, tracks=${
           musicInfo[keys.TRACKS]
@@ -68,7 +68,7 @@ const Tracks = ({ navigation }) => {
         SortingOrders.ASCENDING,
       );
     }
-  }, [musicInfo[keys.TRACKS]]);
+  }, [musicInfo?.[keys.TRACKS]]);
 
   useEffect(() => {
     // console.log(
@@ -376,7 +376,7 @@ const Tracks = ({ navigation }) => {
         compare = (a, b) => getKeyValue(a) - getKeyValue(b);
       else if (type === 'number' && order === SortingOrders.DECREASING)
         compare = (a, b) => getKeyValue(b) - getKeyValue(a);
-      else throw new Error(`Invalid type: ${type} or order=${order}`);
+      else throw new Error(`Invalid type: ${type} or order: ${order}`);
 
       setTracks(list.sort(compare));
     };
@@ -397,6 +397,8 @@ const Tracks = ({ navigation }) => {
       case SortingOptions.FOLDER:
         _sort(['folder', 'path']);
         break;
+      default:
+        throw new Error(`Invalid by: ${by}`);
     }
 
     setSortBy(by);

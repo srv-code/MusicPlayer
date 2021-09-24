@@ -4,29 +4,11 @@ import {
   widthPercentageToDP as wp,
 } from 'react-native-responsive-screen';
 import screenNames from '../../constants/screen-names';
-import { BottomSheetScrollView, BottomSheetView } from '@gorhom/bottom-sheet';
-import {
-  Button,
-  Text,
-  FAB,
-  TextInput,
-  Portal,
-  Snackbar,
-} from 'react-native-paper';
-import globalStyles from '../../styles';
-import {
-  FlatList,
-  Platform,
-  ScrollView,
-  StyleSheet,
-  ToastAndroid,
-  TouchableOpacity,
-  View,
-} from 'react-native';
-import Icon from '../../components/icon';
+import { BottomSheetScrollView } from '@gorhom/bottom-sheet';
+import { Text, FAB, TextInput, Portal, Snackbar } from 'react-native-paper';
+import { StyleSheet, ToastAndroid } from 'react-native';
 import labels from '../../constants/labels';
 import { useFocusEffect, useIsFocused } from '@react-navigation/native';
-import Ionicons from 'react-native-vector-icons/Ionicons';
 import colors from '../../constants/colors';
 import TrackPlayer from 'react-native-track-player';
 import IconUtils from '../../utils/icon';
@@ -34,7 +16,7 @@ import keys from '../../constants/keys';
 import { MusicContext } from '../../context/music';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useBackHandler } from '@react-native-community/hooks';
-import DraggableFlatList from 'react-native-draggable-flatlist';
+import Playlist from '../../components/playlist';
 
 const maxPlaylistNameLength = 25;
 
@@ -47,7 +29,7 @@ const CurrentPlaylist = ({ navigation, route, extraData: { snapIndex } }) => {
   const [isFABOpened, setIsFABOpened] = useState(false);
   const [isFABVisible, setIsFABVisible] = useState(true);
   const [playlistName, setPlaylistName] = useState('');
-  const [draggingTrackIndex, setDraggingTrackIndex] = useState(null);
+  // const [draggingTrackIndex, setDraggingTrackIndex] = useState(null);
   const [fabActions, setFABActions] = useState([]);
   const [isEditingPlaylistName, setIsEditingPlaylistName] = useState(false);
   const [tracks, setTracks] = useState([]);
@@ -55,7 +37,6 @@ const CurrentPlaylist = ({ navigation, route, extraData: { snapIndex } }) => {
   const [playlistId, setPlaylistId] = useState(null);
   const playlistInput = useRef(null);
   const bottomScrollView = useRef(null);
-  const draggableFlatList = useRef(null);
 
   const isFocused = useIsFocused();
 
@@ -183,48 +164,48 @@ const CurrentPlaylist = ({ navigation, route, extraData: { snapIndex } }) => {
   console.log(`[Current-Playlist] musicInfo=${JSON.stringify(musicInfo)}`);
 
   // TODO Add a transparent background when dragging
-  const renderTrackItem = ({ item: track, index, drag, isActive }) => {
-    return (
-      <View
-        style={{
-          borderWidth: 1,
-          borderColor: 'yellow',
-          flexDirection: 'row',
-          alignItems: 'center',
-          backgroundColor: isActive ? 'red' : track.backgroundColor,
-          // alignItems: 'center',
-          justifyContent: 'space-between',
-          height: hp(10),
-          opacity: isActive ? 0.85 : 1,
-        }}>
-        <Text
-          style={{
-            marginVertical: hp(0.5),
-            width: wp(80),
-          }}>
-          {`(${index + 1}/${tracks.length}) ID=${track.id}, title=${
-            track.title
-          }, isActive=${isActive}`}
-        </Text>
-        <TouchableOpacity
-          style={{
-            backgroundColor: 'blue',
-            height: hp(10),
-            width: wp(10),
-          }}
-          // onLongPress={() => {
-          //   // setDraggingTrackIndex(index);
-          //   drag();
-          // }}
-          onPress={() => {
-            drag();
-            setDraggingTrackIndex(index);
-          }}>
-          {/*<Icon name={'play'} />*/}
-        </TouchableOpacity>
-      </View>
-    );
-  };
+  // const renderTrackItem = ({ item: track, index, drag, isActive }) => {
+  //   return (
+  //     <View
+  //       style={{
+  //         borderWidth: 1,
+  //         borderColor: 'yellow',
+  //         flexDirection: 'row',
+  //         alignItems: 'center',
+  //         backgroundColor: isActive ? 'red' : track.backgroundColor,
+  //         // alignItems: 'center',
+  //         justifyContent: 'space-between',
+  //         height: hp(10),
+  //         opacity: isActive ? 0.85 : 1,
+  //       }}>
+  //       <Text
+  //         style={{
+  //           marginVertical: hp(0.5),
+  //           width: wp(80),
+  //         }}>
+  //         {`(${index + 1}/${tracks.length}) ID=${track.id}, title=${
+  //           track.title
+  //         }, isActive=${isActive}`}
+  //       </Text>
+  //       <TouchableOpacity
+  //         style={{
+  //           backgroundColor: 'blue',
+  //           height: hp(10),
+  //           width: wp(10),
+  //         }}
+  //         // onLongPress={() => {
+  //         //   // setDraggingTrackIndex(index);
+  //         //   drag();
+  //         // }}
+  //         onPress={() => {
+  //           drag();
+  //           setDraggingTrackIndex(index);
+  //         }}>
+  //         {/*<Icon name={'play'} />*/}
+  //       </TouchableOpacity>
+  //     </View>
+  //   );
+  // };
 
   return (
     <BottomSheetScrollView
@@ -278,59 +259,59 @@ const CurrentPlaylist = ({ navigation, route, extraData: { snapIndex } }) => {
         </Text>
       )}
 
-      <View
-        style={{
-          // flex: 0.5,
-          borderWidth: 1,
-        }}>
-        {/*<Text>{`Track Count: ${tracks.length}`}</Text>*/}
-        {/*{tracks.map((track, index) => (*/}
-        {/*  <Text*/}
-        {/*    key={index}*/}
-        {/*    style={{*/}
-        {/*      color:*/}
-        {/*        musicInfo.currentlyPlaying.track.id === track.id*/}
-        {/*          ? 'white'*/}
-        {/*          : 'black',*/}
-        {/*      backgroundColor:*/}
-        {/*        musicInfo.currentlyPlaying.track.id === track.id*/}
-        {/*          ? 'blue'*/}
-        {/*          : 'lightgrey',*/}
-        {/*      marginVertical: hp(0.5),*/}
+      {/*<View*/}
+      {/*  style={{*/}
+      {/*    // flex: 0.5,*/}
+      {/*    borderWidth: 1,*/}
+      {/*  }}>*/}
+      {/*  /!*<Text>{`Track Count: ${tracks.length}`}</Text>*!/*/}
+      {/*  /!*{tracks.map((track, index) => (*!/*/}
+      {/*  /!*  <Text*!/*/}
+      {/*  /!*    key={index}*!/*/}
+      {/*  /!*    style={{*!/*/}
+      {/*  /!*      color:*!/*/}
+      {/*  /!*        musicInfo.currentlyPlaying.track.id === track.id*!/*/}
+      {/*  /!*          ? 'white'*!/*/}
+      {/*  /!*          : 'black',*!/*/}
+      {/*  /!*      backgroundColor:*!/*/}
+      {/*  /!*        musicInfo.currentlyPlaying.track.id === track.id*!/*/}
+      {/*  /!*          ? 'blue'*!/*/}
+      {/*  /!*          : 'lightgrey',*!/*/}
+      {/*  /!*      marginVertical: hp(0.5),*!/*/}
 
-        {/*    }}>*/}
-        {/*    {`[${index}] ${*/}
-        {/*      musicInfo.currentlyPlaying.track.id === track.id ? '->' : ''*/}
-        {/*    } ${JSON.stringify(track.title)}`}*/}
-        {/*  </Text>*/}
-        {/*))}*/}
+      {/*  /!*    }}>*!/*/}
+      {/*  /!*    {`[${index}] ${*!/*/}
+      {/*  /!*      musicInfo.currentlyPlaying.track.id === track.id ? '->' : ''*!/*/}
+      {/*  /!*    } ${JSON.stringify(track.title)}`}*!/*/}
+      {/*  /!*  </Text>*!/*/}
+      {/*  /!*))}*!/*/}
 
-        <DraggableFlatList
-          // onRef={ref => (draggableFlatList.current = ref)}
-          // simultaneousHandlers={[bottomScrollView, draggableFlatList]}
-          simultaneousHandlers={bottomScrollView}
-          data={tracks}
-          // dragItemOverflow={false}
-          keyExtractor={(_, index) => index.toString()}
-          renderItem={renderTrackItem}
-          renderPlaceholder={({ item, index }) => (
-            <View style={{ backgroundColor: 'yellow' }}>
-              <Text>{`${index} ${JSON.stringify(item)}`}</Text>
-            </View>
-          )}
-          // onDragBegin={setDraggingTrackIndex}
-          onDragEnd={({ data, from, to }) => {
-            console.log(`[Current-Playlist] drag end, from=${from}, to=${to}`);
-            setTracks(data);
-            setDraggingTrackIndex(null);
-          }}
-          // dragHitSlop={-200}
-          dragHitSlop={
-            // 1 ? { right: -(width * 0.95 - 20) } : { right: -width }
-            draggingTrackIndex === null ? -200 : 0
-          }
-        />
-      </View>
+      {/*  <DraggableFlatList*/}
+      {/*    // onRef={ref => (draggableFlatList.current = ref)}*/}
+      {/*    // simultaneousHandlers={[bottomScrollView, draggableFlatList]}*/}
+      {/*    simultaneousHandlers={bottomScrollView}*/}
+      {/*    data={tracks}*/}
+      {/*    // dragItemOverflow={false}*/}
+      {/*    keyExtractor={(_, index) => index.toString()}*/}
+      {/*    renderItem={renderTrackItem}*/}
+      {/*    renderPlaceholder={({ item, index }) => (*/}
+      {/*      <View style={{ backgroundColor: 'yellow' }}>*/}
+      {/*        <Text>{`${index} ${JSON.stringify(item)}`}</Text>*/}
+      {/*      </View>*/}
+      {/*    )}*/}
+      {/*    // onDragBegin={setDraggingTrackIndex}*/}
+      {/*    onDragEnd={({ data, from, to }) => {*/}
+      {/*      console.log(`[Current-Playlist] drag end, from=${from}, to=${to}`);*/}
+      {/*      setTracks(data);*/}
+      {/*      setDraggingTrackIndex(null);*/}
+      {/*    }}*/}
+      {/*    // dragHitSlop={-200}*/}
+      {/*    dragHitSlop={*/}
+      {/*      // 1 ? { right: -(width * 0.95 - 20) } : { right: -width }*/}
+      {/*      draggingTrackIndex === null ? -200 : 0*/}
+      {/*    }*/}
+      {/*  />*/}
+      {/*</View>*/}
 
       {/*<View>*/}
       {/*  {tracks.length === 0 ? (*/}
@@ -344,6 +325,12 @@ const CurrentPlaylist = ({ navigation, route, extraData: { snapIndex } }) => {
       {/*    />*/}
       {/*  )}*/}
       {/*</View>*/}
+
+      <Playlist
+        tracks={tracks}
+        setTracks={setTracks}
+        simultaneousHandlers={bottomScrollView}
+      />
 
       <Portal>
         <FAB.Group

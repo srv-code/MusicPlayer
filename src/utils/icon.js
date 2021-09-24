@@ -362,7 +362,7 @@ export default class IconUtils {
         };
 
       default:
-        throw new Error(`Invalid type: ${JSON.stringify(type)}`);
+        throw new Error(`Invalid type: ${type}`);
     }
   };
 }

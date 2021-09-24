@@ -79,12 +79,13 @@ const PlaylistControls = ({
               }
               type={IconUtils.getInfo(keys.SORT_ASCENDING_ALT).type}
               size={wp(4)}
+              color={disabled ? colors.lightGrey1 : colors.lightGrey}
             />
             <Icon
               name={IconUtils.getInfo(sortBy).name.outlined}
               type={IconUtils.getInfo(sortBy).type}
               size={wp(4.5)}
-              color={colors.lightGrey}
+              color={disabled ? colors.lightGrey1 : colors.lightGrey}
             />
           </TouchableOpacity>
         }>

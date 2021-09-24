@@ -5,7 +5,6 @@ import {
 } from 'react-native-responsive-screen';
 import { Image, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { Text, Menu, IconButton } from 'react-native-paper';
-import Modal from 'react-native-modal';
 import { MusicContext } from '../../context/music';
 import keys from '../../constants/keys';
 import Icon from '../icon';
@@ -52,7 +51,6 @@ const PlaylistCover = ({
   const [info, setInfo] = useState({});
   const [coverContents, setCoverContents] = useState([]);
   const [showMenu, setShowMenu] = useState(false);
-  const [showEditingModal, setShowEditingModal] = useState(false);
 
   useEffect(() => {
     if (id && musicInfo?.[keys.TRACKS]?.length) {
@@ -167,7 +165,7 @@ const PlaylistCover = ({
     const divContents = [];
     if (coverContents.length === 1) {
       columnItemCount = 1;
-      size = hp(22);
+      size = hp(24);
       textFontSize = wp(32);
     } else {
       const rows = coverContents.length / COVER_ROW_CELL_COUNT;
@@ -175,7 +173,7 @@ const PlaylistCover = ({
       switch (rows) {
         case 1:
           columnItemCount = 2;
-          size = hp(11);
+          size = hp(12);
           textFontSize = wp(7);
           break;
         case 2:
@@ -305,7 +303,7 @@ const PlaylistCover = ({
   if (!id) return null;
   return (
     <TouchableOpacity
-      onPress={onEdit.bind(this, id)}
+      onPress={onEdit.bind(this, info)}
       style={{
         ...styles.container,
         backgroundColor: enabledDarkTheme ? colors.darker : colors.lighter,
@@ -391,7 +389,7 @@ const PlaylistCover = ({
             icon={IconUtils.getInfo(keys.PLAYLIST_EDIT).name.default}
             title={labels.edit}
             onPress={() => {
-              onEdit(id);
+              onEdit(info);
               setShowMenu(false);
             }}
           />

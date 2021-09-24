@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import {
   heightPercentageToDP as hp,
@@ -23,11 +23,19 @@ const Playlists = ({ navigation }) => {
   const { enabledDarkTheme } = useContext(PreferencesContext);
   const { musicInfo, setMusicInfo } = useContext(MusicContext);
 
-  const [showEditingModalForId, setShowEditingModalForId] = useState(null);
+  const [playlists, setPlaylists] = useState([]);
+  const [editingPlaylistInfo, setEditingPlaylistInfo] = useState(null);
   const [sortBy, setSortBy] = useState(SortingOptions.TITLE);
   const [sortOrder, setSortOrder] = useState(SortingOrders.ASCENDING);
 
-  const onEditPlaylist = id => setShowEditingModalForId(id);
+  useEffect(() => {
+    if (musicInfo?.[keys.PLAYLISTS]?.length)
+      sortAllPlaylists(
+        [...musicInfo?.[keys.PLAYLISTS]],
+        SortingOptions.TITLE,
+        SortingOrders.ASCENDING,
+      );
+  }, [musicInfo?.[keys.PLAYLISTS]]);
 
   const onPlayPlaylist = (id, playNext) => {};
 
@@ -39,7 +47,53 @@ const Playlists = ({ navigation }) => {
 
   const onDeletePlaylist = id => {};
 
-  const sortAllPlaylists = (by, order) => {
+  const sortAllPlaylists = (list, by, order) => {
+    const _sort = (getValue, type = 'string') => {
+      let compare;
+      if (type === 'string') {
+        if (order === SortingOrders.ASCENDING)
+          compare = (a, b) =>
+            getValue(a) < getValue(b) ? -1 : getValue(a) > getValue(b) ? 1 : 0;
+        else
+          compare = (a, b) =>
+            getValue(b) < getValue(a) ? -1 : getValue(b) > getValue(a) ? 1 : 0;
+      } else if (type === 'number') {
+        if (order === SortingOrders.ASCENDING)
+          compare = (a, b) => getValue(a) - getValue(b);
+        else compare = (a, b) => getValue(b) - getValue(a);
+      } else throw new Error(`Invalid type: ${type} or order: ${order}`);
+
+      setPlaylists(list.sort(compare));
+    };
+
+    switch (by) {
+      case SortingOptions.TITLE:
+        _sort(x => x.name);
+        break;
+      case SortingOptions.TRACKS:
+        _sort(x => x.track_ids.length, 'number');
+        break;
+      case SortingOptions.DURATION:
+        _sort(x => {
+          let totalDuration = 0;
+          x.track_ids.forEach(
+            id =>
+              (totalDuration +=
+                musicInfo[keys.TRACKS].find(tr => tr.id === id)?.duration ?? 0),
+          );
+          return totalDuration;
+        }, 'number');
+        break;
+      case SortingOptions.CREATED_ON:
+        _sort(x => x.created, 'number');
+        break;
+      case SortingOptions.UPDATED_ON:
+        _sort(x => x.last_updated, 'number');
+        break;
+      default:
+        throw new Error(`Invalid by: ${by}`);
+    }
+
     setSortBy(by);
     setSortOrder(order);
   };
@@ -55,6 +109,23 @@ const Playlists = ({ navigation }) => {
       ...styles.container,
       backgroundColor: enabledDarkTheme ? colors.darkest : colors.light,
     },
+  };
+
+  const closeEditModal = () => {
+    setEditingPlaylistInfo(null);
+  };
+
+  // console.log(
+  //   `[Playlists] editingPlaylistInfo=${JSON.stringify(editingPlaylistInfo)}`,
+  // );
+
+  const updatePlaylistInfo = info => {
+    const tracks = [];
+    musicInfo?.[keys.TRACKS]?.forEach(tr => {
+      if (info.track_ids.includes(tr.id)) tracks.push(tr);
+    });
+    info.tracks = tracks;
+    setEditingPlaylistInfo(info);
   };
 
   return (
@@ -79,9 +150,13 @@ const Playlists = ({ navigation }) => {
               SortingOptions.UPDATED_ON,
             ]}
             sortOrder={sortOrder}
-            onChangeSortOrder={order => sortAllPlaylists(sortBy, order)}
+            onChangeSortOrder={order =>
+              sortAllPlaylists([...playlists], sortBy, order)
+            }
             sortBy={sortBy}
-            onChangeSortBy={by => sortAllPlaylists(by, sortOrder)}
+            onChangeSortBy={by =>
+              sortAllPlaylists([...playlists], by, sortOrder)
+            }
             onShuffle={onShufflePlaylist}
             onPlay={onPlayAllPlaylists}
           />
@@ -94,11 +169,11 @@ const Playlists = ({ navigation }) => {
               alignItems: 'center',
               // alignContents: 'center',
             }}>
-            {musicInfo?.[keys.PLAYLISTS].map((info, playlistIndex) => (
+            {playlists.map((info, index) => (
               <PlaylistCover
-                key={playlistIndex}
+                key={index}
                 id={info.id}
-                onEdit={onEditPlaylist}
+                onEdit={updatePlaylistInfo}
                 onPlay={onPlayPlaylist}
                 onShuffle={onShufflePlaylist}
                 onAddToQueue={onAddPlaylistToQueue}
@@ -131,13 +206,13 @@ const Playlists = ({ navigation }) => {
 
       <Modal
         testID={'modal'}
-        isVisible={Boolean(showEditingModalForId)}
-        onSwipeComplete={setShowEditingModalForId.bind(this, null)}
+        isVisible={Boolean(editingPlaylistInfo)}
+        onSwipeComplete={closeEditModal}
         swipeDirection={['down']}
         // scrollTo={this.handleScrollTo}
         // scrollOffset={this.state.scrollOffset}
-        onBackdropPress={setShowEditingModalForId.bind(this, null)}
-        onBackButtonPress={setShowEditingModalForId.bind(this, null)}
+        onBackdropPress={closeEditModal}
+        onBackButtonPress={closeEditModal}
         backdropOpacity={0.5}
         scrollOffsetMax={hp(80)} // content height - ScrollView height
         propagateSwipe={true}
@@ -167,7 +242,10 @@ const Playlists = ({ navigation }) => {
             }}
           />
 
-          <Playlist id={showEditingModalForId} style={{}} />
+          <Playlist
+            tracks={editingPlaylistInfo?.tracks || []}
+            setTracks={() => {}}
+          />
         </View>
       </Modal>
     </>
