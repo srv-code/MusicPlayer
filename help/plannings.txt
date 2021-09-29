@@ -1,0 +1,41 @@
+[Remaining]
+    - Globals:
+        - Implement the syncing feature (in tabbed-view menu options)
+        - On screen rotation, the UI should look proper
+        - On multiple device screen dimensions, the UI should look proper
+        - On dark mode, all screens should look proper
+        - UI & functionality fixings for iOS
+        - Upload to PlayStore and AppStore
+    - Player functionalities:
+        - Bug fixings in remote access control
+        - Bug fixings on on-screen player functionalities
+        - Lockscreen player control updates (similar to Samsung Music controls - full-fledged)
+    - In the Settings screen:
+        - Complete the control panel functionalities
+        - Complete the UI
+    - In the playlist modal:
+        - Handle the swipe gestures - to reveal delete functionality and move UI
+        - Implement:
+            - Update UI
+            - Rearranging tracks
+            - Multiple track functionalities
+            - Playlist functionalities
+            - Playlist synchronization
+    - In the Playlists screen:
+        - Implement:
+            - Individual playlist context options
+            - Player button functionalities (in header strip)
+    - In the Search screen:
+        - Implement:
+            - Search for playlists
+            - Context options for all types of items
+    - In the Artists, Albums screen:
+        - Complete the UI
+        - Implement the modal functionalities
+        - Implement the playlist functionalities
+    - In the Folders screen:
+        - Complete the UI
+        - Complete the mechanism to load tracks from individual folders (syncing feature)
+    - In the Tracks screen:
+        - Implement:
+            - Playlist context option functionalities

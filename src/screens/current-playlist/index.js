@@ -329,7 +329,7 @@ const CurrentPlaylist = ({ navigation, route, extraData: { snapIndex } }) => {
       <Playlist
         tracks={tracks}
         setTracks={setTracks}
-        simultaneousHandlers={bottomScrollView}
+        // simultaneousHandlers={bottomScrollView}
       />
 
       <Portal>
