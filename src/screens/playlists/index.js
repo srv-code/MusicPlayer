@@ -244,7 +244,9 @@ const Playlists = ({ navigation }) => {
 
           <Playlist
             tracks={editingPlaylistInfo?.tracks || []}
-            setTracks={() => {}}
+            setTracks={tracks => {
+              setEditingPlaylistInfo(prev => ({ ...prev, tracks }));
+            }}
           />
         </View>
       </Modal>

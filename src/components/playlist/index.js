@@ -6,7 +6,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import { Text } from 'react-native-paper';
+import { Snackbar, Text } from 'react-native-paper';
 import {
   heightPercentageToDP as hp,
   widthPercentageToDP as wp,
@@ -40,6 +40,7 @@ const rearrangeActions = {
 //  - Long press to select many tracks to re-order or delete them
 const Playlist = ({ style, tracks, setTracks }) => {
   /////////////////////////////// Test render ///////////////////////////////////////
+  const [lastTrackRemoved, setLastTrackRemoved] = useState(null);
   const [rowTranslateAnimatedValues, setRowTranslateAnimatedValues] = useState(
     [],
   );
@@ -105,11 +106,10 @@ const Playlist = ({ style, tracks, setTracks }) => {
         duration: 200,
         useNativeDriver: false,
       }).start(() => {
+        const removeIndex = tracks.findIndex(track => track.key === key);
+        setLastTrackRemoved({ index: removeIndex, item: tracks[removeIndex] });
         const newList = [...tracks];
-        newList.splice(
-          tracks.findIndex(track => track.key === key),
-          1,
-        );
+        newList.splice(removeIndex, 1);
         setTracks(newList);
         this.animationIsRunning = false;
         setCurrentActions(null);
@@ -332,6 +332,22 @@ const Playlist = ({ style, tracks, setTracks }) => {
         onSwipeValueChange={onSwipeValueChange}
         useNativeDriver={false}
       />
+
+      <Snackbar
+        visible={Boolean(lastTrackRemoved)}
+        duration={2000}
+        onDismiss={setLastTrackRemoved.bind(this, null)}
+        action={{
+          label: 'Undo',
+          onPress: () => {
+            const _tracks = [...tracks];
+            _tracks.splice(lastTrackRemoved.index, 0, lastTrackRemoved.item);
+            setTracks(_tracks);
+            setLastTrackRemoved(null);
+          },
+        }}>
+        Track Removed
+      </Snackbar>
     </View>
   );
 };
