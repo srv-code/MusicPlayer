@@ -44,26 +44,29 @@ const Playlist = ({ style, tracks, setTracks }) => {
     [],
   );
   const [currentActions, setCurrentActions] = useState(null);
-  const [listData, setListData] = useState(
-    Array(20)
-      .fill()
-      .map((_, i) => ({ key: `${i}`, text: `item #${i}` })),
-  );
+  // const [listData, setListData] = useState(
+  //   Array(20)
+  //     .fill()
+  //     .map((_, i) => ({ key: `${i}`, text: `item #${i}` })),
+  // );
 
   useEffect(() => {
-    const animVals = {};
-    Array(20)
-      .fill('')
-      .forEach((_, i) => {
-        animVals[`${i}`] = new Animated.Value(1);
+    if (Object.keys(rowTranslateAnimatedValues).length !== tracks.length) {
+      const animValues = {};
+      tracks.forEach(track => {
+        animValues[`${track.id}`] = new Animated.Value(1);
+        track.key = track.id;
       });
-    console.log(`filled animVals, keys=${Object.keys(animVals)?.length}`);
-    setRowTranslateAnimatedValues(animVals);
-  }, []); // add dep: tracks
+      // console.log(`filling animVals, keys=${Object.keys(animValues)?.length}`);
+      setRowTranslateAnimatedValues(animValues);
+    }
+  }, [tracks]); // add dep: tracks
 
   // console.log(`this.animationIsRunning=${this.animationIsRunning}`);
 
   // console.log(`[re-rendered] currentAction=${currentAction}`);
+
+  // console.log(`track keys=${tracks?.[0]?.key}`);
 
   const rearrange = (id, action) => {
     console.log(`[rearrange] id=${JSON.stringify(id)}, action=${action}`);
@@ -72,13 +75,13 @@ const Playlist = ({ style, tracks, setTracks }) => {
   const onSwipeValueChange = swipeData => {
     const { key, value } = swipeData;
 
-    console.log(
-      `onSwipeValueChange: key=${JSON.stringify(key)}, value=${JSON.stringify(
-        value,
-      )}, rowTranslateAnimatedValues=${JSON.stringify(
-        rowTranslateAnimatedValues,
-      )}`,
-    );
+    // console.log(
+    //   `onSwipeValueChange: swipeData=${JSON.stringify(
+    //     swipeData,
+    //   )}, rowTranslateAnimatedValues=${JSON.stringify(
+    //     rowTranslateAnimatedValues,
+    //   )}`,
+    // );
 
     // console.log(`this.animationIsRunning=${this.animationIsRunning}`);
 
@@ -102,10 +105,12 @@ const Playlist = ({ style, tracks, setTracks }) => {
         duration: 200,
         useNativeDriver: false,
       }).start(() => {
-        const newData = [...listData];
-        const prevIndex = listData.findIndex(item => item.key === key);
-        newData.splice(prevIndex, 1);
-        setListData(newData);
+        const newList = [...tracks];
+        newList.splice(
+          tracks.findIndex(track => track.key === key),
+          1,
+        );
+        setTracks(newList);
         this.animationIsRunning = false;
         setCurrentActions(null);
       });
@@ -131,9 +136,7 @@ const Playlist = ({ style, tracks, setTracks }) => {
         underlayColor={'#AAA'}>
         <View>
           {/*<Text>I am {data.item.text} in a SwipeListView</Text>*/}
-          <Text>
-            key={data.item.key}, index={data.index}
-          </Text>
+          <Text>{`[idx=${data.index}, key=${data.item.key}] ${data.item.title}`}</Text>
         </View>
       </TouchableHighlight>
     </Animated.View>
@@ -146,6 +149,14 @@ const Playlist = ({ style, tracks, setTracks }) => {
       showMove = currentActions[rowData.item.key] === 'moving';
       showRemove = currentActions[rowData.item.key] === 'removing';
     }
+
+    // console.log(
+    //   `renderHiddenItem: rowData.item.key=${JSON.stringify(
+    //     rowData.item.key,
+    //   )}, currentActions=${JSON.stringify(
+    //     currentActions,
+    //   )}, showMove=${showMove}, showRemove=${showRemove}`,
+    // );
 
     // let showMove, showRemove;
     //
@@ -198,7 +209,7 @@ const Playlist = ({ style, tracks, setTracks }) => {
                   <Icon name="angle-up" type="FontAwesome5" size={wp(5)} />
                 </TouchableOpacity>
                 <TouchableOpacity
-                  disabled={rowData.index === listData.length - 1}
+                  disabled={rowData.index === tracks.length - 1}
                   onPress={rearrange.bind(
                     this,
                     rowData,
@@ -234,7 +245,7 @@ const Playlist = ({ style, tracks, setTracks }) => {
                   />
                 </TouchableOpacity>
                 <TouchableOpacity
-                  disabled={rowData.index === listData.length - 1}
+                  disabled={rowData.index === tracks.length - 1}
                   onPress={rearrange.bind(
                     this,
                     rowData,
@@ -258,7 +269,7 @@ const Playlist = ({ style, tracks, setTracks }) => {
                   marginLeft: wp(2),
                   alignSelf: 'center',
                 }}>
-                Move (K{rowData.item.key})
+                Move{rowData.item.key}
               </Text>
             </View>
           </View>
@@ -307,14 +318,15 @@ const Playlist = ({ style, tracks, setTracks }) => {
         //   backgroundColor: 'red',
         //   borderRadius: 10
         // }}
-        data={listData}
+        data={tracks}
         renderItem={renderItem}
         renderHiddenItem={renderHiddenItem}
         leftOpenValue={wp(30)}
         stopLeftSwipe={wp(30)}
         rightOpenValue={-width} // uncomment this
         // rightOpenValue={-150} // remove this
-        previewRowKey={'0'}
+        // previewRowKey={'0'}
+        previewRowIndex={0}
         previewOpenValue={-wp(10)}
         previewOpenDelay={500}
         onSwipeValueChange={onSwipeValueChange}
