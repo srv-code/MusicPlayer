@@ -14,7 +14,7 @@ import {
 import { width } from '../../constants/dimensions';
 import DraggableFlatList from 'react-native-draggable-flatlist';
 import { SwipeListView, SwipeRow } from 'react-native-swipe-list-view';
-import { RectButton, Swipeable } from 'react-native-gesture-handler';
+import Icon from '../icon';
 
 ///////// Test ////////
 const rowTranslateAnimatedValues = {};
@@ -24,6 +24,13 @@ Array(20)
     rowTranslateAnimatedValues[`${i}`] = new Animated.Value(1);
   });
 ///////// Test ////////
+
+const rearrangeActions = {
+  MOVE_UP: 'MOVE_UP',
+  MOVE_TO_FIRST: 'MOVE_TO_FIRST',
+  MOVE_DOWN: 'MOVE_DOWN',
+  MOVE_TO_LAST: 'MOVE_TO_LAST',
+};
 
 // TODO Complete:
 //  - Swiping gestures: left for reordering, right for deletion
@@ -374,16 +381,39 @@ const Playlist = ({ style, tracks, setTracks }) => {
       .map((_, i) => ({ key: `${i}`, text: `item #${i}` })),
   );
 
+  const [currentActions, setCurrentActions] = useState(null);
+
   // console.log(`this.animationIsRunning=${this.animationIsRunning}`);
+
+  // console.log(`[re-rendered] currentAction=${currentAction}`);
+
+  const rearrange = (id, action) => {
+    console.log(`[rearrange] id=${JSON.stringify(id)}, action=${action}`);
+  };
 
   const onSwipeValueChange = swipeData => {
     const { key, value } = swipeData;
 
-    console.log(
-      `onSwipeValueChange: key=${JSON.stringify(key)}, value=${JSON.stringify(
-        value,
-      )}`,
-    );
+    // console.log(
+    //   `onSwipeValueChange: key=${JSON.stringify(key)}, value=${JSON.stringify(
+    //     value,
+    //   )}`,
+    // );
+
+    // console.log(`this.animationIsRunning=${this.animationIsRunning}`);
+
+    if (
+      value < 0 &&
+      (!currentActions?.hasOwnProperty(key) ||
+        currentActions[key] !== 'removing')
+    )
+      setCurrentActions(prev => ({ ...prev, [key]: 'removing' }));
+    else if (value === 0 && currentActions) setCurrentActions(null);
+    else if (
+      value > 0 &&
+      (!currentActions?.hasOwnProperty(key) || currentActions[key] !== 'moving')
+    )
+      setCurrentActions(prev => ({ ...prev, [key]: 'moving' }));
 
     if (value < -width && !this.animationIsRunning) {
       this.animationIsRunning = true;
@@ -397,6 +427,7 @@ const Playlist = ({ style, tracks, setTracks }) => {
         newData.splice(prevIndex, 1);
         setListData(newData);
         this.animationIsRunning = false;
+        setCurrentActions(null);
       });
     }
   };
@@ -410,6 +441,8 @@ const Playlist = ({ style, tracks, setTracks }) => {
             inputRange: [0, 1],
             outputRange: [0, 50],
           }),
+
+          // opacity: 0.3,
         },
       ]}>
       <TouchableHighlight
@@ -417,23 +450,176 @@ const Playlist = ({ style, tracks, setTracks }) => {
         style={styles.rowFront}
         underlayColor={'#AAA'}>
         <View>
-          <Text>I am {data.item.text} in a SwipeListView</Text>
+          {/*<Text>I am {data.item.text} in a SwipeListView</Text>*/}
+          <Text>
+            key={data.item.key}, index={data.index}
+          </Text>
         </View>
       </TouchableHighlight>
     </Animated.View>
   );
 
-  const renderHiddenItem = () => (
-    <View style={styles.rowBack}>
-      <View style={[styles.backRightBtn, styles.backRightBtnRight]}>
-        <Text style={styles.backTextWhite}>Move</Text>
-        <Text style={styles.backTextWhite}>Delete</Text>
+  const renderHiddenItem = rowData => {
+    let showMove = true,
+      showRemove = true;
+    if (currentActions?.hasOwnProperty(rowData.item.key)) {
+      showMove = currentActions[rowData.item.key] === 'moving';
+      showRemove = currentActions[rowData.item.key] === 'removing';
+    }
+
+    // let showMove, showRemove;
+    //
+    // if (
+    //   !currentAction ||
+    //   currentAction.key !== rowData.item.key ||
+    //   currentAction.event === 'moving'
+    // )
+    //   showMove = true;
+    // if (
+    //   !currentAction ||
+    //   currentAction.key !== rowData.item.key ||
+    //   currentAction.event === 'removing'
+    // )
+    //   showRemove = true;
+
+    return (
+      <View
+        style={{
+          ...styles.rowBack,
+          opacity: 1,
+          backgroundColor: showMove ? 'blue' : showRemove ? 'red' : 'grey',
+        }}>
+        {showMove && (
+          <View style={[styles.backRightBtn, styles.backRightBtnRight]}>
+            <View
+              style={{
+                flex: 1,
+                flexDirection: 'row',
+                // alignItems: 'center',
+                // justifyContent: 'space-between',
+                backgroundColor: 'blue',
+                height: '100%',
+                width: '100%',
+              }}>
+              <View
+                style={{
+                  // backgroundColor: 'black',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  marginRight: wp(2),
+                }}>
+                <TouchableOpacity
+                  disabled={!rowData.index}
+                  onPress={rearrange.bind(
+                    this,
+                    rowData,
+                    rearrangeActions.MOVE_UP,
+                  )}>
+                  <Icon name="angle-up" type="FontAwesome5" size={wp(5)} />
+                </TouchableOpacity>
+                <TouchableOpacity
+                  disabled={rowData.index === listData.length - 1}
+                  onPress={rearrange.bind(
+                    this,
+                    rowData,
+                    rearrangeActions.MOVE_DOWN,
+                  )}>
+                  <Icon name="angle-down" type="FontAwesome5" size={wp(5)} />
+                </TouchableOpacity>
+              </View>
+
+              <View
+                style={{
+                  // backgroundColor: 'black',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  marginRight: wp(2),
+                }}>
+                <TouchableOpacity
+                  disabled={!rowData.index}
+                  onPress={rearrange.bind(
+                    this,
+                    rowData,
+                    rearrangeActions.MOVE_TO_FIRST,
+                  )}>
+                  {/*<Icon name="angle-double-up" type="FontAwesome5" />*/}
+                  <Icon
+                    name="first-page"
+                    type="MaterialIcons"
+                    size={wp(6)}
+                    style={{
+                      // fontWeight: 'bold',
+                      transform: [{ rotate: '90deg' }],
+                    }}
+                  />
+                </TouchableOpacity>
+                <TouchableOpacity
+                  disabled={rowData.index === listData.length - 1}
+                  onPress={rearrange.bind(
+                    this,
+                    rowData,
+                    rearrangeActions.MOVE_TO_LAST,
+                  )}>
+                  {/*<Icon name="angle-double-down" type="FontAwesome5" />*/}
+                  <Icon
+                    name="last-page"
+                    type="MaterialIcons"
+                    size={wp(6)}
+                    style={{
+                      // fontWeight: 'bold',
+                      transform: [{ rotate: '90deg' }],
+                    }}
+                  />
+                </TouchableOpacity>
+              </View>
+
+              <Text
+                style={{
+                  marginLeft: wp(2),
+                  alignSelf: 'center',
+                }}>
+                Move (K{rowData.item.key})
+              </Text>
+            </View>
+          </View>
+        )}
+
+        {showRemove && (
+          <View
+            style={{
+              flex: 1,
+              flexDirection: 'row',
+              alignItems: 'center',
+              backgroundColor: 'red',
+              justifyContent: 'flex-end',
+              height: '100%',
+              width: '100%',
+              paddingRight: wp(2),
+            }}>
+            <Text>Remove</Text>
+            <Icon
+              name="ios-remove-circle"
+              type="Ionicons"
+              size={wp(5)}
+              style={{ marginLeft: wp(1) }}
+            />
+          </View>
+        )}
       </View>
-    </View>
-  );
+    );
+  };
 
   return (
-    <View style={styles.container}>
+    <View
+      style={{
+        ...styles.container,
+
+        // backgroundColor:
+        //   currentAction === 'removing'
+        //     ? 'red'
+        //     : currentAction === 'moving' && 'blue',
+      }}>
+      <Text>currentAction: {JSON.stringify(currentActions)}</Text>
       <SwipeListView
         // disableRightSwipe
         // leftActivationValue={{}}
@@ -445,11 +631,12 @@ const Playlist = ({ style, tracks, setTracks }) => {
         renderItem={renderItem}
         renderHiddenItem={renderHiddenItem}
         leftOpenValue={wp(30)}
+        stopLeftSwipe={wp(30)}
         rightOpenValue={-width} // uncomment this
         // rightOpenValue={-150} // remove this
         previewRowKey={'0'}
-        previewOpenValue={-40}
-        previewOpenDelay={1000}
+        previewOpenValue={-wp(10)}
+        previewOpenDelay={500}
         onSwipeValueChange={onSwipeValueChange}
         useNativeDriver={false}
       />
@@ -472,14 +659,14 @@ const styles = StyleSheet.create({
   },
   rowFrontContainer: {
     // backgroundColor: 'green'
+    width: wp(80),
   },
   container: {
-    backgroundColor: 'red',
     flex: 1,
     borderWidth: 1,
-  },
-  backTextWhite: {
-    color: '#FFF',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    // backgroundColor: 'grey',
   },
   rowFront: {
     alignItems: 'center',
@@ -494,7 +681,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    backgroundColor: 'red',
+    // backgroundColor: 'green',
     paddingLeft: wp(4),
   },
   backRightBtn: {
