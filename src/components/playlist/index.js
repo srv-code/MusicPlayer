@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   Animated,
   StyleSheet,
@@ -46,6 +46,7 @@ const Playlist = ({ style, tracks, setTracks }) => {
     [],
   );
   const [currentActions, setCurrentActions] = useState(null);
+  const list = useRef(null);
   // const [listData, setListData] = useState(
   //   Array(20)
   //     .fill()
@@ -107,6 +108,11 @@ const Playlist = ({ style, tracks, setTracks }) => {
     _tracks[fromIndex] = _tracks[toIndex];
     _tracks[toIndex] = tmp;
     setTracks(_tracks);
+
+    if (action === rearrangeActions.MOVE_TO_LAST)
+      list.current._listRef._scrollRef.scrollToEnd();
+    else if (action === rearrangeActions.MOVE_TO_FIRST)
+      list.current._listRef._scrollRef.scrollTo({ x: 0, animated: true });
   };
 
   const onSwipeValueChange = swipeData => {
@@ -340,6 +346,13 @@ const Playlist = ({ style, tracks, setTracks }) => {
     );
   };
 
+  // console.log(
+  //   `list=${
+  //     list.current &&
+  //     JSON.stringify(Object.keys(list.current._listRef._scrollRef))
+  //   }`,
+  // );
+
   return (
     <View
       style={{
@@ -352,6 +365,7 @@ const Playlist = ({ style, tracks, setTracks }) => {
       }}>
       {/*<Text>currentAction: {JSON.stringify(currentActions)}</Text>*/}
       <SwipeListView
+        listViewRef={list}
         // disableRightSwipe
         // leftActivationValue={{}}
         // swipeRowStyle={{
@@ -370,7 +384,10 @@ const Playlist = ({ style, tracks, setTracks }) => {
         previewOpenValue={-wp(10)}
         previewOpenDelay={500}
         onSwipeValueChange={onSwipeValueChange}
+        closeOnRowBeginSwipe={true}
+        closeOnScroll={false}
         useNativeDriver={false}
+        useAnimatedList={true}
       />
 
       <Snackbar
