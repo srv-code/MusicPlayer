@@ -15,6 +15,7 @@ import { width } from '../../constants/dimensions';
 import DraggableFlatList from 'react-native-draggable-flatlist';
 import { SwipeListView, SwipeRow } from 'react-native-swipe-list-view';
 import Icon from '../icon';
+import labels from '../../constants/labels';
 
 ///////// Test ////////
 // const rowTranslateAnimatedValues = {};
@@ -69,8 +70,43 @@ const Playlist = ({ style, tracks, setTracks }) => {
 
   // console.log(`track keys=${tracks?.[0]?.key}`);
 
-  const rearrange = (id, action) => {
-    console.log(`[rearrange] id=${JSON.stringify(id)}, action=${action}`);
+  const rearrange = (item, fromIndex, action) => {
+    console.log(
+      `[rearrange] item.title=${item.title}, fromIndex=${fromIndex}, action=${action}`,
+    );
+
+    let toIndex;
+    switch (action) {
+      case rearrangeActions.MOVE_UP:
+      case rearrangeActions.MOVE_TO_FIRST:
+        if (fromIndex <= 0)
+          throw new Error(
+            `Invalid move operation: action: ${action}, fromIndex=${fromIndex}`,
+          );
+        toIndex = action === rearrangeActions.MOVE_TO_FIRST ? 0 : fromIndex - 1;
+        break;
+
+      case rearrangeActions.MOVE_DOWN:
+      case rearrangeActions.MOVE_TO_LAST:
+        if (fromIndex >= tracks.length - 1)
+          throw new Error(
+            `Invalid move operation: action: ${action}, fromIndex=${fromIndex}`,
+          );
+        toIndex =
+          action === rearrangeActions.MOVE_TO_LAST
+            ? tracks.length - 1
+            : fromIndex + 1;
+        break;
+
+      default:
+        throw new Error(`Invalid action: ${action}`);
+    }
+
+    const _tracks = [...tracks];
+    const tmp = _tracks[fromIndex];
+    _tracks[fromIndex] = _tracks[toIndex];
+    _tracks[toIndex] = tmp;
+    setTracks(_tracks);
   };
 
   const onSwipeValueChange = swipeData => {
@@ -204,6 +240,7 @@ const Playlist = ({ style, tracks, setTracks }) => {
                   onPress={rearrange.bind(
                     this,
                     rowData,
+                    rowData.index,
                     rearrangeActions.MOVE_UP,
                   )}>
                   <Icon name="angle-up" type="FontAwesome5" size={wp(5)} />
@@ -213,6 +250,7 @@ const Playlist = ({ style, tracks, setTracks }) => {
                   onPress={rearrange.bind(
                     this,
                     rowData,
+                    rowData.index,
                     rearrangeActions.MOVE_DOWN,
                   )}>
                   <Icon name="angle-down" type="FontAwesome5" size={wp(5)} />
@@ -231,6 +269,7 @@ const Playlist = ({ style, tracks, setTracks }) => {
                   onPress={rearrange.bind(
                     this,
                     rowData,
+                    rowData.index,
                     rearrangeActions.MOVE_TO_FIRST,
                   )}>
                   {/*<Icon name="angle-double-up" type="FontAwesome5" />*/}
@@ -249,6 +288,7 @@ const Playlist = ({ style, tracks, setTracks }) => {
                   onPress={rearrange.bind(
                     this,
                     rowData,
+                    rowData.index,
                     rearrangeActions.MOVE_TO_LAST,
                   )}>
                   {/*<Icon name="angle-double-down" type="FontAwesome5" />*/}
@@ -269,7 +309,7 @@ const Playlist = ({ style, tracks, setTracks }) => {
                   marginLeft: wp(2),
                   alignSelf: 'center',
                 }}>
-                Move{rowData.item.key}
+                {labels.move}
               </Text>
             </View>
           </View>
@@ -287,7 +327,7 @@ const Playlist = ({ style, tracks, setTracks }) => {
               width: '100%',
               paddingRight: wp(2),
             }}>
-            <Text>Remove</Text>
+            <Text>{labels.remove}</Text>
             <Icon
               name="ios-remove-circle"
               type="Ionicons"
@@ -338,7 +378,7 @@ const Playlist = ({ style, tracks, setTracks }) => {
         duration={2000}
         onDismiss={setLastTrackRemoved.bind(this, null)}
         action={{
-          label: 'Undo',
+          label: labels.undo,
           onPress: () => {
             const _tracks = [...tracks];
             _tracks.splice(lastTrackRemoved.index, 0, lastTrackRemoved.item);

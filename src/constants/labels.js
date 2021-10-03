@@ -64,6 +64,9 @@ const labels = {
   edit: 'Edit',
   createdOn: 'Created On',
   updatedOn: 'Updated On',
+  move: 'Move',
+  undo: 'Undo',
+  remove: 'Remove',
 };
 
 export default labels;
