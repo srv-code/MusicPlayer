@@ -12,19 +12,9 @@ import {
   widthPercentageToDP as wp,
 } from 'react-native-responsive-screen';
 import { width } from '../../constants/dimensions';
-import DraggableFlatList from 'react-native-draggable-flatlist';
-import { SwipeListView, SwipeRow } from 'react-native-swipe-list-view';
+import { SwipeListView } from 'react-native-swipe-list-view';
 import Icon from '../icon';
 import labels from '../../constants/labels';
-
-///////// Test ////////
-// const rowTranslateAnimatedValues = {};
-// Array(20)
-//   .fill('')
-//   .forEach((_, i) => {
-//     rowTranslateAnimatedValues[`${i}`] = new Animated.Value(1);
-//   });
-///////// Test ////////
 
 const rearrangeActions = {
   MOVE_UP: 'MOVE_UP',
@@ -40,18 +30,12 @@ const rearrangeActions = {
 //  - Proper intial swiping previews
 //  - Long press to select many tracks to re-order or delete them
 const Playlist = ({ style, tracks, setTracks }) => {
-  /////////////////////////////// Test render ///////////////////////////////////////
   const [lastTrackRemoved, setLastTrackRemoved] = useState(null);
   const [rowTranslateAnimatedValues, setRowTranslateAnimatedValues] = useState(
     [],
   );
   const [currentActions, setCurrentActions] = useState(null);
   const list = useRef(null);
-  // const [listData, setListData] = useState(
-  //   Array(20)
-  //     .fill()
-  //     .map((_, i) => ({ key: `${i}`, text: `item #${i}` })),
-  // );
 
   useEffect(() => {
     if (Object.keys(rowTranslateAnimatedValues).length !== tracks.length) {
@@ -60,21 +44,19 @@ const Playlist = ({ style, tracks, setTracks }) => {
         animValues[`${track.id}`] = new Animated.Value(1);
         track.key = track.id;
       });
-      // console.log(`filling animVals, keys=${Object.keys(animValues)?.length}`);
+      // console.log(`filling animValues, keys=${Object.keys(animValues)?.length}`);
       setRowTranslateAnimatedValues(animValues);
     }
-  }, [tracks]); // add dep: tracks
+  }, [tracks]);
 
   // console.log(`this.animationIsRunning=${this.animationIsRunning}`);
-
   // console.log(`[re-rendered] currentAction=${currentAction}`);
-
   // console.log(`track keys=${tracks?.[0]?.key}`);
 
   const rearrange = (item, fromIndex, action) => {
-    console.log(
-      `[rearrange] item.title=${item.title}, fromIndex=${fromIndex}, action=${action}`,
-    );
+    // console.log(
+    //   `[rearrange] item.title=${item.title}, fromIndex=${fromIndex}, action=${action}`,
+    // );
 
     let toIndex;
     switch (action) {
@@ -177,7 +159,6 @@ const Playlist = ({ style, tracks, setTracks }) => {
         style={styles.rowFront}
         underlayColor={'#AAA'}>
         <View>
-          {/*<Text>I am {data.item.text} in a SwipeListView</Text>*/}
           <Text>{`[idx=${data.index}, key=${data.item.key}] ${data.item.title}`}</Text>
         </View>
       </TouchableHighlight>
@@ -354,18 +335,11 @@ const Playlist = ({ style, tracks, setTracks }) => {
   // );
 
   return (
-    <View
-      style={{
-        ...styles.container,
-
-        // backgroundColor:
-        //   currentAction === 'removing'
-        //     ? 'red'
-        //     : currentAction === 'moving' && 'blue',
-      }}>
+    <View style={[styles.container, style]}>
       {/*<Text>currentAction: {JSON.stringify(currentActions)}</Text>*/}
       <SwipeListView
         listViewRef={list}
+        // simultaneousHandlers={simultaneousHandlers}
         // disableRightSwipe
         // leftActivationValue={{}}
         // swipeRowStyle={{
@@ -379,8 +353,9 @@ const Playlist = ({ style, tracks, setTracks }) => {
         stopLeftSwipe={wp(30)}
         rightOpenValue={-width} // uncomment this
         // rightOpenValue={-150} // remove this
-        // previewRowKey={'0'}
-        previewRowIndex={0}
+        previewRowKey={tracks[0]?.key}
+        // previewRowIndex={0}
+        // previewFirstRow={true}
         previewOpenValue={-wp(10)}
         previewOpenDelay={500}
         onSwipeValueChange={onSwipeValueChange}

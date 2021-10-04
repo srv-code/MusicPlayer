@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import ScreenContainer from '../../components/screen-container';
 import screenNames from '../../constants/screen-names';
@@ -46,14 +46,16 @@ const ItemInfo = ({ navigation, route, extraData }) => {
 
   const { displayMode, type, data } = route.params;
 
-  if (displayMode === DisplayModes.MODAL && extraData.snapIndex < 2)
-    navigation.navigate(screenNames.nowPlaying);
-
   console.log(
     `[ItemInfo] displayMode=${JSON.stringify(
       displayMode,
     )}, type=${JSON.stringify(type)}, data=${JSON.stringify(data)}`,
   );
+
+  useEffect(() => {
+    if (displayMode === DisplayModes.MODAL && extraData.snapIndex < 2)
+      navigation.navigate(screenNames.nowPlaying);
+  }, [extraData?.snapIndex]);
 
   const Container = ({ children }) => {
     switch (displayMode) {

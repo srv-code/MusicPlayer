@@ -4,9 +4,10 @@ import {
   widthPercentageToDP as wp,
 } from 'react-native-responsive-screen';
 import screenNames from '../../constants/screen-names';
-import { BottomSheetScrollView } from '@gorhom/bottom-sheet';
+import { BottomSheetScrollView, BottomSheetView } from '@gorhom/bottom-sheet';
 import { Text, FAB, TextInput, Portal, Snackbar } from 'react-native-paper';
-import { StyleSheet, ToastAndroid } from 'react-native';
+import { StyleSheet, ToastAndroid, View } from 'react-native';
+import { handlers as PlayerBottomSheetHandlers } from '../../components/player-bottom-sheet';
 import labels from '../../constants/labels';
 import { useFocusEffect, useIsFocused } from '@react-navigation/native';
 import colors from '../../constants/colors';
@@ -24,19 +25,15 @@ const maxPlaylistNameLength = 25;
 const CurrentPlaylist = ({ navigation, route, extraData: { snapIndex } }) => {
   const { musicInfo, setMusicInfo } = useContext(MusicContext);
 
-  if (snapIndex < 2) navigation.navigate(screenNames.nowPlaying);
-
   const [isFABOpened, setIsFABOpened] = useState(false);
   const [isFABVisible, setIsFABVisible] = useState(true);
   const [playlistName, setPlaylistName] = useState('');
-  // const [draggingTrackIndex, setDraggingTrackIndex] = useState(null);
   const [fabActions, setFABActions] = useState([]);
   const [isEditingPlaylistName, setIsEditingPlaylistName] = useState(false);
   const [tracks, setTracks] = useState([]);
   const [snackbarError, setSnackbarError] = useState(null);
   const [playlistId, setPlaylistId] = useState(null);
   const playlistInput = useRef(null);
-  const bottomScrollView = useRef(null);
 
   const isFocused = useIsFocused();
 
@@ -49,9 +46,14 @@ const CurrentPlaylist = ({ navigation, route, extraData: { snapIndex } }) => {
     return false;
   });
 
+  useEffect(() => {
+    if (snapIndex < 2) navigation.navigate(screenNames.nowPlaying);
+  }, [snapIndex]);
+
   useEffect(async () => {
-    setIsFABVisible(isFocused);
     if (isFocused) setTracks(await TrackPlayer.getQueue());
+    setIsFABVisible(isFocused);
+    PlayerBottomSheetHandlers.setIsContentPanningGestureEnabled?.(!isFocused);
   }, [isFocused]);
 
   useEffect(() => {
@@ -85,9 +87,9 @@ const CurrentPlaylist = ({ navigation, route, extraData: { snapIndex } }) => {
         onPress: () => {
           setIsEditingPlaylistName(true);
           // playlistInput.current?.focus();
-          console.log(
-            `[Current-Playlist] playlistTextInput.current=${playlistInput.current}`,
-          );
+          // console.log(
+          //   `[Current-Playlist] playlistTextInput.current=${playlistInput.current}`,
+          // );
           // playlistTextInput.current.clear();
           setIsFABOpened(false);
         },
@@ -161,7 +163,7 @@ const CurrentPlaylist = ({ navigation, route, extraData: { snapIndex } }) => {
     }
   };
 
-  console.log(`[Current-Playlist] musicInfo=${JSON.stringify(musicInfo)}`);
+  // console.log(`[Current-Playlist] musicInfo=${JSON.stringify(musicInfo)}`);
 
   // TODO Add a transparent background when dragging
   // const renderTrackItem = ({ item: track, index, drag, isActive }) => {
@@ -209,16 +211,22 @@ const CurrentPlaylist = ({ navigation, route, extraData: { snapIndex } }) => {
 
   return (
     <BottomSheetScrollView
-      ref={bottomScrollView}
+      // scrollEnabled={false}
+      // nestedScrollEnabled={false}
+      // ref={bottomScrollView}
       // simultaneousHandlers={[bottomScrollView, draggableFlatList]}
       bounces={true}
       focusHook={useFocusEffect}
+      // style={{
+      //   flex: 1,
+      // }}
       contentContainerStyle={{
         backgroundColor: 'lightgreen',
-        // flex: 1,
-        paddingHorizontal: wp(4),
-        overflow: 'visible',
+        flex: 1,
+        // paddingHorizontal: wp(4),
+        // overflow: 'visible',
       }}>
+      {/*<Text>{tracks.length}</Text>*/}
       {isEditingPlaylistName ? (
         <TextInput
           // // multiline
@@ -326,11 +334,7 @@ const CurrentPlaylist = ({ navigation, route, extraData: { snapIndex } }) => {
       {/*  )}*/}
       {/*</View>*/}
 
-      <Playlist
-        tracks={tracks}
-        setTracks={setTracks}
-        // simultaneousHandlers={bottomScrollView}
-      />
+      <Playlist tracks={tracks} setTracks={setTracks} />
 
       <Portal>
         <FAB.Group

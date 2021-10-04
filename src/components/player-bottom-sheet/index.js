@@ -1,10 +1,4 @@
-import React, {
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useState,
-} from 'react';
+import React, { useCallback, useContext, useEffect, useState } from 'react';
 import { StyleSheet } from 'react-native';
 import BottomSheet, {
   BottomSheetBackdrop,
@@ -20,12 +14,18 @@ import { MusicContext } from '../../context/music';
 import colors from '../../constants/colors';
 import CustomHandle from './sub-components/custom-handle';
 
+export const handlers = {
+  setIsContentPanningGestureEnabled: null,
+};
+
 const PlayerBottomSheet = ({ navigator: Navigator }) => {
   const { enabledDarkTheme } = useContext(PreferencesContext);
 
   const startSnapIndex = -1; // TODO: 0 indicates minimized, to hide pass -1 (when there's no currently playing)
   const snapPoints = ['10%', '45%', '92%'];
   const [snapIndex, setSnapIndex] = useState(startSnapIndex);
+  const [isContentPanningGestureEnabled, setIsContentPanningGestureEnabled] =
+    useState(true);
 
   // const handleSnapPress = useCallback(index => {
   //   // console.log('handleSnapPress:', { index, bottomSheet });
@@ -59,6 +59,8 @@ const PlayerBottomSheet = ({ navigator: Navigator }) => {
         close: bottomSheetCloseHandler,
       });
     }
+    handlers.setIsContentPanningGestureEnabled =
+      setIsContentPanningGestureEnabled;
   }, []);
 
   const animationConfigs = useBottomSheetSpringConfigs({
@@ -70,13 +72,23 @@ const PlayerBottomSheet = ({ navigator: Navigator }) => {
   });
 
   const handleSheetChange = useCallback(index => {
+    console.log(`handleSheetChange: index=${index}`);
     setSnapIndex(index);
     if (index <= 0) setBottomSheetMiniPositionIndex(index);
   }, []);
 
-  const handleSheetAnimate = useCallback((fromIndex, toIndex) => {
-    console.log('handleSheetAnimate', `from ${fromIndex} to ${toIndex}`);
-  }, []);
+  // const handleSheetAnimate = useCallback((fromIndex, toIndex) => {
+  //   console.log('handleSheetAnimate', `from ${fromIndex} to ${toIndex}`);
+  //   if (toIndex !== 2 && externalHandlers.currentPlaylist.setCloseReason)
+  //     externalHandlers.currentPlaylist.setCloseReason('minimizing');
+  //   // setPlayerAuxiliaryData(prev => ({
+  //   //   ...prev,
+  //   //   animatingSnapIndices: {
+  //   //     fromIndex,
+  //   //     toIndex,
+  //   //   },
+  //   // }));
+  // }, []);
 
   const renderCustomHandle = useCallback(
     props => <CustomHandle {...props} enabledDarkTheme={enabledDarkTheme} />,
@@ -96,7 +108,7 @@ const PlayerBottomSheet = ({ navigator: Navigator }) => {
       snapPoints={snapPoints}
       animationConfigs={animationConfigs}
       animateOnMount={true}
-      enableContentPanningGesture={true}
+      enableContentPanningGesture={isContentPanningGestureEnabled}
       enableHandlePanningGesture={true}
       handleComponent={renderCustomHandle}
       backgroundStyle={{
@@ -109,7 +121,8 @@ const PlayerBottomSheet = ({ navigator: Navigator }) => {
       backdropComponent={snapIndex === 2 ? renderBackdrop : null}
       enablePanDownToClose={true}
       onChange={handleSheetChange}
-      onAnimate={handleSheetAnimate}>
+      // onAnimate={handleSheetAnimate}
+    >
       <Navigator
         snapIndex={snapIndex}
         setSnapIndex={setSnapIndex}
