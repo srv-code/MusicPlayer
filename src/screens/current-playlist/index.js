@@ -3,20 +3,20 @@ import {
   heightPercentageToDP as hp,
   widthPercentageToDP as wp,
 } from 'react-native-responsive-screen';
+import { useFocusEffect, useIsFocused } from '@react-navigation/native';
+import { useBackHandler } from '@react-native-community/hooks';
 import screenNames from '../../constants/screen-names';
 import { BottomSheetScrollView, BottomSheetView } from '@gorhom/bottom-sheet';
 import { Text, FAB, TextInput, Portal, Snackbar } from 'react-native-paper';
 import { StyleSheet, ToastAndroid, View } from 'react-native';
 import { handlers as PlayerBottomSheetHandlers } from '../../components/player-bottom-sheet';
 import labels from '../../constants/labels';
-import { useFocusEffect, useIsFocused } from '@react-navigation/native';
 import colors from '../../constants/colors';
 import TrackPlayer from 'react-native-track-player';
 import IconUtils from '../../utils/icon';
 import keys from '../../constants/keys';
 import { MusicContext } from '../../context/music';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useBackHandler } from '@react-native-community/hooks';
 import Playlist from '../../components/playlist';
 
 const maxPlaylistNameLength = 25;

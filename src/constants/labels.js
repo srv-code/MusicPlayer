@@ -67,6 +67,7 @@ const labels = {
   move: 'Move',
   undo: 'Undo',
   remove: 'Remove',
+  playingFromPlaylist: 'Playing from playlist',
 };
 
 export default labels;

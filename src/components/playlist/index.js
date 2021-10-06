@@ -1,12 +1,20 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import {
   Animated,
   StyleSheet,
-  TouchableHighlight,
+  ToastAndroid,
   TouchableOpacity,
   View,
 } from 'react-native';
-import { Snackbar, Text } from 'react-native-paper';
+import {
+  Avatar,
+  Divider,
+  IconButton,
+  List,
+  Menu,
+  Snackbar,
+  Text,
+} from 'react-native-paper';
 import {
   heightPercentageToDP as hp,
   widthPercentageToDP as wp,
@@ -15,6 +23,12 @@ import { width } from '../../constants/dimensions';
 import { SwipeListView } from 'react-native-swipe-list-view';
 import Icon from '../icon';
 import labels from '../../constants/labels';
+import colors from '../../constants/colors';
+import PlayerUtils from '../../utils/player';
+import { PreferencesContext } from '../../context/preferences';
+import { MusicContext } from '../../context/music';
+import IconUtils from '../../utils/icon';
+import keys from '../../constants/keys';
 
 const rearrangeActions = {
   MOVE_UP: 'MOVE_UP',
@@ -29,13 +43,22 @@ const rearrangeActions = {
 //  - Restore/Ignore changes playlist icon button
 //  - Proper intial swiping previews
 //  - Long press to select many tracks to re-order or delete them
-const Playlist = ({ style, tracks, setTracks }) => {
+const Playlist = ({ style, onModal, name, tracks, setTracks }) => {
+  const { enabledDarkTheme } = useContext(PreferencesContext);
+  const { playerControls } = useContext(MusicContext);
+
   const [lastTrackRemoved, setLastTrackRemoved] = useState(null);
   const [rowTranslateAnimatedValues, setRowTranslateAnimatedValues] = useState(
     [],
   );
   const [currentActions, setCurrentActions] = useState(null);
+  // FIXME Not updating the current playing track currently: setCurrentlyPlayingTrackId
+  const [currentlyPlayingTrackId, setCurrentlyPlayingTrackId] = useState(null);
+  const [showMoreOptionForTrackId, setShowMoreOptionForTrackId] =
+    useState(null);
   const list = useRef(null);
+
+  let animationIsRunning = false;
 
   useEffect(() => {
     if (Object.keys(rowTranslateAnimatedValues).length !== tracks.length) {
@@ -108,7 +131,7 @@ const Playlist = ({ style, tracks, setTracks }) => {
     //   )}`,
     // );
 
-    // console.log(`this.animationIsRunning=${this.animationIsRunning}`);
+    // console.log(`animationIsRunning=${animationIsRunning}`);
 
     if (
       value < 0 &&
@@ -123,8 +146,8 @@ const Playlist = ({ style, tracks, setTracks }) => {
     )
       setCurrentActions(prev => ({ ...prev, [key]: 'moving' }));
 
-    if (value < -width && !this.animationIsRunning) {
-      this.animationIsRunning = true;
+    if (value < -width && !animationIsRunning) {
+      animationIsRunning = true;
       Animated.timing(rowTranslateAnimatedValues[key], {
         toValue: 0,
         duration: 200,
@@ -135,36 +158,192 @@ const Playlist = ({ style, tracks, setTracks }) => {
         const newList = [...tracks];
         newList.splice(removeIndex, 1);
         setTracks(newList);
-        this.animationIsRunning = false;
+        animationIsRunning = false;
         setCurrentActions(null);
       });
     }
   };
 
-  const renderItem = data => (
-    <Animated.View
-      style={[
-        styles.rowFrontContainer,
-        {
+  const renderItem = data => {
+    const onPress = () => {
+      PlayerUtils.playTracks(tracks, data.index)
+        .then(() => {
+          playerControls.collapse();
+          ToastAndroid.show(
+            `${labels.playingFromPlaylist} ${name}`,
+            ToastAndroid.SHORT,
+          );
+        })
+        .catch(err => {
+          ToastAndroid.show(
+            `${labels.couldntPlayTracks} (${err.message}}`,
+            ToastAndroid.LONG,
+          );
+          throw err;
+        });
+    };
+
+    const renderDescription = () => (
+      <View style={styles.trackDescText}>
+        <Icon
+          name={IconUtils.getInfo(keys.ARTISTS).name.outlined}
+          type={IconUtils.getInfo(keys.ARTISTS).type}
+          size={wp(3.5)}
+          color={colors.lightGrey}
+        />
+        <Text numberOfLines={1} style={styles.trackSubtitleText}>
+          {data.item.artist}
+          {/*{Object.keys(data.item)}*/}
+        </Text>
+      </View>
+    );
+
+    const renderLeftComponent = props => {
+      if (data.item.artwork)
+        return (
+          <Avatar.Image
+            size={hp(6)}
+            source={{ uri: `file://${data.item.artwork}` }}
+          />
+        );
+      return <Avatar.Icon size={hp(6)} icon="music" style={styles.musicIcon} />;
+    };
+
+    const renderRightComponent = props => (
+      <Menu
+        {...props}
+        visible={!onModal && showMoreOptionForTrackId === data.item.id}
+        onDismiss={setShowMoreOptionForTrackId.bind(this, null)}
+        style={{
+          zIndex: 99999,
+          elevation: 99999,
+          // flex: 1,
+          // position: 'absolute',
+          // top: 0,
+        }}
+        // anchor={{ x: 0, y: 0 }}
+        anchor={
+          <IconButton
+            {...props}
+            icon={IconUtils.getInfo(keys.VERTICAL_ELLIPSIS).name.default}
+            onPress={setShowMoreOptionForTrackId.bind(this, data.item.id)}
+            // style={{
+            //   zIndex: 999,
+            // }}
+          />
+        }>
+        <Menu.Item
+          icon={IconUtils.getInfo(keys.SKIP_NEXT).name.default}
+          title={labels.playNext}
+          onPress={() => {
+            alert(JSON.stringify(props));
+            setShowMoreOptionForTrackId(null);
+          }}
+          // style={{ zIndex: 999, backgroundColor: 'lightgreen' }}
+        />
+        <Menu.Item
+          icon={IconUtils.getInfo(keys.ADD_TO_PLAYLIST).name.default}
+          title={labels.addToPlaylist}
+          onPress={() => {
+            setShowMoreOptionForTrackId(null);
+            alert(JSON.stringify(props));
+          }}
+        />
+        <Menu.Item
+          icon={IconUtils.getInfo(keys.ADD_TO_QUEUE).name.default}
+          title={labels.addToQueue}
+          onPress={() => {
+            // alert(JSON.stringify(props));
+            setShowMoreOptionForTrackId(null);
+            ToastAndroid.show(labels.addedToQueue, ToastAndroid.SHORT);
+          }}
+        />
+        <Menu.Item
+          icon={IconUtils.getInfo(keys.INFO).name.filled}
+          title={labels.showInfo}
+          onPress={() => {
+            // alert(JSON.stringify(props));
+            // navigation.navigate(screenNames.itemInfo, { type, data });
+            // setInfoModalData({ type, data });
+            setShowMoreOptionForTrackId(null);
+          }}
+        />
+      </Menu>
+    );
+
+    // FIXME Not working
+    const renderDivider = () => {
+      if (data.index === tracks.length - 1) {
+        return <View style={styles.listItemEndSmallBar} />;
+      } else {
+        if (currentlyPlayingTrackId) {
+          const playingIndex = tracks.findIndex(
+            t => t.id === currentlyPlayingTrackId,
+          );
+          if (playingIndex === -1)
+            throw new Error(`Could not find playing track index`);
+          if (data.index === playingIndex - 1 || data.index === playingIndex)
+            return null;
+          else return <Divider inset />;
+        } else return <Divider inset />;
+      }
+    };
+
+    return (
+      <Animated.View
+        style={{
+          ...styles.rowFrontContainer,
           height: rowTranslateAnimatedValues[data.item.key]?.interpolate({
             inputRange: [0, 1],
-            outputRange: [0, 50],
+            outputRange: [0, hp(8)],
           }),
 
-          // opacity: 0.3,
-        },
-      ]}>
-      <TouchableHighlight
-        onPress={() => console.log('You touched me')}
-        style={styles.rowFront}
-        underlayColor={'#AAA'}>
-        <View>
-          <Text>{`[idx=${data.index}, key=${data.item.key}] ${data.item.title}`}</Text>
-        </View>
-      </TouchableHighlight>
-    </Animated.View>
-  );
+          // opacity: 1,
+          borderRadius: currentlyPlayingTrackId === data.item.id ? wp(2) : 0,
+          backgroundColor:
+            currentlyPlayingTrackId === data.item.id
+              ? enabledDarkTheme
+                ? colors.darker
+                : colors.lighter
+              : enabledDarkTheme
+              ? colors.dark
+              : colors.light,
+          elevation: currentlyPlayingTrackId === data.item.id ? 2 : 0,
 
+          // backgroundColor: 'lightgreen',
+          // borderWidth: 1,
+          // paddingBottom: hp(2),
+        }}>
+        {/*<TouchableHighlight*/}
+        {/*  onPress={() => console.log('You touched me')}*/}
+        {/*  style={styles.rowFront}*/}
+        {/*  underlayColor={'#AAA'}>*/}
+        {/*  <View>*/}
+        {/*    <Text>{`[idx=${data.index}, key=${data.item.key}] ${data.item.title}`}</Text>*/}
+        {/*  </View>*/}
+        {/*</TouchableHighlight>*/}
+
+        <List.Item
+          style={styles.trackItemContainer}
+          onPress={onPress}
+          titleEllipsizeMode={'tail'}
+          titleNumberOfLines={1}
+          titleStyle={styles.listItemText}
+          // title={`[${index}] ${track.title}`}
+          title={data.item.title}
+          descriptionEllipsizeMode={'tail'}
+          descriptionNumberOfLines={1}
+          description={renderDescription}
+          left={renderLeftComponent}
+          right={renderRightComponent}
+        />
+
+        {renderDivider()}
+      </Animated.View>
+    );
+  };
+
+  // FIXME Dimension not proper
   const renderHiddenItem = rowData => {
     let showMove = true,
       showRemove = true;
@@ -200,8 +379,12 @@ const Playlist = ({ style, tracks, setTracks }) => {
       <View
         style={{
           ...styles.rowBack,
-          opacity: 1,
+          // opacity: 1,
+          // TODO Take the colors from colors object
+          // TODO Modify the colors intensity as per the value in the onSwipe* function
           backgroundColor: showMove ? 'blue' : showRemove ? 'red' : 'grey',
+          borderRadius:
+            currentlyPlayingTrackId === rowData.item.key ? wp(2) : 0,
         }}>
         {showMove && (
           <View style={[styles.backRightBtn, styles.backRightBtnRight]}>
@@ -399,7 +582,9 @@ const styles = StyleSheet.create({
   },
   rowFrontContainer: {
     // backgroundColor: 'green'
-    width: wp(80),
+    width: wp(88),
+    alignItems: 'center',
+    textAlignVertical: 'center',
   },
   container: {
     flex: 1,
@@ -423,6 +608,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     // backgroundColor: 'green',
     paddingLeft: wp(4),
+    overflow: 'hidden',
   },
   backRightBtn: {
     flex: 1,
@@ -441,6 +627,38 @@ const styles = StyleSheet.create({
     // left: 0,
     // width: wp(50),
     // zIndex: 10,
+  },
+  trackItemContainer: {
+    alignItems: 'center',
+    // borderRadius: wp(2),
+    // paddingVertical: 0,
+    // backgroundColor: 'lightgreen',
+    // borderWidth: 1,
+    // paddingBottom: hp(5),
+  },
+  trackSubtitleText: {
+    fontSize: wp(3.2),
+    color: colors.lightGrey,
+    marginLeft: wp(0.5),
+  },
+  trackDescText: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  listItemText: {
+    fontSize: wp(4),
+  },
+  musicIcon: {
+    backgroundColor: colors.lightPurple,
+  },
+  listItemEndSmallBar: {
+    paddingVertical: hp(0.3),
+    width: wp(12),
+    backgroundColor: colors.black,
+    opacity: 0.1,
+    borderRadius: 10,
+    alignSelf: 'center',
+    marginTop: hp(1),
   },
 });
 

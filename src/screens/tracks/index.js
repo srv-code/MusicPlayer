@@ -166,30 +166,6 @@ const Tracks = ({ navigation }) => {
 
   // console.log(`[Tracks] tracks=${JSON.stringify(tracks)}`);
 
-  // TODO Apply this everywhere applicable
-  const getIconInfo = type => {
-    switch (type) {
-      case SortingOptions.TITLE:
-        return { name: 'format-text', type: 'MaterialCommunityIcons' };
-      case SortingOptions.DURATION:
-        return {
-          name: 'clock-time-five-outline',
-          type: 'MaterialCommunityIcons',
-        };
-      case SortingOptions.ALBUM:
-        return { name: 'disc-outline', type: 'Ionicons' };
-      case SortingOptions.ARTIST:
-        return {
-          name: 'account-music-outline',
-          type: 'MaterialCommunityIcons',
-        };
-      case SortingOptions.FOLDER:
-        return { name: 'folder-music-outline', type: 'MaterialCommunityIcons' };
-      default:
-        throw new Error(`Invalid type: ${type}`);
-    }
-  };
-
   const renderTrackDescription = track => {
     const getText = () => {
       switch (sortBy) {
@@ -211,9 +187,16 @@ const Tracks = ({ navigation }) => {
     return (
       <View style={styles.trackDescText}>
         <Icon
-          {...getIconInfo(
-            sortBy === SortingOptions.TITLE ? SortingOptions.ARTIST : sortBy,
-          )}
+          name={
+            IconUtils.getInfo(
+              sortBy === SortingOptions.TITLE ? SortingOptions.ARTIST : sortBy,
+            ).name.outlined
+          }
+          type={
+            IconUtils.getInfo(
+              sortBy === SortingOptions.TITLE ? SortingOptions.ARTIST : sortBy,
+            ).type
+          }
           size={wp(3.5)}
           color={colors.lightGrey}
         />

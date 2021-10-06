@@ -5,13 +5,10 @@ import {
   widthPercentageToDP as wp,
 } from 'react-native-responsive-screen';
 import ScreenContainer from '../../components/screen-container';
-import screenNames from '../../constants/screen-names';
 import colors from '../../constants/colors';
 import { PreferencesContext } from '../../context/preferences';
-import { Text } from 'react-native-paper';
-import IconUtils from '../../utils/icon';
+
 import keys from '../../constants/keys';
-import labels from '../../constants/labels';
 import { MusicContext } from '../../context/music';
 import PlaylistCover from '../../components/playlist-cover';
 import Modal from 'react-native-modal';
@@ -21,7 +18,7 @@ import { SortingOptions, SortingOrders } from '../../constants/tracks';
 
 const Playlists = ({ navigation }) => {
   const { enabledDarkTheme } = useContext(PreferencesContext);
-  const { musicInfo, setMusicInfo } = useContext(MusicContext);
+  const { musicInfo } = useContext(MusicContext);
 
   const [playlists, setPlaylists] = useState([]);
   const [editingPlaylistInfo, setEditingPlaylistInfo] = useState(null);
@@ -119,7 +116,7 @@ const Playlists = ({ navigation }) => {
   //   `[Playlists] editingPlaylistInfo=${JSON.stringify(editingPlaylistInfo)}`,
   // );
 
-  const updatePlaylistInfo = info => {
+  const fillEditingPlaylistInfo = info => {
     const tracks = [];
     musicInfo?.[keys.TRACKS]?.forEach(tr => {
       if (info.track_ids.includes(tr.id)) tracks.push(tr);
@@ -173,7 +170,7 @@ const Playlists = ({ navigation }) => {
               <PlaylistCover
                 key={index}
                 id={info.id}
-                onEdit={updatePlaylistInfo}
+                onEdit={fillEditingPlaylistInfo}
                 onPlay={onPlayPlaylist}
                 onShuffle={onShufflePlaylist}
                 onAddToQueue={onAddPlaylistToQueue}
@@ -207,6 +204,7 @@ const Playlists = ({ navigation }) => {
       <Modal
         testID={'modal'}
         isVisible={Boolean(editingPlaylistInfo)}
+        // isVisible={false}
         onSwipeComplete={closeEditModal}
         swipeDirection={['down']}
         // scrollTo={this.handleScrollTo}
@@ -219,7 +217,6 @@ const Playlists = ({ navigation }) => {
         style={{
           justifyContent: 'flex-end',
           margin: 0,
-          // backgroundColor: 'transparent',
         }}>
         <View
           style={{
@@ -243,6 +240,7 @@ const Playlists = ({ navigation }) => {
           />
 
           <Playlist
+            name={editingPlaylistInfo?.name}
             tracks={editingPlaylistInfo?.tracks || []}
             setTracks={tracks => {
               setEditingPlaylistInfo(prev => ({ ...prev, tracks }));
