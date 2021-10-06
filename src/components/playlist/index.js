@@ -61,16 +61,24 @@ const Playlist = ({ style, onModal, name, tracks, setTracks }) => {
   let animationIsRunning = false;
 
   useEffect(() => {
-    if (Object.keys(rowTranslateAnimatedValues).length !== tracks.length) {
-      const animValues = {};
-      tracks.forEach(track => {
-        animValues[`${track.id}`] = new Animated.Value(1);
-        track.key = track.id;
-      });
-      // console.log(`filling animValues, keys=${Object.keys(animValues)?.length}`);
-      setRowTranslateAnimatedValues(animValues);
-    }
-  }, [tracks]);
+    const animValues = {};
+    tracks.forEach(track => {
+      // animValues[`${track.id}`] = new Animated.Value(1);
+      // animValues[track.id] = new Animated.Value(1);
+      animValues[track.id] = new Animated.Value(hp(8));
+      // animValues[track.id] = {
+      //   removal: new Animated.Value(hp(8)),
+      //   swapping: new Animated.Value(hp(8)),
+      // };
+      track.key = track.id;
+    });
+    console.log(
+      `[Playlist/useEffect] filling animValues, keys=${
+        Object.keys(animValues)?.length
+      }`,
+    );
+    setRowTranslateAnimatedValues(animValues);
+  }, []);
 
   // console.log(`this.animationIsRunning=${this.animationIsRunning}`);
   // console.log(`[re-rendered] currentAction=${currentAction}`);
@@ -148,6 +156,7 @@ const Playlist = ({ style, onModal, name, tracks, setTracks }) => {
 
     if (value < -width && !animationIsRunning) {
       animationIsRunning = true;
+      // rowTranslateAnimatedValues[key].setValue(0);
       Animated.timing(rowTranslateAnimatedValues[key], {
         toValue: 0,
         duration: 200,
@@ -158,11 +167,15 @@ const Playlist = ({ style, onModal, name, tracks, setTracks }) => {
         const newList = [...tracks];
         newList.splice(removeIndex, 1);
         setTracks(newList);
-        animationIsRunning = false;
         setCurrentActions(null);
+        animationIsRunning = false;
+
+        // console.log(`deleted track ${tracks[removeIndex].key}`);
       });
     }
   };
+
+  // console.log(`tracks::keys=${JSON.stringify(tracks.map(t => t.key))}`);
 
   const renderItem = data => {
     const onPress = () => {
@@ -293,22 +306,36 @@ const Playlist = ({ style, onModal, name, tracks, setTracks }) => {
       <Animated.View
         style={{
           ...styles.rowFrontContainer,
-          height: rowTranslateAnimatedValues[data.item.key]?.interpolate({
-            inputRange: [0, 1],
-            outputRange: [0, hp(8)],
+          // height: rowTranslateAnimatedValues[data.item.key]?.interpolate({
+          //   inputRange: [0, 1],
+          //   outputRange: [0, hp(8)],
+          // }),
+          height: rowTranslateAnimatedValues[data.item.key],
+
+          // opacity: 0.3,
+          borderRadius: currentlyPlayingTrackId === data.item.id ? wp(2) : 0,
+          // backgroundColor:
+          //   currentlyPlayingTrackId === data.item.id
+          //     ? enabledDarkTheme
+          //       ? colors.darker
+          //       : colors.lighter
+          //     : enabledDarkTheme
+          //     ? colors.dark
+          //     : colors.light,
+
+          backgroundColor: rowTranslateAnimatedValues[
+            data.item.key
+          ]?.interpolate({
+            inputRange: [0, hp(7), hp(8)],
+            outputRange: ['blue', '#0080ff', 'white'],
           }),
 
-          // opacity: 1,
-          borderRadius: currentlyPlayingTrackId === data.item.id ? wp(2) : 0,
-          backgroundColor:
-            currentlyPlayingTrackId === data.item.id
-              ? enabledDarkTheme
-                ? colors.darker
-                : colors.lighter
-              : enabledDarkTheme
-              ? colors.dark
-              : colors.light,
           elevation: currentlyPlayingTrackId === data.item.id ? 2 : 0,
+
+          // marginTop: data.index === 2 ? -40 : data.index === 1 ? 40 : null,
+          // opacity: data.index === 2 ? 0.7 : 1,
+          // backgroundColor:
+          //   data.index === 2 ? 'orange' : data.index === 1 ? 'blue' : 'white',
 
           // backgroundColor: 'lightgreen',
           // borderWidth: 1,
@@ -329,8 +356,8 @@ const Playlist = ({ style, onModal, name, tracks, setTracks }) => {
           titleEllipsizeMode={'tail'}
           titleNumberOfLines={1}
           titleStyle={styles.listItemText}
-          // title={`[${index}] ${track.title}`}
-          title={data.item.title}
+          title={`[${data.item.id}] ${data.item.title}`}
+          // title={data.item.title}
           descriptionEllipsizeMode={'tail'}
           descriptionNumberOfLines={1}
           description={renderDescription}
@@ -343,7 +370,6 @@ const Playlist = ({ style, onModal, name, tracks, setTracks }) => {
     );
   };
 
-  // FIXME Dimension not proper
   const renderHiddenItem = rowData => {
     let showMove = true,
       showRemove = true;
@@ -379,12 +405,25 @@ const Playlist = ({ style, onModal, name, tracks, setTracks }) => {
       <View
         style={{
           ...styles.rowBack,
+
           // opacity: 1,
+          // opacity: rowTranslateAnimatedValues[rowData.item.key]?.interpolate({
+          //   inputRange: [0, hp(8)],
+          //   outputRange: [0, 1],
+          // }),
+
           // TODO Take the colors from colors object
           // TODO Modify the colors intensity as per the value in the onSwipe* function
+          // flex: 1,
+          // alignSelf: 'center',
+          // alignItems: 'center',
+          // height: rowTranslateAnimatedValues[rowData.item.key],
+          // height: hp(8),
           backgroundColor: showMove ? 'blue' : showRemove ? 'red' : 'grey',
           borderRadius:
             currentlyPlayingTrackId === rowData.item.key ? wp(2) : 0,
+          // borderWidth: 1,
+          // borderColor: 'blue',
         }}>
         {showMove && (
           <View style={[styles.backRightBtn, styles.backRightBtnRight]}>
@@ -395,7 +434,8 @@ const Playlist = ({ style, onModal, name, tracks, setTracks }) => {
                 // alignItems: 'center',
                 // justifyContent: 'space-between',
                 backgroundColor: 'blue',
-                height: '100%',
+                // height: '100%',
+                height: hp(8),
                 width: '100%',
               }}>
               <View
@@ -493,7 +533,8 @@ const Playlist = ({ style, onModal, name, tracks, setTracks }) => {
               alignItems: 'center',
               backgroundColor: 'red',
               justifyContent: 'flex-end',
-              height: '100%',
+              // height: '100%',
+              height: hp(8),
               width: '100%',
               paddingRight: wp(2),
             }}>
@@ -555,13 +596,31 @@ const Playlist = ({ style, onModal, name, tracks, setTracks }) => {
         action={{
           label: labels.undo,
           onPress: () => {
+            if (!lastTrackRemoved.item) return;
+
             const _tracks = [...tracks];
             _tracks.splice(lastTrackRemoved.index, 0, lastTrackRemoved.item);
             setTracks(_tracks);
             setLastTrackRemoved(null);
+            // animationIsRunning = false;
+
+            if (!animationIsRunning) {
+              animationIsRunning = true;
+              // rowTranslateAnimatedValues[lastTrackRemoved.item.key].setValue(0);
+              Animated.timing(
+                rowTranslateAnimatedValues[lastTrackRemoved.item.key],
+                {
+                  toValue: hp(8),
+                  duration: 400,
+                  useNativeDriver: false,
+                },
+              ).start(() => {
+                animationIsRunning = false;
+              });
+            }
           },
         }}>
-        Track Removed
+        {labels.trackRemoved}
       </Snackbar>
     </View>
   );

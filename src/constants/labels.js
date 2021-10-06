@@ -68,6 +68,7 @@ const labels = {
   undo: 'Undo',
   remove: 'Remove',
   playingFromPlaylist: 'Playing from playlist',
+  trackRemoved: 'Track Removed',
 };
 
 export default labels;
