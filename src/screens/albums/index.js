@@ -23,6 +23,10 @@ const Albums = () => {
   const [modalAnimValue] = useState(new Animated.Value(0));
   const [isAnimModalOpen, setIsAnimModalOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [parallelAnim] = useState({
+    leftAnimValue: new Animated.Value(0),
+    rightAnimValue: new Animated.Value(0),
+  });
   const [note, setNote] = useState(null);
 
   const dynamicStyles = {
@@ -53,6 +57,28 @@ const Albums = () => {
       if (action === 'close') setIsAnimModalOpen(false);
       console.log(action === 'open' ? 'Modal opened' : 'Modal closed');
     });
+  };
+
+  const swapItems = (toIndex, fromIndex, action) => {
+    // Swap 2nd & 3rd
+  };
+
+  const buttonStyle = {
+    backgroundColor: 'lightblue',
+    margin: 5,
+    elevation: 2,
+    padding: 5,
+    borderRadius: 5,
+    alignSelf: 'flex-start',
+  };
+  const rowStyle = {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flexWrap: 'wrap',
+    justifyContent: 'space-around',
+    backgroundColor: 'lightgreen',
+    marginVertical: 5,
+    borderRadius: 5,
   };
 
   return (
@@ -99,23 +125,59 @@ const Albums = () => {
         {/*  Reset*/}
         {/*</Text>*/}
 
-        <Text
-          onPress={toggleModalOpenState.bind(
-            this,
-            isAnimModalOpen ? 'close' : 'open',
-          )}>
-          {isAnimModalOpen ? 'Hide' : 'Show'} Anim Modal
-        </Text>
+        <View style={rowStyle}>
+          <Text
+            style={buttonStyle}
+            onPress={toggleModalOpenState.bind(
+              this,
+              isAnimModalOpen ? 'close' : 'open',
+            )}>
+            {isAnimModalOpen ? 'Hide' : 'Show'} Anim Modal
+          </Text>
 
-        <Text
-          onPress={toggleModalOpenState.bind(
-            this,
-            isAnimModalOpen ? 'close' : 'open',
-          )}>
-          {isAnimModalOpen ? 'Close' : 'Open'} Anim Modal
-        </Text>
+          <Text
+            style={buttonStyle}
+            onPress={toggleModalOpenState.bind(
+              this,
+              isAnimModalOpen ? 'close' : 'open',
+            )}>
+            {isAnimModalOpen ? 'Close' : 'Open'} Anim Modal
+          </Text>
 
-        <Text onPress={setIsModalOpen.bind(this, true)}>Open Modal</Text>
+          <Text style={buttonStyle} onPress={setIsModalOpen.bind(this, true)}>
+            Open Modal
+          </Text>
+        </View>
+
+        <View style={rowStyle}>
+          <Text style={buttonStyle} onPress={() => {}}>
+            Swap 2nd & 3rd
+          </Text>
+          <Text style={buttonStyle} onPress={() => {}}>
+            Swap 3rd & 2nd
+          </Text>
+
+          <Text style={buttonStyle} onPress={() => {}}>
+            Swap first & 4th
+          </Text>
+          <Text style={buttonStyle} onPress={() => {}}>
+            Swap 4th & first
+          </Text>
+
+          <Text style={buttonStyle} onPress={() => {}}>
+            Swap first & last
+          </Text>
+          <Text style={buttonStyle} onPress={() => {}}>
+            Swap last & first
+          </Text>
+
+          <Text style={buttonStyle} onPress={() => {}}>
+            Swap 2nd & last
+          </Text>
+          <Text style={buttonStyle} onPress={() => {}}>
+            Swap last & 2nd
+          </Text>
+        </View>
 
         {/*<View*/}
         {/*  style={{*/}
@@ -155,6 +217,128 @@ const Albums = () => {
                 <Text>Item {index + 1}</Text>
               </View>
             ))}
+        </View>
+
+        <View>
+          <View style={rowStyle}>
+            <Text
+              style={buttonStyle}
+              onPress={() => {
+                parallelAnim.leftAnimValue.setValue(0);
+                parallelAnim.rightAnimValue.setValue(0);
+              }}>
+              Reset
+            </Text>
+
+            <Text
+              style={buttonStyle}
+              onPress={() => {
+                parallelAnim.leftAnimValue.setValue(0);
+                parallelAnim.rightAnimValue.setValue(0);
+                console.log(
+                  `Starting parallel animations (left=${JSON.stringify(
+                    parallelAnim.leftAnimValue,
+                  )}, right=${JSON.stringify(parallelAnim.rightAnimValue)})...`,
+                );
+
+                // Animated.parallel([
+                //   Animated.timing(parallelAnim.leftAnimValue, {
+                //     toValue: 50,
+                //     duration: 500,
+                //     useNativeDriver: false,
+                //   }),
+                //   Animated.timing(parallelAnim.rightAnimValue, {
+                //     toValue: -50,
+                //     duration: 500,
+                //     useNativeDriver: false,
+                //   }),
+                // ])
+                //
+                //   // Animated.timing(parallelAnim.leftAnimValue, {
+                //   //   toValue: 1,
+                //   //   duration: 500,
+                //   //   useNativeDriver: false,
+                //   // })
+                //
+                //   .start(() => {
+                //     console.log(
+                //       `Parallel animation done, (left=${JSON.stringify(
+                //         parallelAnim.leftAnimValue,
+                //       )}, right=${JSON.stringify(parallelAnim.rightAnimValue)})`,
+                //     );
+                //   });
+
+                Animated.timing(parallelAnim.leftAnimValue, {
+                  toValue: 50,
+                  duration: 1000,
+                  useNativeDriver: false,
+                }).start(() => {
+                  console.log(
+                    `Animation 1 done, (left=${JSON.stringify(
+                      parallelAnim.leftAnimValue,
+                    )})`,
+                  );
+
+                  Animated.timing(parallelAnim.rightAnimValue, {
+                    toValue: -100,
+                    duration: 1000,
+                    useNativeDriver: false,
+                  }).start(() => {
+                    console.log(
+                      `Animation 2 done, (left=${JSON.stringify(
+                        parallelAnim.leftAnimValue,
+                      )}, right=${JSON.stringify(
+                        parallelAnim.rightAnimValue,
+                      )})`,
+                    );
+                  });
+                });
+              }}>
+              Start Parallel
+            </Text>
+          </View>
+
+          <View
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'center',
+              // justifyContent: 'space-between',
+              backgroundColor: 'lightgreen',
+            }}>
+            <Animated.View
+              style={{
+                // position: 'absolute',
+                height: 50,
+                width: 50,
+                backgroundColor: 'red',
+                elevation: 2,
+                borderRadius: 26,
+                marginLeft: parallelAnim.leftAnimValue,
+                // left: parallelAnim.rightAnimValue,
+                // marginLeft: parallelAnim.leftAnimValue.interpolate({
+                //   inputRange: [0, 1],
+                //   outputRange: [0, 50],
+                // }),
+              }}
+            />
+            <Animated.View
+              style={{
+                // position: 'absolute',
+                height: 50,
+                width: 50,
+                backgroundColor: 'blue',
+                borderRadius: 26,
+                elevation: 2,
+                marginLeft: parallelAnim.rightAnimValue,
+                // left: parallelAnim.leftAnimValue,
+                // marginRight: parallelAnim.leftAnimValue.interpolate({
+                //   inputRange: [0, 1],
+                //   outputRange: [0, 50],
+                // }),
+              }}
+            />
+          </View>
         </View>
       </View>
 

@@ -29,6 +29,7 @@ import { PreferencesContext } from '../../context/preferences';
 import { MusicContext } from '../../context/music';
 import IconUtils from '../../utils/icon';
 import keys from '../../constants/keys';
+import { useIsFocused } from '@react-navigation/native';
 
 const rearrangeActions = {
   MOVE_UP: 'MOVE_UP',
@@ -41,9 +42,10 @@ const rearrangeActions = {
 //  - Swiping gestures: left for reordering, right for deletion
 //  - Undo snackbar message for adding back the last removed track
 //  - Restore/Ignore changes playlist icon button
-//  - Proper intial swiping previews
+//  - Proper initial swiping previews
 //  - Long press to select many tracks to re-order or delete them
-const Playlist = ({ style, onModal, name, tracks, setTracks }) => {
+//  - Replace the test hardcoded colors with the ones from colors object
+const Playlist = ({ style, name, tracks, setTracks }) => {
   const { enabledDarkTheme } = useContext(PreferencesContext);
   const { playerControls } = useContext(MusicContext);
 
@@ -60,36 +62,89 @@ const Playlist = ({ style, onModal, name, tracks, setTracks }) => {
 
   let animationIsRunning = false;
 
+  // const isFocused = useIsFocused(); // TODO check if its required for checking in useEffect
+
+  // useEffect(() => {
+  //   // console.log(`[Playlist] isFocused=${isFocused}`);
+  //   if (isFocused) {
+  //   }
+  // }, [isFocused]);
+
   useEffect(() => {
-    const animValues = {};
-    tracks.forEach(track => {
-      // animValues[`${track.id}`] = new Animated.Value(1);
-      // animValues[track.id] = new Animated.Value(1);
-      animValues[track.id] = new Animated.Value(hp(8));
-      // animValues[track.id] = {
-      //   removal: new Animated.Value(hp(8)),
-      //   swapping: new Animated.Value(hp(8)),
+    // console.log(`[Playlist/useEffect] isFocused=${isFocused}`);
+
+    if (
+      // isFocused &&
+      tracks.length &&
+      !Object.keys(rowTranslateAnimatedValues).length
+    ) {
+      console.log(
+        `[Playlist/useEffect] tracks.length=${tracks.length}, keys=${
+          Object.keys(rowTranslateAnimatedValues).length
+        }`,
+      );
+
+      const animValues = {};
+      tracks.forEach(track => {
+        // animValues[`${track.id}`] = new Animated.Value(1);
+        // animValues[track.id] = new Animated.Value(1);
+        // animValues[track.id] = new Animated.Value(hp(8));
+        animValues[track.id] = {
+          removal: new Animated.Value(hp(8)),
+          expansion: new Animated.Value(0),
+        };
+        track.key = track.id;
+      });
+
+      for (const e in animValues) {
+        console.log(
+          `[Playlist/useEffect] ${e}=${JSON.stringify(
+            animValues[e].expansion,
+          )}`,
+        );
+      }
+
+      // console.log(
+      //   `[Playlist/useEffect] filling animValues, keys=${JSON.stringify(
+      //     animValues
+      //   )}`,
+      // );
+      setRowTranslateAnimatedValues(animValues);
+
+      // return () => {
+      //   // console.log(
+      //   //   `[Playlist] unmounting..., showMoreOptionForTrackId=${showMoreOptionForTrackId}`,
+      //   // );
+      //   // animateOptionsMenu({
+      //   //   shouldCollapse: true,
+      //   //   currentKey: showMoreOptionForTrackId,
+      //   // });
+      //   // const expandedOptionMenuAnimatedValue = rowTranslateAnimatedValues.find()
+      //   console.log(
+      //     `[Playlist] checking for any opened option menu...  expanded=${JSON.stringify(
+      //       rowTranslateAnimatedValues.find(x => {
+      //         console.log(`[Playlist] x=${JSON.stringify(x)}`);
+      //         return x.expansion > 0;
+      //       }),
+      //     )}, animValues=${JSON.stringify(rowTranslateAnimatedValues)}`,
+      //   );
       // };
-      track.key = track.id;
-    });
-    console.log(
-      `[Playlist/useEffect] filling animValues, keys=${
-        Object.keys(animValues)?.length
-      }`,
-    );
-    setRowTranslateAnimatedValues(animValues);
-  }, []);
+    }
+  }, [tracks]);
+  // }, [isFocused, tracks]);
 
   // console.log(`this.animationIsRunning=${this.animationIsRunning}`);
   // console.log(`[re-rendered] currentAction=${currentAction}`);
   // console.log(`track keys=${tracks?.[0]?.key}`);
+  console.log(`showMoreOptionForTrackId=${showMoreOptionForTrackId}`);
+  console.log(
+    `rowTranslateAnimatedValues=${JSON.stringify(rowTranslateAnimatedValues)}`,
+  );
 
   const rearrange = (item, fromIndex, action) => {
-    // console.log(
-    //   `[rearrange] item.title=${item.title}, fromIndex=${fromIndex}, action=${action}`,
-    // );
+    const getScrollValue = index => hp(8) * (index - 3); /* 3 items spacing */
 
-    let toIndex;
+    let toIndex, scrollX, scrollY;
     switch (action) {
       case rearrangeActions.MOVE_UP:
       case rearrangeActions.MOVE_TO_FIRST:
@@ -98,6 +153,8 @@ const Playlist = ({ style, onModal, name, tracks, setTracks }) => {
             `Invalid move operation: action: ${action}, fromIndex=${fromIndex}`,
           );
         toIndex = action === rearrangeActions.MOVE_TO_FIRST ? 0 : fromIndex - 1;
+        scrollX = getScrollValue(toIndex);
+        scrollY = 0;
         break;
 
       case rearrangeActions.MOVE_DOWN:
@@ -110,6 +167,8 @@ const Playlist = ({ style, onModal, name, tracks, setTracks }) => {
           action === rearrangeActions.MOVE_TO_LAST
             ? tracks.length - 1
             : fromIndex + 1;
+        scrollX = 0;
+        scrollY = getScrollValue(toIndex);
         break;
 
       default:
@@ -122,10 +181,29 @@ const Playlist = ({ style, onModal, name, tracks, setTracks }) => {
     _tracks[toIndex] = tmp;
     setTracks(_tracks);
 
-    if (action === rearrangeActions.MOVE_TO_LAST)
-      list.current._listRef._scrollRef.scrollToEnd();
-    else if (action === rearrangeActions.MOVE_TO_FIRST)
-      list.current._listRef._scrollRef.scrollTo({ x: 0, animated: true });
+    //   index = toIndex,
+    //   itemHeight = hp(8);
+    // console.log(`should scroll by ${index} items: ${scrollValue}`);
+
+    list.current._listRef._scrollRef.scrollTo({
+      x: scrollX,
+      y: scrollY,
+      animated: true,
+    });
+
+    // console.log(
+    //   `list-view keys=${JSON.stringify(
+    //     Object.keys(list.current._listRef._scrollRef),
+    //   )} (${list.current._listRef._averageCellLength}, ${
+    //     list.current._listRef._totalCellLength
+    //   })`,
+    // );
+
+    // TODO for MOVE_UP scroll one item height up & for MOVE_DOWN one item height down
+    // if (action === rearrangeActions.MOVE_TO_LAST)
+    //   list.current._listRef._scrollRef.scrollToEnd({ animated: true });
+    // else if (action === rearrangeActions.MOVE_TO_FIRST)
+    //   list.current._listRef._scrollRef.scrollTo({ x: 0, animated: true });
   };
 
   const onSwipeValueChange = swipeData => {
@@ -157,7 +235,7 @@ const Playlist = ({ style, onModal, name, tracks, setTracks }) => {
     if (value < -width && !animationIsRunning) {
       animationIsRunning = true;
       // rowTranslateAnimatedValues[key].setValue(0);
-      Animated.timing(rowTranslateAnimatedValues[key], {
+      Animated.timing(rowTranslateAnimatedValues[key].removal, {
         toValue: 0,
         duration: 200,
         useNativeDriver: false,
@@ -176,6 +254,41 @@ const Playlist = ({ style, onModal, name, tracks, setTracks }) => {
   };
 
   // console.log(`tracks::keys=${JSON.stringify(tracks.map(t => t.key))}`);
+
+  const animateOptionsMenu = ({
+    shouldCollapse,
+    currentKey,
+    otherKeyToCollapse,
+  }) => {
+    if (!animationIsRunning) {
+      animationIsRunning = true;
+      Animated.parallel([
+        Animated.timing(rowTranslateAnimatedValues[currentKey].expansion, {
+          toValue: shouldCollapse ? 0 : 1,
+          // toValue: shouldCollapse ? 0 : hp(11),
+          duration: 400,
+          useNativeDriver: false,
+        }),
+        otherKeyToCollapse &&
+          Animated.timing(
+            rowTranslateAnimatedValues[otherKeyToCollapse].expansion,
+            {
+              toValue: 0,
+              duration: 400,
+              useNativeDriver: false,
+            },
+          ),
+      ]).start(() => {
+        setShowMoreOptionForTrackId(shouldCollapse ? null : currentKey);
+        animationIsRunning = false;
+        // console.log(
+        //   `Done animating, showMoreOptionForTrackId=${
+        //     shouldCollapse ? null : currentKey
+        //   }`,
+        // );
+      });
+    }
+  };
 
   const renderItem = data => {
     const onPress = () => {
@@ -222,67 +335,108 @@ const Playlist = ({ style, onModal, name, tracks, setTracks }) => {
       return <Avatar.Icon size={hp(6)} icon="music" style={styles.musicIcon} />;
     };
 
-    const renderRightComponent = props => (
-      <Menu
-        {...props}
-        visible={!onModal && showMoreOptionForTrackId === data.item.id}
-        onDismiss={setShowMoreOptionForTrackId.bind(this, null)}
-        style={{
-          zIndex: 99999,
-          elevation: 99999,
-          // flex: 1,
-          // position: 'absolute',
-          // top: 0,
-        }}
-        // anchor={{ x: 0, y: 0 }}
-        anchor={
-          <IconButton
-            {...props}
-            icon={IconUtils.getInfo(keys.VERTICAL_ELLIPSIS).name.default}
-            onPress={setShowMoreOptionForTrackId.bind(this, data.item.id)}
-            // style={{
-            //   zIndex: 999,
-            // }}
+    const renderRightComponent = props => {
+      return (
+        <IconButton
+          {...props}
+          color={
+            showMoreOptionForTrackId === data.item.key ? 'blue' : props.color
+          }
+          icon={IconUtils.getInfo(keys.VERTICAL_ELLIPSIS).name.default}
+          onPress={() => {
+            // console.log(`showMoreOptionForTrackId=${showMoreOptionForTrackId}`);
+            if (!showMoreOptionForTrackId) {
+              // console.log(`expand current: ${data.item.key}`);
+              animateOptionsMenu({ currentKey: data.item.key });
+            } else {
+              if (showMoreOptionForTrackId !== data.item.key) {
+                // console.log(
+                //   `collapse other: ${showMoreOptionForTrackId}, expand current: ${data.item.key}`,
+                // );
+                animateOptionsMenu({
+                  currentKey: data.item.key,
+                  otherKeyToCollapse: showMoreOptionForTrackId,
+                });
+              } else {
+                // console.log(`collapse current: ${showMoreOptionForTrackId}`);
+                animateOptionsMenu({
+                  shouldCollapse: true,
+                  currentKey: data.item.key,
+                });
+              }
+            }
+          }}
+          // style={{
+          //   zIndex: 999,
+          // }}
+        />
+      );
+
+      // TODO Deprecated, remove later
+      return (
+        <Menu
+          {...props}
+          visible={showMoreOptionForTrackId === data.item.id}
+          onDismiss={setShowMoreOptionForTrackId.bind(this, null)}
+          style={
+            {
+              // zIndex: 99999,
+              // elevation: 99999,
+              // flex: 1,
+              // position: 'absolute',
+              // top: 0,
+            }
+          }
+          // anchor={{ x: 0, y: 0 }}
+          anchor={
+            <IconButton
+              {...props}
+              icon={IconUtils.getInfo(keys.VERTICAL_ELLIPSIS).name.default}
+              onPress={setShowMoreOptionForTrackId.bind(this, data.item.id)}
+              // style={{
+              //   zIndex: 999,
+              // }}
+            />
+          }>
+          <Menu.Item
+            icon={IconUtils.getInfo(keys.SKIP_NEXT).name.default}
+            title={labels.playNext}
+            onPress={() => {
+              alert(JSON.stringify(props));
+              setShowMoreOptionForTrackId(null);
+            }}
+            // style={{ zIndex: 999, backgroundColor: 'lightgreen' }}
           />
-        }>
-        <Menu.Item
-          icon={IconUtils.getInfo(keys.SKIP_NEXT).name.default}
-          title={labels.playNext}
-          onPress={() => {
-            alert(JSON.stringify(props));
-            setShowMoreOptionForTrackId(null);
-          }}
-          // style={{ zIndex: 999, backgroundColor: 'lightgreen' }}
-        />
-        <Menu.Item
-          icon={IconUtils.getInfo(keys.ADD_TO_PLAYLIST).name.default}
-          title={labels.addToPlaylist}
-          onPress={() => {
-            setShowMoreOptionForTrackId(null);
-            alert(JSON.stringify(props));
-          }}
-        />
-        <Menu.Item
-          icon={IconUtils.getInfo(keys.ADD_TO_QUEUE).name.default}
-          title={labels.addToQueue}
-          onPress={() => {
-            // alert(JSON.stringify(props));
-            setShowMoreOptionForTrackId(null);
-            ToastAndroid.show(labels.addedToQueue, ToastAndroid.SHORT);
-          }}
-        />
-        <Menu.Item
-          icon={IconUtils.getInfo(keys.INFO).name.filled}
-          title={labels.showInfo}
-          onPress={() => {
-            // alert(JSON.stringify(props));
-            // navigation.navigate(screenNames.itemInfo, { type, data });
-            // setInfoModalData({ type, data });
-            setShowMoreOptionForTrackId(null);
-          }}
-        />
-      </Menu>
-    );
+          <Menu.Item
+            icon={IconUtils.getInfo(keys.ADD_TO_PLAYLIST).name.default}
+            title={labels.addToPlaylist}
+            onPress={() => {
+              setShowMoreOptionForTrackId(null);
+              alert(JSON.stringify(props));
+            }}
+          />
+          <Menu.Item
+            icon={IconUtils.getInfo(keys.ADD_TO_QUEUE).name.default}
+            title={labels.addToQueue}
+            onPress={() => {
+              // alert(JSON.stringify(props));
+              setShowMoreOptionForTrackId(null);
+              ToastAndroid.show(labels.addedToQueue, ToastAndroid.SHORT);
+            }}
+          />
+          <Menu.Item
+            icon={IconUtils.getInfo(keys.INFO).name.filled}
+            title={labels.showInfo}
+            onPress={() => {
+              // alert(JSON.stringify(props));
+              // navigation.navigate(screenNames.itemInfo, { type, data });
+              // setInfoModalData({ type, data });
+              setShowMoreOptionForTrackId(null);
+            }}
+          />
+        </Menu>
+      );
+    };
 
     // FIXME Not working
     const renderDivider = () => {
@@ -303,70 +457,316 @@ const Playlist = ({ style, onModal, name, tracks, setTracks }) => {
     };
 
     return (
-      <Animated.View
+      <View
         style={{
-          ...styles.rowFrontContainer,
-          // height: rowTranslateAnimatedValues[data.item.key]?.interpolate({
-          //   inputRange: [0, 1],
-          //   outputRange: [0, hp(8)],
-          // }),
-          height: rowTranslateAnimatedValues[data.item.key],
-
-          // opacity: 0.3,
-          borderRadius: currentlyPlayingTrackId === data.item.id ? wp(2) : 0,
-          // backgroundColor:
-          //   currentlyPlayingTrackId === data.item.id
-          //     ? enabledDarkTheme
-          //       ? colors.darker
-          //       : colors.lighter
-          //     : enabledDarkTheme
-          //     ? colors.dark
-          //     : colors.light,
-
-          backgroundColor: rowTranslateAnimatedValues[
-            data.item.key
-          ]?.interpolate({
-            inputRange: [0, hp(7), hp(8)],
-            outputRange: ['blue', '#0080ff', 'white'],
-          }),
-
-          elevation: currentlyPlayingTrackId === data.item.id ? 2 : 0,
-
-          // marginTop: data.index === 2 ? -40 : data.index === 1 ? 40 : null,
-          // opacity: data.index === 2 ? 0.7 : 1,
-          // backgroundColor:
-          //   data.index === 2 ? 'orange' : data.index === 1 ? 'blue' : 'white',
-
-          // backgroundColor: 'lightgreen',
-          // borderWidth: 1,
-          // paddingBottom: hp(2),
+          backgroundColor: 'white',
         }}>
-        {/*<TouchableHighlight*/}
-        {/*  onPress={() => console.log('You touched me')}*/}
-        {/*  style={styles.rowFront}*/}
-        {/*  underlayColor={'#AAA'}>*/}
-        {/*  <View>*/}
-        {/*    <Text>{`[idx=${data.index}, key=${data.item.key}] ${data.item.title}`}</Text>*/}
-        {/*  </View>*/}
-        {/*</TouchableHighlight>*/}
+        <Animated.View
+          style={{
+            ...styles.rowFrontContainer,
+            // height: rowTranslateAnimatedValues[data.item.key]?.interpolate({
+            //   inputRange: [0, 1],
+            //   outputRange: [0, hp(8)],
+            // }),
+            height: rowTranslateAnimatedValues[data.item.key]?.removal,
 
-        <List.Item
-          style={styles.trackItemContainer}
-          onPress={onPress}
-          titleEllipsizeMode={'tail'}
-          titleNumberOfLines={1}
-          titleStyle={styles.listItemText}
-          title={`[${data.item.id}] ${data.item.title}`}
-          // title={data.item.title}
-          descriptionEllipsizeMode={'tail'}
-          descriptionNumberOfLines={1}
-          description={renderDescription}
-          left={renderLeftComponent}
-          right={renderRightComponent}
-        />
+            // opacity: 0.3,
+            borderRadius: currentlyPlayingTrackId === data.item.id ? wp(2) : 0,
+            // backgroundColor: // FIXME Integrate this coloring scheme too when removal animation is not in progress
+            //   currentlyPlayingTrackId === data.item.id
+            //     ? enabledDarkTheme
+            //       ? colors.darker
+            //       : colors.lighter
+            //     : enabledDarkTheme
+            //     ? colors.dark
+            //     : colors.light,
 
-        {renderDivider()}
-      </Animated.View>
+            backgroundColor:
+              rowTranslateAnimatedValues[data.item.key]?.removal?.interpolate({
+                inputRange: [0, hp(7), hp(8)],
+                outputRange: ['blue', '#0080ff', 'white'],
+              }) ?? hp(8),
+
+            elevation: currentlyPlayingTrackId === data.item.id ? 2 : 0,
+
+            marginTop: rowTranslateAnimatedValues[data.item.key]?.rearrangement,
+            // opacity: // TODO Try this too
+            //   rowTranslateAnimatedValues[
+            //     data.item.key
+            //   ]?.rearrangement?.interpolate({
+            //     inputRange: [0, hp(7.5), hp(8)],
+            //     outputRange: [1, 0.7, 1],
+            //   }) ?? 1,
+            // backgroundColor: // TODO Try this too
+            //   // data.index === 2 ? 'orange' : data.index === 1 ? 'blue' : 'white',
+            //   +data.item.key === 32
+            //     ? 'orange'
+            //     : +data.item.key === 14
+            //     ? 'blue'
+            //     : 'white',
+
+            // backgroundColor: 'lightgreen',
+            // borderWidth: 1,
+            // paddingBottom: hp(2),
+          }}>
+          {/*<TouchableHighlight*/}
+          {/*  onPress={() => console.log('You touched me')}*/}
+          {/*  style={styles.rowFront}*/}
+          {/*  underlayColor={'#AAA'}>*/}
+          {/*  <View>*/}
+          {/*    <Text>{`[idx=${data.index}, key=${data.item.key}] ${data.item.title}`}</Text>*/}
+          {/*  </View>*/}
+          {/*</TouchableHighlight>*/}
+
+          <List.Item
+            style={styles.trackItemContainer}
+            onPress={onPress}
+            titleEllipsizeMode={'tail'}
+            titleNumberOfLines={1}
+            titleStyle={styles.listItemText}
+            title={`[${data.item.id}] ${data.item.title}`}
+            // title={data.item.title}
+            descriptionEllipsizeMode={'tail'}
+            descriptionNumberOfLines={1}
+            description={renderDescription}
+            left={renderLeftComponent}
+            right={renderRightComponent}
+          />
+
+          {renderDivider()}
+        </Animated.View>
+
+        {/*<View*/}
+        {/*  style={{*/}
+        {/*    // position: 'absolute',*/}
+        {/*    display:  // FIXME Required??*/}
+        {/*      showMoreOptionForTrackId === data.item.key ? 'flex' : 'none',*/}
+        {/*    backgroundColor: 'white',*/}
+        {/*    paddingVertical: hp(1),*/}
+        {/*    // paddingHorizontal: wp(2),*/}
+        {/*    // justifyContent: 'flex-start',*/}
+        {/*    alignItems: 'flex-end',*/}
+        {/*  }}>*/}
+        <Animated.View
+          style={{
+            // ...styles.rowFrontContainer,
+            // flexDirection: 'row',
+            // flex: 1,
+            alignItems: 'center',
+            // alignItems: '',
+            // alignContent: 'center',
+            // flexWrap: 'wrap',
+            // justifyContent: 'space-between',
+            // justifyContent: 'space-around',
+            justifyContent: 'center',
+            // verticalAlign: 'center',
+            width: wp(88),
+            paddingHorizontal: wp(4),
+            // alignItems: 'center',
+            // textAlignVertical: 'center',
+            // height: rowTranslateAnimatedValues[data.item.key]?.interpolate({
+            //   inputRange: [0, 1],
+            //   outputRange: [0, hp(8)],
+            // }),
+            // elevation: 4,
+            // marginHorizontal: wp(2),
+            // width: wp(85),
+
+            borderBottomStartRadius: 10,
+            borderBottomEndRadius: 10,
+            // height: hp(4),
+            // height: rowTranslateAnimatedValues[data.item.key]?.expansion,
+            height: rowTranslateAnimatedValues[
+              data.item.key
+            ]?.expansion.interpolate({
+              inputRange: [0, 1],
+              outputRange: [0, hp(11)],
+            }),
+            // backgroundColor: 'lightgreen',
+            backgroundColor: rowTranslateAnimatedValues[
+              data.item.key
+            ]?.expansion.interpolate({
+              inputRange: [0, 1],
+              outputRange: ['blue', 'lightgreen'],
+            }),
+            opacity: rowTranslateAnimatedValues[
+              data.item.key
+            ]?.expansion.interpolate({
+              inputRange: [0, 0.7, 1],
+              outputRange: [0, 0.1, 1],
+            }),
+          }}>
+          {/*<Icon*/}
+          {/*  name="caretup"*/}
+          {/*  type="AntDesign"*/}
+          {/*  color={'lightgreen'}*/}
+          {/*  style={{*/}
+          {/*    position: 'absolute',*/}
+          {/*    right: wp(3),*/}
+          {/*    top: -hp(2.2),*/}
+          {/*  }}*/}
+          {/*/>*/}
+
+          <View
+            style={{
+              flexDirection: 'row',
+              alignContent: 'center',
+              flexWrap: 'wrap',
+              justifyContent: 'space-around',
+              // backgroundColor: 'lightblue',
+              //
+              // backgroundColor: rowTranslateAnimatedValues[
+              //   data.item.key
+              // ]?.expansion.interpolate({
+              //   inputRange: [0, 1],
+              //   outputRange: ['blue', 'black'],
+              // }),
+            }}>
+            {[
+              {
+                title: labels.playNext,
+                iconName: IconUtils.getInfo(keys.SKIP_NEXT).name.default,
+                onPress: () => {
+                  // alert(JSON.stringify(props));
+                  setShowMoreOptionForTrackId(null);
+                },
+              },
+
+              {
+                title: labels.addToPlaylist,
+                iconName: IconUtils.getInfo(keys.ADD_TO_PLAYLIST).name.default,
+                onPress: () => {
+                  // alert(JSON.stringify(props));
+                  setShowMoreOptionForTrackId(null);
+                },
+              },
+
+              {
+                title: labels.addToQueue,
+                iconName: IconUtils.getInfo(keys.ADD_TO_QUEUE).name.default,
+                onPress: () => {
+                  // alert(JSON.stringify(props));
+                  setShowMoreOptionForTrackId(null);
+                },
+              },
+
+              {
+                title: labels.showInfo,
+                iconName: IconUtils.getInfo(keys.INFO).name.filled,
+                onPress: () => {
+                  // alert(JSON.stringify(props));
+                  setShowMoreOptionForTrackId(null);
+                },
+              },
+            ].map((option, index) => (
+              <TouchableOpacity
+                key={index}
+                onPress={option.onPress}
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  // paddingVertical: hp(0.2),
+                  marginVertical: hp(0.5),
+                  paddingRight: wp(2),
+                  borderWidth: 1,
+                  borderColor: colors.lightGrey,
+                  borderRadius: 50,
+                  // opacity: rowTranslateAnimatedValues[
+                  //   data.item.key
+                  // ]?.expansion.interpolate({
+                  //   inputRange: [0, hp(11)],
+                  //   outputRange: [0, 1],
+                  // }),
+                }}>
+                <Icon
+                  name={option.iconName}
+                  size={wp(5)}
+                  color={colors.white}
+                  style={{
+                    marginRight: wp(2),
+                    padding: wp(1),
+                    backgroundColor: colors.lightGrey,
+                    borderRadius: 50,
+                  }}
+                />
+                <Text
+                  style={{
+                    fontSize: wp(3.5),
+                    color: colors.lightGrey,
+                    alignItems: 'center',
+                  }}>
+                  {option.title}
+                  {/*{index !== items.length - 1 && (*/}
+                  {/*  <Text*/}
+                  {/*    style={{*/}
+                  {/*      fontSize: wp(4),*/}
+                  {/*      color: 'darkgray',*/}
+                  {/*      fontWeight: 'bold',*/}
+                  {/*    }}>*/}
+                  {/*    {`  |  `}*/}
+                  {/*  </Text>*/}
+                  {/*)}*/}
+                </Text>
+              </TouchableOpacity>
+            ))}
+
+            {/*<Menu.Item*/}
+            {/*  icon={IconUtils.getInfo(keys.SKIP_NEXT).name.default}*/}
+            {/*  title={labels.playNext}*/}
+            {/*  onPress={() => {*/}
+            {/*    alert(JSON.stringify(props));*/}
+            {/*    setShowMoreOptionForTrackId(null);*/}
+            {/*  }}*/}
+            {/*  style={{*/}
+            {/*    backgroundColor: 'lightblue',*/}
+            {/*    alignSelf: 'flex-start',*/}
+            {/*    margin: 0,*/}
+            {/*    padding: 0,*/}
+            {/*  }}*/}
+            {/*  contentStyle={{ backgroundColor: 'red', margin: 0, padding: 0 }}*/}
+            {/*/>*/}
+
+            {/*<Menu.Item*/}
+            {/*  icon={IconUtils.getInfo(keys.SKIP_NEXT).name.default}*/}
+            {/*  title={labels.playNext}*/}
+            {/*  onPress={() => {*/}
+            {/*    alert(JSON.stringify(props));*/}
+            {/*    setShowMoreOptionForTrackId(null);*/}
+            {/*  }}*/}
+            {/*  // style={{ zIndex: 999, backgroundColor: 'lightgreen' }}*/}
+            {/*/>*/}
+            {/*<Menu.Item*/}
+            {/*  icon={IconUtils.getInfo(keys.ADD_TO_PLAYLIST).name.default}*/}
+            {/*  title={labels.addToPlaylist}*/}
+            {/*  onPress={() => {*/}
+            {/*    setShowMoreOptionForTrackId(null);*/}
+            {/*    alert(JSON.stringify(props));*/}
+            {/*  }}*/}
+            {/*/>*/}
+            {/*<Menu.Item*/}
+            {/*  icon={IconUtils.getInfo(keys.ADD_TO_QUEUE).name.default}*/}
+            {/*  title={labels.addToQueue}*/}
+            {/*  onPress={() => {*/}
+            {/*    // alert(JSON.stringify(props));*/}
+            {/*    setShowMoreOptionForTrackId(null);*/}
+            {/*    ToastAndroid.show(labels.addedToQueue, ToastAndroid.SHORT);*/}
+            {/*  }}*/}
+            {/*/>*/}
+            {/*<Menu.Item*/}
+            {/*  icon={IconUtils.getInfo(keys.INFO).name.filled}*/}
+            {/*  title={labels.showInfo}*/}
+            {/*  onPress={() => {*/}
+            {/*    // alert(JSON.stringify(props));*/}
+            {/*    // navigation.navigate(screenNames.itemInfo, { type, data });*/}
+            {/*    // setInfoModalData({ type, data });*/}
+            {/*    setShowMoreOptionForTrackId(null);*/}
+            {/*  }}*/}
+            {/*/>*/}
+          </View>
+        </Animated.View>
+        {/*</View>*/}
+      </View>
     );
   };
 
@@ -592,11 +992,20 @@ const Playlist = ({ style, onModal, name, tracks, setTracks }) => {
       <Snackbar
         visible={Boolean(lastTrackRemoved)}
         duration={2000}
+        // wrapperStyle={{
+        //   // backgroundColor: 'blue',
+        //   // zIndex: 100,
+        // }}
+        style={{
+          // backgroundColor: 'red',
+          opacity: 0.7,
+          // zIndex: 100,
+        }}
         onDismiss={setLastTrackRemoved.bind(this, null)}
         action={{
           label: labels.undo,
           onPress: () => {
-            if (!lastTrackRemoved.item) return;
+            if (!lastTrackRemoved) return;
 
             const _tracks = [...tracks];
             _tracks.splice(lastTrackRemoved.index, 0, lastTrackRemoved.item);
@@ -608,7 +1017,7 @@ const Playlist = ({ style, onModal, name, tracks, setTracks }) => {
               animationIsRunning = true;
               // rowTranslateAnimatedValues[lastTrackRemoved.item.key].setValue(0);
               Animated.timing(
-                rowTranslateAnimatedValues[lastTrackRemoved.item.key],
+                rowTranslateAnimatedValues[lastTrackRemoved.item.key].removal,
                 {
                   toValue: hp(8),
                   duration: 400,

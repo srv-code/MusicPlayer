@@ -338,6 +338,11 @@ const CurrentPlaylist = ({ navigation, route, extraData: { snapIndex } }) => {
 
       <Portal>
         <FAB.Group
+          style={{
+            // zIndex: 1,
+            paddingBottom: hp(6),
+            opacity: isFABOpened ? 1 : 0.7,
+          }}
           visible={isFABVisible}
           open={isFABOpened}
           icon={
