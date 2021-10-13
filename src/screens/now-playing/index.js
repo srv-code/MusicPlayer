@@ -331,7 +331,7 @@ const NowPlaying = ({ navigation, extraData: { snapIndex, setSnapIndex } }) => {
             onPress={navigation.navigate.bind(
               this,
               screenNames.currentPlaylist,
-              { playlistId: null },
+              { playlistId: musicInfo.currentlyPlaying?.playlistId },
             )}>
             <Icon
               name={IconUtils.getInfo(keys.PLAYLISTS).name.outlined}
@@ -406,11 +406,12 @@ const NowPlaying = ({ navigation, extraData: { snapIndex, setSnapIndex } }) => {
             }}>
             <Icon
               name={
-                trackInfo.markedFavorite
-                  ? IconUtils.getInfo(keys.FAVORITE).name.filled
-                  : IconUtils.getInfo(keys.FAVORITE).name.outlined
+                IconUtils.getInfo(keys.FAVORITE).name[
+                  trackInfo.markedFavorite ? 'filled' : 'outlined'
+                ]
               }
               // TODO update the button colors
+              // TODO Implement spring animation and make icon bigger if marked favorite
               size={wp(6)}
               // style={{ opacity: hasPreviousTrack ? 1 : 0.2 }}
             />

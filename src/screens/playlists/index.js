@@ -127,6 +127,7 @@ const Playlists = ({ navigation }) => {
   //   setEditingPlaylistInfo(info);
   // };
 
+  // FIXME Screen is not scrollable
   return (
     <>
       <ScreenContainer style={dynamicStyles.screen}>

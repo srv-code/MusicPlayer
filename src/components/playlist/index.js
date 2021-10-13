@@ -78,33 +78,33 @@ const MAX_PLAYLIST_NAME_LENGTH = 25;
 //        (if saved then keep the previous name else keep it unsaved)
 
 // TODO [Complete]
-//  - Swiping gestures: left for reordering, right for deletion
-//  - Undo snackbar message for adding back the last removed track
-//  - Restore/Ignore changes playlist icon button
-//  - Proper initial swiping previews
-//  - Long press to select many tracks to re-order or delete them
+//  - [LATER] Long press to select many tracks to re-order or delete them
 //  - Replace the test hardcoded colors with the ones from colors object
-//  - Move the rename playlist functionality from current-playlist screen
-//  - Move the FAB.Group from current-playlist screen
 //  - Restructure all the playlist related functionalities here (from current-playlist screen & playlists)
 //  - Implement all pending props, update code as per the new set of props
+//  - Implement the show info button press logic
 
-const Playlist = ({ style, id: _id, showIcon }) => {
+// TODO [Test]
+//  - Play sequence in current & other playlists
+//  - If all the unsaved changes are saved when required and also if its handled properly
+//      when the current playlist is from tracks (unsaved & untitled)
+
+const Playlist = ({ style, id: _id }) => {
   const { enabledDarkTheme } = useContext(PreferencesContext);
   const { musicInfo, setMusicInfo } = useContext(MusicContext);
   const { playerControls } = useContext(MusicContext);
 
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [id, setID] = useState(null);
+  const [name, setName] = useState('');
+  const [tracks, setTracks] = useState([]);
   const [isFABOpened, setIsFABOpened] = useState(false);
   const [isFABVisible, setIsFABVisible] = useState(true);
   const [isEditingPlaylistName, setIsEditingPlaylistName] = useState(false);
-  const [playlistName, setPlaylistName] = useState('');
   const [lastTrackRemoved, setLastTrackRemoved] = useState(null);
   const [rowTranslateAnimatedValues, setRowTranslateAnimatedValues] = useState(
     [],
   );
-  const [tracks, setTracks] = useState([]);
   const [currentActions, setCurrentActions] = useState(null);
   const [currentlyPlayingTrackId, setCurrentlyPlayingTrackId] = useState(null);
   const [showMoreOptionForTrackId, setShowMoreOptionForTrackId] =
@@ -121,7 +121,7 @@ const Playlist = ({ style, id: _id, showIcon }) => {
     if (isEditingPlaylistName) {
       setIsEditingPlaylistName(false);
       // FIXME Should restore the previous set name
-      setPlaylistName('');
+      setName('');
       return true;
     }
     if (id && hasUnsavedChanges) savePlaylist();
@@ -134,6 +134,8 @@ const Playlist = ({ style, id: _id, showIcon }) => {
   };
 
   useEffect(async () => {
+    console.log(`[Playlist/useEffect] isFocused=${isFocused}`);
+
     if (isFocused) {
       setID(_id);
       const _info = _id && musicInfo[keys.PLAYLISTS].find(pl => pl.id === _id);
@@ -153,7 +155,7 @@ const Playlist = ({ style, id: _id, showIcon }) => {
       setTracks(_tracks);
 
       /* Update playlist name */
-      if (_info) setPlaylistName(_info.name);
+      if (_info) setName(_info.name);
 
       /* Update rowTranslateAnimatedValues */
       if (_tracks.length && !Object.keys(rowTranslateAnimatedValues).length) {
@@ -245,19 +247,25 @@ const Playlist = ({ style, id: _id, showIcon }) => {
 
   // TODO Update with the newer scheme
   const savePlaylist = () => {
+    console.log(
+      `[Playlist/savePlaylist] isFocused=${isFocused}, hasUnsavedChanges=${hasUnsavedChanges}, id=${id}, name=${name}, tracks=${tracks.map(
+        t => t.title,
+      )}`,
+    );
+
     // console.log(
     //   `[Current-Playlist] playlists=${JSON.stringify(
     //     musicInfo[keys.PLAYLISTS],
     //   )}`,
     // );
 
-    const name = playlistName.trim();
-    if (name === '')
+    const newName = name.trim();
+    if (newName === '')
       setSnackbarMessage({
         type: snackbarMessageType.ERROR_MESSAGE,
         info: labels.emptyPlaylistName,
       });
-    else if (musicInfo[keys.PLAYLISTS].some(info => info.name === name))
+    else if (musicInfo[keys.PLAYLISTS].some(info => info.name === newName))
       setSnackbarMessage({
         type: snackbarMessageType.ERROR_MESSAGE,
         info: labels.sameNamePlaylist,
@@ -271,7 +279,7 @@ const Playlist = ({ style, id: _id, showIcon }) => {
         isCreating = false;
         newPlaylists = [...musicInfo[keys.PLAYLISTS]];
         const currentPlaylist = newPlaylists.find(x => x.id === id);
-        currentPlaylist.name = name;
+        currentPlaylist.name = newName;
         currentPlaylist.track_ids = tracks.map(t => t.id);
       } else {
         /* Creating playlist */
@@ -281,7 +289,7 @@ const Playlist = ({ style, id: _id, showIcon }) => {
           ...musicInfo[keys.PLAYLISTS],
           {
             id: createdOn,
-            name,
+            name: newName,
             track_ids: tracks.map(t => t.id),
             created: createdOn,
             last_updated: new Date().getTime(),
@@ -295,7 +303,6 @@ const Playlist = ({ style, id: _id, showIcon }) => {
             ...info,
             [keys.PLAYLISTS]: newPlaylists,
           }));
-          setIsEditingPlaylistName(false);
           if (isCreating) {
             setID(createdOn);
             setMusicInfo(data => ({
@@ -848,16 +855,19 @@ const Playlist = ({ style, id: _id, showIcon }) => {
               mode="outlined"
               placeholder={labels.playlistName}
               label={labels.playlistName}
-              value={playlistName}
-              onBlur={savePlaylist}
-              onChangeText={name => {
-                // console.log(`[Current-Playlist/onChangeText] text=${name}, ASCII=`);
-                if (name.length <= MAX_PLAYLIST_NAME_LENGTH)
-                  setPlaylistName(name);
+              value={name}
+              // onBlur={savePlaylist}
+              onBlur={() => {
+                setIsEditingPlaylistName(false);
+                setHasUnsavedChanges(true);
+              }}
+              onChangeText={text => {
+                // console.log(`[Current-Playlist/onChangeText] text=${text}, ASCII=`);
+                if (text.length <= MAX_PLAYLIST_NAME_LENGTH) setName(text);
               }}
               right={
                 <TextInput.Affix
-                  text={`/${MAX_PLAYLIST_NAME_LENGTH - playlistName.length}`}
+                  text={`/${MAX_PLAYLIST_NAME_LENGTH - name.length}`}
                 />
               }
               left={
@@ -881,7 +891,7 @@ const Playlist = ({ style, id: _id, showIcon }) => {
                 fontSize: wp(5),
                 textAlign: 'center',
               }}>
-              {playlistName || labels.untitledPlaylist}
+              {name || labels.untitledPlaylist}
             </Text>
           </TouchableOpacity>
         )}

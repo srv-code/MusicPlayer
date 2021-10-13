@@ -9,7 +9,7 @@ import screenNames from '../../constants/screen-names';
 import { BottomSheetScrollView, BottomSheetView } from '@gorhom/bottom-sheet';
 import { Text, FAB, TextInput, Portal, Snackbar } from 'react-native-paper';
 import { StyleSheet, ToastAndroid, View } from 'react-native';
-import { handlers as PlayerBottomSheetHandlers } from '../../components/player-bottom-sheet';
+import { handlers as playerBottomSheetHandlers } from '../../components/player-bottom-sheet';
 import labels from '../../constants/labels';
 import colors from '../../constants/colors';
 import TrackPlayer from 'react-native-track-player';
@@ -45,7 +45,7 @@ const CurrentPlaylist = ({ navigation, route, extraData: { snapIndex } }) => {
     // setIsFABVisible(isFocused);
     // TODO [END] Move to Playlist component
 
-    PlayerBottomSheetHandlers.setIsContentPanningGestureEnabled?.(!isFocused);
+    playerBottomSheetHandlers.setIsContentPanningGestureEnabled?.(!isFocused);
   }, [isFocused]);
 
   // useEffect(() => {
@@ -333,7 +333,7 @@ const CurrentPlaylist = ({ navigation, route, extraData: { snapIndex } }) => {
       {/*</View>*/}
 
       {/*<Playlist tracks={tracks} setTracks={setTracks} />*/}
-      <Playlist id={route.params.playlistId} showIcon />
+      <Playlist id={route.params.playlistId} />
 
       {/*<Portal>*/}
       {/*<FAB.Group*/}
