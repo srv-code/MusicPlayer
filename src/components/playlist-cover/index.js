@@ -119,8 +119,7 @@ const PlaylistCover = ({
 
       let count = Math.floor(artworks.length / COVER_ROW_CELL_COUNT);
       if (count === 0) count = 1;
-      else if (count > COVER_ROW_CELL_COUNT)
-        count = Math.pow(COVER_ROW_CELL_COUNT, 2);
+      else if (count > COVER_ROW_CELL_COUNT) count = COVER_ROW_CELL_COUNT ** 2;
       else count *= COVER_ROW_CELL_COUNT;
 
       artworks.splice(count);

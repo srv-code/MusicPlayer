@@ -21,7 +21,8 @@ const Playlists = ({ navigation }) => {
   const { musicInfo } = useContext(MusicContext);
 
   const [playlists, setPlaylists] = useState([]);
-  const [editingPlaylistInfo, setEditingPlaylistInfo] = useState(null);
+  // const [editingPlaylistInfo, setEditingPlaylistInfo] = useState(null);
+  const [editingPlaylistID, setEditingPlaylistID] = useState(null);
   const [sortBy, setSortBy] = useState(SortingOptions.TITLE);
   const [sortOrder, setSortOrder] = useState(SortingOrders.ASCENDING);
 
@@ -109,21 +110,22 @@ const Playlists = ({ navigation }) => {
   };
 
   const closeEditModal = () => {
-    setEditingPlaylistInfo(null);
+    // setEditingPlaylistInfo(null);
+    setEditingPlaylistID(null);
   };
 
   // console.log(
   //   `[Playlists] editingPlaylistInfo=${JSON.stringify(editingPlaylistInfo)}`,
   // );
 
-  const fillEditingPlaylistInfo = info => {
-    const tracks = [];
-    musicInfo?.[keys.TRACKS]?.forEach(tr => {
-      if (info.track_ids.includes(tr.id)) tracks.push(tr);
-    });
-    info.tracks = tracks;
-    setEditingPlaylistInfo(info);
-  };
+  // const fillEditingPlaylistInfo = info => {
+  //   const tracks = [];
+  //   musicInfo?.[keys.TRACKS]?.forEach(tr => {
+  //     if (info.track_ids.includes(tr.id)) tracks.push(tr);
+  //   });
+  //   info.tracks = tracks;
+  //   setEditingPlaylistInfo(info);
+  // };
 
   return (
     <>
@@ -170,7 +172,8 @@ const Playlists = ({ navigation }) => {
               <PlaylistCover
                 key={index}
                 id={info.id}
-                onEdit={fillEditingPlaylistInfo}
+                onEdit={info => setEditingPlaylistID(info.id)}
+                // onEdit={fillEditingPlaylistInfo}
                 onPlay={onPlayPlaylist}
                 onShuffle={onShufflePlaylist}
                 onAddToQueue={onAddPlaylistToQueue}
@@ -203,7 +206,8 @@ const Playlists = ({ navigation }) => {
 
       <Modal
         testID={'modal'}
-        isVisible={Boolean(editingPlaylistInfo)}
+        // isVisible={Boolean(editingPlaylistInfo)}
+        isVisible={Boolean(editingPlaylistID)}
         // isVisible={false}
         onSwipeComplete={closeEditModal}
         swipeDirection={['down']}
@@ -215,15 +219,18 @@ const Playlists = ({ navigation }) => {
         scrollOffsetMax={hp(80)} // content height - ScrollView height
         propagateSwipe={true}
         style={{
+          // flex: 1,
           justifyContent: 'flex-end',
           margin: 0,
         }}>
         <View
           style={{
-            height: hp(70),
+            // height: hp(70),
+            flex: 0.8,
             backgroundColor: enabledDarkTheme ? colors.darker : colors.lighter,
             borderTopStartRadius: 15,
             borderTopEndRadius: 15,
+            overflow: 'hidden',
             alignItems: 'center',
           }}>
           <View
@@ -239,13 +246,14 @@ const Playlists = ({ navigation }) => {
             }}
           />
 
-          <Playlist
-            name={editingPlaylistInfo?.name}
-            tracks={editingPlaylistInfo?.tracks || []}
-            setTracks={tracks => {
-              setEditingPlaylistInfo(prev => ({ ...prev, tracks }));
-            }}
-          />
+          {/*<Playlist*/}
+          {/*  name={editingPlaylistInfo?.name}*/}
+          {/*  tracks={editingPlaylistInfo?.tracks || []}*/}
+          {/*  setTracks={tracks => {*/}
+          {/*    setEditingPlaylistInfo(prev => ({ ...prev, tracks }));*/}
+          {/*  }}*/}
+          {/*/>*/}
+          <Playlist id={editingPlaylistID} />
         </View>
       </Modal>
     </>

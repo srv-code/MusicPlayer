@@ -19,149 +19,145 @@ import { MusicContext } from '../../context/music';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Playlist from '../../components/playlist';
 
-const maxPlaylistNameLength = 25;
+// const maxPlaylistNameLength = 25;
 
 // TODO Can reorder the tracks by dragging items
 const CurrentPlaylist = ({ navigation, route, extraData: { snapIndex } }) => {
-  const { musicInfo, setMusicInfo } = useContext(MusicContext);
-
-  const [isFABOpened, setIsFABOpened] = useState(false);
-  const [isFABVisible, setIsFABVisible] = useState(true);
-  const [playlistName, setPlaylistName] = useState('');
-  const [fabActions, setFABActions] = useState([]);
-  const [isEditingPlaylistName, setIsEditingPlaylistName] = useState(false);
-  const [tracks, setTracks] = useState([]);
-  const [snackbarError, setSnackbarError] = useState(null);
-  const [playlistId, setPlaylistId] = useState(null);
-  const playlistInput = useRef(null);
-
   const isFocused = useIsFocused();
-
-  useBackHandler(() => {
-    if (isEditingPlaylistName) {
-      setIsEditingPlaylistName(false);
-      setPlaylistName('');
-      return true;
-    }
-    return false;
-  });
+  // TODO Move to Playlist component
+  // useBackHandler(() => {
+  //   if (isEditingPlaylistName) {
+  //     setIsEditingPlaylistName(false);
+  //     setPlaylistName('');
+  //     return true;
+  //   }
+  //   return false;
+  // });
 
   useEffect(() => {
     if (snapIndex < 2) navigation.navigate(screenNames.nowPlaying);
   }, [snapIndex]);
 
   useEffect(async () => {
-    if (isFocused) setTracks(await TrackPlayer.getQueue());
-    setIsFABVisible(isFocused);
+    // TODO [START] Move to Playlist component
+    // FIXME In case the playlist is unsaved then should fetch from the TrackPlayer.getQueue() else should fetch from the playlist track list itself
+    // if (isFocused) setTracks(await TrackPlayer.getQueue());
+    // setIsFABVisible(isFocused);
+    // TODO [END] Move to Playlist component
+
     PlayerBottomSheetHandlers.setIsContentPanningGestureEnabled?.(!isFocused);
   }, [isFocused]);
 
-  useEffect(() => {
-    if (route.params.playlistId) {
-      setPlaylistId(route.params.playlistId);
-      setPlaylistName(
-        musicInfo[keys.PLAYLISTS].find(pl => pl.id === route.params.playlistId)
-          .name,
-      );
-    }
-  }, [route.params.playlistId]);
+  // useEffect(() => {
+  //   if (route.params.playlistId) {
+  //     // FIXME Why is this required?
+  //     setPlaylistId(route.params.playlistId);
+  //
+  //     // TODO Move to Playlist component
+  //     setPlaylistName(
+  //       musicInfo[keys.PLAYLISTS].find(pl => pl.id === route.params.playlistId)
+  //         .name,
+  //     );
+  //     // TODO Move to Playlist component
+  //   }
+  // }, [route.params.playlistId]);
 
-  useEffect(() => {
-    const actions = [
-      {
-        icon: IconUtils.getInfo(keys.SHUFFLE).name.default,
-        label: labels.shuffle,
-        onPress: () => console.log('Pressed star'),
-      },
-      {
-        icon: IconUtils.getInfo(keys.PLAY).name.default,
-        label: labels.play,
-        onPress: () => console.log('Pressed email'),
-      },
-    ];
+  // useEffect(() => {
+  //   const actions = [
+  //     {
+  //       icon: IconUtils.getInfo(keys.SHUFFLE).name.default,
+  //       label: labels.shuffle,
+  //       onPress: () => console.log('Pressed star'),
+  //     },
+  //     {
+  //       icon: IconUtils.getInfo(keys.PLAY).name.default,
+  //       label: labels.play,
+  //       onPress: () => console.log('Pressed email'),
+  //     },
+  //   ];
+  //
+  //   if (!playlistId)
+  //     actions.push({
+  //       icon: IconUtils.getInfo(keys.SAVE).name.default,
+  //       label: labels.save,
+  //       onPress: () => {
+  //         setIsEditingPlaylistName(true);
+  //         // playlistInput.current?.focus();
+  //         // console.log(
+  //         //   `[Current-Playlist] playlistTextInput.current=${playlistInput.current}`,
+  //         // );
+  //         // playlistTextInput.current.clear();
+  //         setIsFABOpened(false);
+  //       },
+  //       // small: false,
+  //       color: colors.red,
+  //     });
+  //
+  //   setFABActions(actions);
+  // }, [playlistId]);
 
-    if (!playlistId)
-      actions.push({
-        icon: IconUtils.getInfo(keys.SAVE).name.default,
-        label: labels.save,
-        onPress: () => {
-          setIsEditingPlaylistName(true);
-          // playlistInput.current?.focus();
-          // console.log(
-          //   `[Current-Playlist] playlistTextInput.current=${playlistInput.current}`,
-          // );
-          // playlistTextInput.current.clear();
-          setIsFABOpened(false);
-        },
-        // small: false,
-        color: colors.red,
-      });
-
-    setFABActions(actions);
-  }, [playlistId]);
-
-  useEffect(() => {
-    // console.log(
-    //   `[Current-Playlist] focusing on playlist input... cond=${Boolean(
-    //     isEditingPlaylistName && playlistInput.current,
-    //   )}`,
-    // );
-    if (isEditingPlaylistName) {
-      playlistInput.current?.focus();
-    }
-  }, [isEditingPlaylistName]);
+  // TODO Move this to Playlist component
+  // useEffect(() => {
+  //   // console.log(
+  //   //   `[Current-Playlist] focusing on playlist input... cond=${Boolean(
+  //   //     isEditingPlaylistName && playlistInput.current,
+  //   //   )}`,
+  //   // );
+  //   if (isEditingPlaylistName) playlistInput.current?.focus();
+  // }, [isEditingPlaylistName]);
 
   // console.log(`[Current-Playlist] playlistInput=${playlistInput.current}`);
 
-  const onSavePlaylist = () => {
-    console.log(
-      `[Current-Playlist] playlists=${JSON.stringify(
-        musicInfo[keys.PLAYLISTS],
-      )}`,
-    );
-
-    const name = playlistName.trim();
-    if (name === '') setSnackbarError(labels.emptyPlaylistName);
-    else if (musicInfo[keys.PLAYLISTS].some(info => info.name === name))
-      setSnackbarError(labels.sameNamePlaylist);
-    else {
-      const createdOn = new Date().getTime();
-      const newPlaylists = [
-        ...musicInfo[keys.PLAYLISTS],
-        {
-          id: createdOn,
-          name,
-          track_ids: tracks.map(t => t.id),
-          created: createdOn,
-          last_updated: new Date().getTime(),
-        },
-      ];
-      AsyncStorage.setItem(keys.PLAYLISTS, JSON.stringify(newPlaylists))
-        .then(() => {
-          setMusicInfo(info => ({
-            ...info,
-            [keys.PLAYLISTS]: newPlaylists,
-          }));
-          setPlaylistId(createdOn);
-          setIsEditingPlaylistName(false);
-          setMusicInfo(data => ({
-            ...data,
-            currentlyPlaying: {
-              ...data.currentlyPlaying,
-              playlistId: createdOn,
-            },
-          }));
-          ToastAndroid.show(labels.playlistSaved, ToastAndroid.SHORT);
-        })
-        .catch(err => {
-          ToastAndroid.show(
-            `${labels.couldntSavePlaylist}: ${err.message}`,
-            ToastAndroid.LONG,
-          );
-          throw err;
-        });
-    }
-  };
+  // TODO Move this to Playlist component
+  // const onSavePlaylist = () => {
+  //   console.log(
+  //     `[Current-Playlist] playlists=${JSON.stringify(
+  //       musicInfo[keys.PLAYLISTS],
+  //     )}`,
+  //   );
+  //
+  //   const name = playlistName.trim();
+  //   if (name === '') setSnackbarError(labels.emptyPlaylistName);
+  //   else if (musicInfo[keys.PLAYLISTS].some(info => info.name === name))
+  //     setSnackbarError(labels.sameNamePlaylist);
+  //   else {
+  //     const createdOn = new Date().getTime();
+  //     const newPlaylists = [
+  //       ...musicInfo[keys.PLAYLISTS],
+  //       {
+  //         id: createdOn,
+  //         name,
+  //         track_ids: tracks.map(t => t.id),
+  //         created: createdOn,
+  //         last_updated: new Date().getTime(),
+  //       },
+  //     ];
+  //     AsyncStorage.setItem(keys.PLAYLISTS, JSON.stringify(newPlaylists))
+  //       .then(() => {
+  //         setMusicInfo(info => ({
+  //           ...info,
+  //           [keys.PLAYLISTS]: newPlaylists,
+  //         }));
+  //         setPlaylistId(createdOn);
+  //         setIsEditingPlaylistName(false);
+  //         setMusicInfo(data => ({
+  //           ...data,
+  //           currentlyPlaying: {
+  //             ...data.currentlyPlaying,
+  //             playlistId: createdOn,
+  //           },
+  //         }));
+  //         ToastAndroid.show(labels.playlistSaved, ToastAndroid.SHORT);
+  //       })
+  //       .catch(err => {
+  //         ToastAndroid.show(
+  //           `${labels.couldntSavePlaylist}: ${err.message}`,
+  //           ToastAndroid.LONG,
+  //         );
+  //         throw err;
+  //       });
+  //   }
+  // };
 
   // console.log(`[Current-Playlist] musicInfo=${JSON.stringify(musicInfo)}`);
 
@@ -227,45 +223,47 @@ const CurrentPlaylist = ({ navigation, route, extraData: { snapIndex } }) => {
         // overflow: 'visible',
       }}>
       {/*<Text>{tracks.length}</Text>*/}
-      {isEditingPlaylistName ? (
-        <TextInput
-          // // multiline
-          // ref={_ref => {
-          //   console.log(`djfjdsjfslsdlj `, _ref);
-          // }}
-          ref={playlistInput}
-          dense
-          autoFocus
-          mode="outlined"
-          placeholder={labels.playlistName}
-          label={labels.playlistName}
-          value={playlistName}
-          onBlur={onSavePlaylist}
-          onChangeText={name => {
-            // console.log(`[Current-Playlist/onChangeText] text=${name}, ASCII=`);
-            if (name.length <= maxPlaylistNameLength) setPlaylistName(name);
-          }}
-          right={
-            <TextInput.Affix
-              text={`/${maxPlaylistNameLength - playlistName.length}`}
-            />
-          }
-          left={
-            <TextInput.Icon
-              name={IconUtils.getInfo(keys.PLAYLIST_EDIT).name.default}
-            />
-          }
-        />
-      ) : (
-        <Text
-          style={{
-            fontSize: wp(5),
-            textAlign: 'center',
-            marginVertical: hp(1.5),
-          }}>
-          {playlistName || labels.untitledPlaylist}
-        </Text>
-      )}
+
+      {/* TODO Move this to Playlist component */}
+      {/*{isEditingPlaylistName ? (*/}
+      {/*  <TextInput*/}
+      {/*    // // multiline*/}
+      {/*    // ref={_ref => {*/}
+      {/*    //   console.log(`djfjdsjfslsdlj `, _ref);*/}
+      {/*    // }}*/}
+      {/*    ref={playlistInput}*/}
+      {/*    dense*/}
+      {/*    autoFocus*/}
+      {/*    mode="outlined"*/}
+      {/*    placeholder={labels.playlistName}*/}
+      {/*    label={labels.playlistName}*/}
+      {/*    value={playlistName}*/}
+      {/*    onBlur={onSavePlaylist}*/}
+      {/*    onChangeText={name => {*/}
+      {/*      // console.log(`[Current-Playlist/onChangeText] text=${name}, ASCII=`);*/}
+      {/*      if (name.length <= maxPlaylistNameLength) setPlaylistName(name);*/}
+      {/*    }}*/}
+      {/*    right={*/}
+      {/*      <TextInput.Affix*/}
+      {/*        text={`/${maxPlaylistNameLength - playlistName.length}`}*/}
+      {/*      />*/}
+      {/*    }*/}
+      {/*    left={*/}
+      {/*      <TextInput.Icon*/}
+      {/*        name={IconUtils.getInfo(keys.PLAYLIST_EDIT).name.default}*/}
+      {/*      />*/}
+      {/*    }*/}
+      {/*  />*/}
+      {/*) : (*/}
+      {/*  <Text*/}
+      {/*    style={{*/}
+      {/*      fontSize: wp(5),*/}
+      {/*      textAlign: 'center',*/}
+      {/*      marginVertical: hp(1.5),*/}
+      {/*    }}>*/}
+      {/*    {playlistName || labels.untitledPlaylist}*/}
+      {/*  </Text>*/}
+      {/*)}*/}
 
       {/*<View*/}
       {/*  style={{*/}
@@ -334,40 +332,41 @@ const CurrentPlaylist = ({ navigation, route, extraData: { snapIndex } }) => {
       {/*  )}*/}
       {/*</View>*/}
 
-      <Playlist tracks={tracks} setTracks={setTracks} />
+      {/*<Playlist tracks={tracks} setTracks={setTracks} />*/}
+      <Playlist id={route.params.playlistId} showIcon />
 
-      <Portal>
-        <FAB.Group
-          style={{
-            // zIndex: 1,
-            paddingBottom: hp(6),
-            opacity: isFABOpened ? 1 : 0.7,
-          }}
-          visible={isFABVisible}
-          open={isFABOpened}
-          icon={
-            IconUtils.getInfo(keys.ACTION).name[
-              isFABOpened ? 'filled' : 'outlined'
-            ]
-          }
-          actions={fabActions}
-          onStateChange={state => {
-            console.log(`[CurrentPlaylist] FAB state=${JSON.stringify(state)}`);
-          }}
-          onPress={setIsFABOpened.bind(this, val => !val)}
-        />
+      {/*<Portal>*/}
+      {/*<FAB.Group*/}
+      {/*  style={{*/}
+      {/*    // zIndex: 9999,*/}
+      {/*    paddingBottom: hp(6),*/}
+      {/*    // opacity: isFABOpened ? 1 : 0.7,*/}
+      {/*  }}*/}
+      {/*  visible={isFABVisible}*/}
+      {/*  open={isFABOpened}*/}
+      {/*  icon={*/}
+      {/*    IconUtils.getInfo(keys.ACTION).name[*/}
+      {/*      isFABOpened ? 'filled' : 'outlined'*/}
+      {/*    ]*/}
+      {/*  }*/}
+      {/*  actions={fabActions}*/}
+      {/*  onStateChange={state => {*/}
+      {/*    console.log(`[CurrentPlaylist] FAB state=${JSON.stringify(state)}`);*/}
+      {/*  }}*/}
+      {/*  onPress={setIsFABOpened.bind(this, val => !val)}*/}
+      {/*/>*/}
 
-        <Snackbar
-          visible={Boolean(snackbarError)}
-          onDismiss={setSnackbarError.bind(this, null)}
-          duration={4000}
-          action={{
-            label: labels.dismiss,
-            onPress: setSnackbarError.bind(this, null),
-          }}>
-          {snackbarError}
-        </Snackbar>
-      </Portal>
+      {/*<Snackbar*/}
+      {/*  visible={Boolean(snackbarError)}*/}
+      {/*  onDismiss={setSnackbarError.bind(this, null)}*/}
+      {/*  duration={4000}*/}
+      {/*  action={{*/}
+      {/*    label: labels.dismiss,*/}
+      {/*    onPress: setSnackbarError.bind(this, null),*/}
+      {/*  }}>*/}
+      {/*  {snackbarError}*/}
+      {/*</Snackbar>*/}
+      {/*</Portal>*/}
     </BottomSheetScrollView>
   );
 };

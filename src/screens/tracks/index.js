@@ -76,7 +76,7 @@ const Tracks = ({ navigation }) => {
     //     musicInfo.currentlyPlayingTrack,
     //   )}`,
     // );
-    setCurrentlyPlayingTrackId(musicInfo.currentlyPlaying?.track?.id);
+    setCurrentlyPlayingTrackId(musicInfo.currentlyPlaying?.track.id);
   }, [musicInfo.currentlyPlaying]);
 
   // TODO apply useMemo later

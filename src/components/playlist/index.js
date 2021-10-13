@@ -9,11 +9,14 @@ import {
 import {
   Avatar,
   Divider,
+  FAB,
   IconButton,
   List,
   Menu,
+  Portal,
   Snackbar,
   Text,
+  TextInput,
 } from 'react-native-paper';
 import {
   heightPercentageToDP as hp,
@@ -29,7 +32,10 @@ import { PreferencesContext } from '../../context/preferences';
 import { MusicContext } from '../../context/music';
 import IconUtils from '../../utils/icon';
 import keys from '../../constants/keys';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useBackHandler } from '@react-native-community/hooks';
 import { useIsFocused } from '@react-navigation/native';
+import TrackPlayer from 'react-native-track-player';
 
 const rearrangeActions = {
   MOVE_UP: 'MOVE_UP',
@@ -38,108 +44,280 @@ const rearrangeActions = {
   MOVE_TO_LAST: 'MOVE_TO_LAST',
 };
 
-// TODO Complete:
+const snackbarMessageType = {
+  TRACK_REMOVED: 'TRACK_REMOVED',
+  ERROR_MESSAGE: 'ERROR_MESSAGE',
+};
+
+const MAX_PLAYLIST_NAME_LENGTH = 25;
+
+// FIXME [Algorithm #1] for saving the playlist:
+//  - hasUnsavedChanges hook initially set to false
+//  - Actions: renaming, tracks re-ordering/removing
+//  - Also can re-order/remove from an unsaved playlist for which hasUnsavedChanges will be false
+//  - Re-ordering/removing tracks should also affect the tracks being played immediately (without crashing)
+//    - If there's no track after the current one will stop playing (or follow the repeat-mode if specified)
+//  - In initial load (useEffect with dep: id): if (id) setHasUnsavedChanges(true)
+//  - When tracks are reordered/removed: ??
+//  - When renaming but cancelled in between: using back-button / minimizing (resulting in navigating to now-playing screen): ??
+//  - When name is changed but not saved: ??
+
+// FIXME [Algorithm #1/Solution]
+//  - Add a hook: id (initially update with _id)
+//  - Inside useBackHandler() saved only if id is non-null
+//  - When track is re-ordered/removed or playlist name is updated,
+//      hasUnsavedChanges will be updated to true if not already set
+//  - When track is re-ordered/removed,
+//      if the playlist being modified is the current one then the current TrackPlayer queue
+//      will be updated (take care so that the current playing track should not start
+//      from beginning, silently make the update),
+//       if the current track is removed then play the next one,
+//          if there's no next track then stop playing
+//  - While renaming playlist,
+//      if the process is cancelled then the previous state is restored
+//        (if saved then keep the previous name else keep it unsaved)
+
+// TODO [Complete]
 //  - Swiping gestures: left for reordering, right for deletion
 //  - Undo snackbar message for adding back the last removed track
 //  - Restore/Ignore changes playlist icon button
 //  - Proper initial swiping previews
 //  - Long press to select many tracks to re-order or delete them
 //  - Replace the test hardcoded colors with the ones from colors object
-const Playlist = ({ style, name, tracks, setTracks }) => {
+//  - Move the rename playlist functionality from current-playlist screen
+//  - Move the FAB.Group from current-playlist screen
+//  - Restructure all the playlist related functionalities here (from current-playlist screen & playlists)
+//  - Implement all pending props, update code as per the new set of props
+
+const Playlist = ({ style, id: _id, showIcon }) => {
   const { enabledDarkTheme } = useContext(PreferencesContext);
+  const { musicInfo, setMusicInfo } = useContext(MusicContext);
   const { playerControls } = useContext(MusicContext);
 
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const [id, setID] = useState(null);
+  const [isFABOpened, setIsFABOpened] = useState(false);
+  const [isFABVisible, setIsFABVisible] = useState(true);
+  const [fabActions, setFABActions] = useState([]);
+  const [isEditingPlaylistName, setIsEditingPlaylistName] = useState(false);
+  const [playlistName, setPlaylistName] = useState('');
   const [lastTrackRemoved, setLastTrackRemoved] = useState(null);
   const [rowTranslateAnimatedValues, setRowTranslateAnimatedValues] = useState(
     [],
   );
+  const [tracks, setTracks] = useState([]);
   const [currentActions, setCurrentActions] = useState(null);
-  // FIXME Not updating the current playing track currently: setCurrentlyPlayingTrackId
   const [currentlyPlayingTrackId, setCurrentlyPlayingTrackId] = useState(null);
   const [showMoreOptionForTrackId, setShowMoreOptionForTrackId] =
     useState(null);
+  const [snackbarMessage, setSnackbarMessage] = useState(null);
+  // const [info, setInfo] = useState(null);
   const list = useRef(null);
+  const playlistInput = useRef(null);
 
+  const isFocused = useIsFocused();
   let animationIsRunning = false;
 
-  // const isFocused = useIsFocused(); // TODO check if its required for checking in useEffect
+  useBackHandler(() => {
+    if (isEditingPlaylistName) {
+      setIsEditingPlaylistName(false);
+      // FIXME Should restore the previous set name
+      setPlaylistName('');
+      return true;
+    }
+    if (id && hasUnsavedChanges) savePlaylist();
+    return false;
+  });
 
-  // useEffect(() => {
-  //   // console.log(`[Playlist] isFocused=${isFocused}`);
-  //   if (isFocused) {
-  //   }
-  // }, [isFocused]);
+  const _setCurrentlyPlayingTrackId = playlistId => {
+    if (playlistId === musicInfo.currentlyPlaying?.playlistId)
+      setCurrentlyPlayingTrackId(musicInfo.currentlyPlaying.track.id);
+  };
+
+  useEffect(async () => {
+    if (isFocused) {
+      setID(_id);
+      const _info = _id && musicInfo[keys.PLAYLISTS].find(pl => pl.id === _id);
+
+      /* Set currently playing track ID from this playlist */
+      // FIXME Check if this is required as another useEffect is added with musicInfo.currentlyPlaying as a dep
+      _setCurrentlyPlayingTrackId(_id);
+
+      /* Update action menu */
+      const actions = [
+        {
+          icon: IconUtils.getInfo(keys.SHUFFLE).name.default,
+          label: labels.shuffle,
+          onPress: () => console.log('Pressed star'),
+        },
+        {
+          icon: IconUtils.getInfo(keys.PLAY).name.default,
+          label: labels.play,
+          onPress: () => console.log('Pressed email'),
+        },
+      ];
+
+      if (!_id)
+        actions.push({
+          icon: IconUtils.getInfo(keys.SAVE).name.default,
+          label: labels.save,
+          onPress: () => {
+            setIsEditingPlaylistName(true);
+            playlistInput.current?.focus();
+            // console.log(
+            //   `[Current-Playlist] playlistTextInput.current=${playlistInput.current}`,
+            // );
+            // playlistInput.current.clear();
+            setIsFABOpened(false);
+          },
+          // small: false,
+          color: colors.red,
+        });
+
+      setFABActions(actions);
+
+      /* Update tracks */
+      let _tracks;
+      if (_id)
+        _tracks = _info.track_ids.map(id =>
+          musicInfo?.[keys.TRACKS].find(t => t.id === id),
+        );
+      else _tracks = await TrackPlayer.getQueue();
+
+      setTracks(_tracks);
+
+      /* Update playlist name */
+      if (_info) setPlaylistName(_info.name);
+
+      /* Update rowTranslateAnimatedValues */
+      if (_tracks.length && !Object.keys(rowTranslateAnimatedValues).length) {
+        console.log(
+          `[Playlist/useEffect] tracks.length=$_{tracks.length}, keys=${
+            Object.keys(rowTranslateAnimatedValues).length
+          }`,
+        );
+
+        const animValues = {};
+        _tracks.forEach(track => {
+          animValues[track.id] = {
+            removal: new Animated.Value(1),
+            expansion: new Animated.Value(0),
+          };
+          track.key = track.id;
+        });
+
+        // for (const e in animValues) {
+        //   console.log(
+        //     `[Playlist/useEffect] ${e}=${JSON.stringify(
+        //       animValues[e].expansion,
+        //     )}`,
+        //   );
+        // }
+
+        setRowTranslateAnimatedValues(animValues);
+      }
+    } else if (hasUnsavedChanges) savePlaylist();
+
+    setIsFABVisible(isFocused);
+  }, [isFocused]);
 
   useEffect(() => {
-    // console.log(`[Playlist/useEffect] isFocused=${isFocused}`);
+    // FIXME Check if this function is called when this component is first initialised
+    //    and the track is still not changed
+    _setCurrentlyPlayingTrackId(id);
+  }, [musicInfo.currentlyPlaying]);
 
-    if (
-      // isFocused &&
-      tracks.length &&
-      !Object.keys(rowTranslateAnimatedValues).length
-    ) {
-      console.log(
-        `[Playlist/useEffect] tracks.length=${tracks.length}, keys=${
-          Object.keys(rowTranslateAnimatedValues).length
-        }`,
-      );
+  // useEffect(() => {
+  //   // console.log(
+  //   //   `[Current-Playlist] focusing on playlist input... cond=${Boolean(
+  //   //     isEditingPlaylistName && playlistInput.current,
+  //   //   )}`,
+  //   // );
+  //   if (isEditingPlaylistName) playlistInput.current?.focus();
+  // }, [isEditingPlaylistName]);
 
-      const animValues = {};
-      tracks.forEach(track => {
-        // animValues[`${track.id}`] = new Animated.Value(1);
-        // animValues[track.id] = new Animated.Value(1);
-        // animValues[track.id] = new Animated.Value(hp(8));
-        animValues[track.id] = {
-          removal: new Animated.Value(hp(8)),
-          expansion: new Animated.Value(0),
-        };
-        track.key = track.id;
+  // console.log(
+  //   `rowTranslateAnimatedValues=${JSON.stringify(rowTranslateAnimatedValues)}`,
+  // );
+
+  // TODO Update with the newer scheme
+  const savePlaylist = () => {
+    // console.log(
+    //   `[Current-Playlist] playlists=${JSON.stringify(
+    //     musicInfo[keys.PLAYLISTS],
+    //   )}`,
+    // );
+
+    const name = playlistName.trim();
+    if (name === '')
+      setSnackbarMessage({
+        type: snackbarMessageType.ERROR_MESSAGE,
+        info: labels.emptyPlaylistName,
       });
+    else if (musicInfo[keys.PLAYLISTS].some(info => info.name === name))
+      setSnackbarMessage({
+        type: snackbarMessageType.ERROR_MESSAGE,
+        info: labels.sameNamePlaylist,
+      });
+    else {
+      let isCreating;
+      let createdOn, newPlaylists;
 
-      for (const e in animValues) {
-        console.log(
-          `[Playlist/useEffect] ${e}=${JSON.stringify(
-            animValues[e].expansion,
-          )}`,
-        );
+      if (id) {
+        /* Updating playlist */
+        isCreating = false;
+        newPlaylists = [...musicInfo[keys.PLAYLISTS]];
+        const currentPlaylist = newPlaylists.find(x => x.id === id);
+        currentPlaylist.name = name;
+        currentPlaylist.track_ids = tracks.map(t => t.id);
+      } else {
+        /* Creating playlist */
+        isCreating = true;
+        createdOn = new Date().getTime();
+        newPlaylists = [
+          ...musicInfo[keys.PLAYLISTS],
+          {
+            id: createdOn,
+            name,
+            track_ids: tracks.map(t => t.id),
+            created: createdOn,
+            last_updated: new Date().getTime(),
+          },
+        ];
       }
 
-      // console.log(
-      //   `[Playlist/useEffect] filling animValues, keys=${JSON.stringify(
-      //     animValues
-      //   )}`,
-      // );
-      setRowTranslateAnimatedValues(animValues);
-
-      // return () => {
-      //   // console.log(
-      //   //   `[Playlist] unmounting..., showMoreOptionForTrackId=${showMoreOptionForTrackId}`,
-      //   // );
-      //   // animateOptionsMenu({
-      //   //   shouldCollapse: true,
-      //   //   currentKey: showMoreOptionForTrackId,
-      //   // });
-      //   // const expandedOptionMenuAnimatedValue = rowTranslateAnimatedValues.find()
-      //   console.log(
-      //     `[Playlist] checking for any opened option menu...  expanded=${JSON.stringify(
-      //       rowTranslateAnimatedValues.find(x => {
-      //         console.log(`[Playlist] x=${JSON.stringify(x)}`);
-      //         return x.expansion > 0;
-      //       }),
-      //     )}, animValues=${JSON.stringify(rowTranslateAnimatedValues)}`,
-      //   );
-      // };
+      AsyncStorage.setItem(keys.PLAYLISTS, JSON.stringify(newPlaylists))
+        .then(() => {
+          setMusicInfo(info => ({
+            ...info,
+            [keys.PLAYLISTS]: newPlaylists,
+          }));
+          setIsEditingPlaylistName(false);
+          if (isCreating) {
+            setID(createdOn);
+            setMusicInfo(data => ({
+              ...data,
+              currentlyPlaying: {
+                ...data.currentlyPlaying,
+                playlistId: createdOn,
+              },
+            }));
+          }
+          ToastAndroid.show(
+            isCreating ? labels.playlistCreated : labels.playlistUpdated,
+            ToastAndroid.SHORT,
+          );
+          setHasUnsavedChanges(false);
+        })
+        .catch(err => {
+          ToastAndroid.show(
+            `${labels.couldntSavePlaylist}: ${err.message}`,
+            ToastAndroid.LONG,
+          );
+          throw err;
+        });
     }
-  }, [tracks]);
-  // }, [isFocused, tracks]);
-
-  // console.log(`this.animationIsRunning=${this.animationIsRunning}`);
-  // console.log(`[re-rendered] currentAction=${currentAction}`);
-  // console.log(`track keys=${tracks?.[0]?.key}`);
-  console.log(`showMoreOptionForTrackId=${showMoreOptionForTrackId}`);
-  console.log(
-    `rowTranslateAnimatedValues=${JSON.stringify(rowTranslateAnimatedValues)}`,
-  );
+  };
 
   const rearrange = (item, fromIndex, action) => {
     const getScrollValue = index => hp(8) * (index - 3); /* 3 items spacing */
@@ -181,43 +359,17 @@ const Playlist = ({ style, name, tracks, setTracks }) => {
     _tracks[toIndex] = tmp;
     setTracks(_tracks);
 
-    //   index = toIndex,
-    //   itemHeight = hp(8);
-    // console.log(`should scroll by ${index} items: ${scrollValue}`);
-
     list.current._listRef._scrollRef.scrollTo({
       x: scrollX,
       y: scrollY,
       animated: true,
     });
 
-    // console.log(
-    //   `list-view keys=${JSON.stringify(
-    //     Object.keys(list.current._listRef._scrollRef),
-    //   )} (${list.current._listRef._averageCellLength}, ${
-    //     list.current._listRef._totalCellLength
-    //   })`,
-    // );
-
-    // TODO for MOVE_UP scroll one item height up & for MOVE_DOWN one item height down
-    // if (action === rearrangeActions.MOVE_TO_LAST)
-    //   list.current._listRef._scrollRef.scrollToEnd({ animated: true });
-    // else if (action === rearrangeActions.MOVE_TO_FIRST)
-    //   list.current._listRef._scrollRef.scrollTo({ x: 0, animated: true });
+    if (!hasUnsavedChanges) setHasUnsavedChanges(true);
   };
 
   const onSwipeValueChange = swipeData => {
     const { key, value } = swipeData;
-
-    // console.log(
-    //   `onSwipeValueChange: swipeData=${JSON.stringify(
-    //     swipeData,
-    //   )}, rowTranslateAnimatedValues=${JSON.stringify(
-    //     rowTranslateAnimatedValues,
-    //   )}`,
-    // );
-
-    // console.log(`animationIsRunning=${animationIsRunning}`);
 
     if (
       value < 0 &&
@@ -234,7 +386,6 @@ const Playlist = ({ style, name, tracks, setTracks }) => {
 
     if (value < -width && !animationIsRunning) {
       animationIsRunning = true;
-      // rowTranslateAnimatedValues[key].setValue(0);
       Animated.timing(rowTranslateAnimatedValues[key].removal, {
         toValue: 0,
         duration: 200,
@@ -242,18 +393,16 @@ const Playlist = ({ style, name, tracks, setTracks }) => {
       }).start(() => {
         const removeIndex = tracks.findIndex(track => track.key === key);
         setLastTrackRemoved({ index: removeIndex, item: tracks[removeIndex] });
+        setSnackbarMessage({ type: snackbarMessageType.TRACK_REMOVED });
         const newList = [...tracks];
         newList.splice(removeIndex, 1);
         setTracks(newList);
         setCurrentActions(null);
+        if (!hasUnsavedChanges) setHasUnsavedChanges(true);
         animationIsRunning = false;
-
-        // console.log(`deleted track ${tracks[removeIndex].key}`);
       });
     }
   };
-
-  // console.log(`tracks::keys=${JSON.stringify(tracks.map(t => t.key))}`);
 
   const animateOptionsMenu = ({
     shouldCollapse,
@@ -265,7 +414,6 @@ const Playlist = ({ style, name, tracks, setTracks }) => {
       Animated.parallel([
         Animated.timing(rowTranslateAnimatedValues[currentKey].expansion, {
           toValue: shouldCollapse ? 0 : 1,
-          // toValue: shouldCollapse ? 0 : hp(11),
           duration: 400,
           useNativeDriver: false,
         }),
@@ -281,11 +429,6 @@ const Playlist = ({ style, name, tracks, setTracks }) => {
       ]).start(() => {
         setShowMoreOptionForTrackId(shouldCollapse ? null : currentKey);
         animationIsRunning = false;
-        // console.log(
-        //   `Done animating, showMoreOptionForTrackId=${
-        //     shouldCollapse ? null : currentKey
-        //   }`,
-        // );
       });
     }
   };
@@ -344,21 +487,15 @@ const Playlist = ({ style, name, tracks, setTracks }) => {
           }
           icon={IconUtils.getInfo(keys.VERTICAL_ELLIPSIS).name.default}
           onPress={() => {
-            // console.log(`showMoreOptionForTrackId=${showMoreOptionForTrackId}`);
             if (!showMoreOptionForTrackId) {
-              // console.log(`expand current: ${data.item.key}`);
               animateOptionsMenu({ currentKey: data.item.key });
             } else {
               if (showMoreOptionForTrackId !== data.item.key) {
-                // console.log(
-                //   `collapse other: ${showMoreOptionForTrackId}, expand current: ${data.item.key}`,
-                // );
                 animateOptionsMenu({
                   currentKey: data.item.key,
                   otherKeyToCollapse: showMoreOptionForTrackId,
                 });
               } else {
-                // console.log(`collapse current: ${showMoreOptionForTrackId}`);
                 animateOptionsMenu({
                   shouldCollapse: true,
                   currentKey: data.item.key,
@@ -366,75 +503,7 @@ const Playlist = ({ style, name, tracks, setTracks }) => {
               }
             }
           }}
-          // style={{
-          //   zIndex: 999,
-          // }}
         />
-      );
-
-      // TODO Deprecated, remove later
-      return (
-        <Menu
-          {...props}
-          visible={showMoreOptionForTrackId === data.item.id}
-          onDismiss={setShowMoreOptionForTrackId.bind(this, null)}
-          style={
-            {
-              // zIndex: 99999,
-              // elevation: 99999,
-              // flex: 1,
-              // position: 'absolute',
-              // top: 0,
-            }
-          }
-          // anchor={{ x: 0, y: 0 }}
-          anchor={
-            <IconButton
-              {...props}
-              icon={IconUtils.getInfo(keys.VERTICAL_ELLIPSIS).name.default}
-              onPress={setShowMoreOptionForTrackId.bind(this, data.item.id)}
-              // style={{
-              //   zIndex: 999,
-              // }}
-            />
-          }>
-          <Menu.Item
-            icon={IconUtils.getInfo(keys.SKIP_NEXT).name.default}
-            title={labels.playNext}
-            onPress={() => {
-              alert(JSON.stringify(props));
-              setShowMoreOptionForTrackId(null);
-            }}
-            // style={{ zIndex: 999, backgroundColor: 'lightgreen' }}
-          />
-          <Menu.Item
-            icon={IconUtils.getInfo(keys.ADD_TO_PLAYLIST).name.default}
-            title={labels.addToPlaylist}
-            onPress={() => {
-              setShowMoreOptionForTrackId(null);
-              alert(JSON.stringify(props));
-            }}
-          />
-          <Menu.Item
-            icon={IconUtils.getInfo(keys.ADD_TO_QUEUE).name.default}
-            title={labels.addToQueue}
-            onPress={() => {
-              // alert(JSON.stringify(props));
-              setShowMoreOptionForTrackId(null);
-              ToastAndroid.show(labels.addedToQueue, ToastAndroid.SHORT);
-            }}
-          />
-          <Menu.Item
-            icon={IconUtils.getInfo(keys.INFO).name.filled}
-            title={labels.showInfo}
-            onPress={() => {
-              // alert(JSON.stringify(props));
-              // navigation.navigate(screenNames.itemInfo, { type, data });
-              // setInfoModalData({ type, data });
-              setShowMoreOptionForTrackId(null);
-            }}
-          />
-        </Menu>
       );
     };
 
@@ -464,11 +533,12 @@ const Playlist = ({ style, name, tracks, setTracks }) => {
         <Animated.View
           style={{
             ...styles.rowFrontContainer,
-            // height: rowTranslateAnimatedValues[data.item.key]?.interpolate({
-            //   inputRange: [0, 1],
-            //   outputRange: [0, hp(8)],
-            // }),
-            height: rowTranslateAnimatedValues[data.item.key]?.removal,
+            height: rowTranslateAnimatedValues[
+              data.item.key
+            ]?.removal.interpolate({
+              inputRange: [0, 1],
+              outputRange: [0, hp(8)],
+            }),
 
             // opacity: 0.3,
             borderRadius: currentlyPlayingTrackId === data.item.id ? wp(2) : 0,
@@ -483,49 +553,20 @@ const Playlist = ({ style, name, tracks, setTracks }) => {
 
             backgroundColor:
               rowTranslateAnimatedValues[data.item.key]?.removal?.interpolate({
-                inputRange: [0, hp(7), hp(8)],
+                inputRange: [0, 0.8, 1],
                 outputRange: ['blue', '#0080ff', 'white'],
               }) ?? hp(8),
 
             elevation: currentlyPlayingTrackId === data.item.id ? 2 : 0,
-
-            marginTop: rowTranslateAnimatedValues[data.item.key]?.rearrangement,
-            // opacity: // TODO Try this too
-            //   rowTranslateAnimatedValues[
-            //     data.item.key
-            //   ]?.rearrangement?.interpolate({
-            //     inputRange: [0, hp(7.5), hp(8)],
-            //     outputRange: [1, 0.7, 1],
-            //   }) ?? 1,
-            // backgroundColor: // TODO Try this too
-            //   // data.index === 2 ? 'orange' : data.index === 1 ? 'blue' : 'white',
-            //   +data.item.key === 32
-            //     ? 'orange'
-            //     : +data.item.key === 14
-            //     ? 'blue'
-            //     : 'white',
-
-            // backgroundColor: 'lightgreen',
-            // borderWidth: 1,
-            // paddingBottom: hp(2),
           }}>
-          {/*<TouchableHighlight*/}
-          {/*  onPress={() => console.log('You touched me')}*/}
-          {/*  style={styles.rowFront}*/}
-          {/*  underlayColor={'#AAA'}>*/}
-          {/*  <View>*/}
-          {/*    <Text>{`[idx=${data.index}, key=${data.item.key}] ${data.item.title}`}</Text>*/}
-          {/*  </View>*/}
-          {/*</TouchableHighlight>*/}
-
           <List.Item
             style={styles.trackItemContainer}
             onPress={onPress}
             titleEllipsizeMode={'tail'}
             titleNumberOfLines={1}
             titleStyle={styles.listItemText}
-            title={`[${data.item.id}] ${data.item.title}`}
-            // title={data.item.title}
+            // title={`[${data.item.id}] ${data.item.title}`}
+            title={data.item.title}
             descriptionEllipsizeMode={'tail'}
             descriptionNumberOfLines={1}
             description={renderDescription}
@@ -536,53 +577,20 @@ const Playlist = ({ style, name, tracks, setTracks }) => {
           {renderDivider()}
         </Animated.View>
 
-        {/*<View*/}
-        {/*  style={{*/}
-        {/*    // position: 'absolute',*/}
-        {/*    display:  // FIXME Required??*/}
-        {/*      showMoreOptionForTrackId === data.item.key ? 'flex' : 'none',*/}
-        {/*    backgroundColor: 'white',*/}
-        {/*    paddingVertical: hp(1),*/}
-        {/*    // paddingHorizontal: wp(2),*/}
-        {/*    // justifyContent: 'flex-start',*/}
-        {/*    alignItems: 'flex-end',*/}
-        {/*  }}>*/}
         <Animated.View
           style={{
-            // ...styles.rowFrontContainer,
-            // flexDirection: 'row',
-            // flex: 1,
             alignItems: 'center',
-            // alignItems: '',
-            // alignContent: 'center',
-            // flexWrap: 'wrap',
-            // justifyContent: 'space-between',
-            // justifyContent: 'space-around',
             justifyContent: 'center',
-            // verticalAlign: 'center',
             width: wp(88),
             paddingHorizontal: wp(4),
-            // alignItems: 'center',
-            // textAlignVertical: 'center',
-            // height: rowTranslateAnimatedValues[data.item.key]?.interpolate({
-            //   inputRange: [0, 1],
-            //   outputRange: [0, hp(8)],
-            // }),
-            // elevation: 4,
-            // marginHorizontal: wp(2),
-            // width: wp(85),
-
             borderBottomStartRadius: 10,
             borderBottomEndRadius: 10,
-            // height: hp(4),
-            // height: rowTranslateAnimatedValues[data.item.key]?.expansion,
             height: rowTranslateAnimatedValues[
               data.item.key
             ]?.expansion.interpolate({
               inputRange: [0, 1],
               outputRange: [0, hp(11)],
             }),
-            // backgroundColor: 'lightgreen',
             backgroundColor: rowTranslateAnimatedValues[
               data.item.key
             ]?.expansion.interpolate({
@@ -596,31 +604,12 @@ const Playlist = ({ style, name, tracks, setTracks }) => {
               outputRange: [0, 0.1, 1],
             }),
           }}>
-          {/*<Icon*/}
-          {/*  name="caretup"*/}
-          {/*  type="AntDesign"*/}
-          {/*  color={'lightgreen'}*/}
-          {/*  style={{*/}
-          {/*    position: 'absolute',*/}
-          {/*    right: wp(3),*/}
-          {/*    top: -hp(2.2),*/}
-          {/*  }}*/}
-          {/*/>*/}
-
           <View
             style={{
               flexDirection: 'row',
               alignContent: 'center',
               flexWrap: 'wrap',
               justifyContent: 'space-around',
-              // backgroundColor: 'lightblue',
-              //
-              // backgroundColor: rowTranslateAnimatedValues[
-              //   data.item.key
-              // ]?.expansion.interpolate({
-              //   inputRange: [0, 1],
-              //   outputRange: ['blue', 'black'],
-              // }),
             }}>
             {[
               {
@@ -666,18 +655,11 @@ const Playlist = ({ style, name, tracks, setTracks }) => {
                   flexDirection: 'row',
                   alignItems: 'center',
                   justifyContent: 'space-between',
-                  // paddingVertical: hp(0.2),
                   marginVertical: hp(0.5),
                   paddingRight: wp(2),
                   borderWidth: 1,
                   borderColor: colors.lightGrey,
                   borderRadius: 50,
-                  // opacity: rowTranslateAnimatedValues[
-                  //   data.item.key
-                  // ]?.expansion.interpolate({
-                  //   inputRange: [0, hp(11)],
-                  //   outputRange: [0, 1],
-                  // }),
                 }}>
                 <Icon
                   name={option.iconName}
@@ -697,75 +679,11 @@ const Playlist = ({ style, name, tracks, setTracks }) => {
                     alignItems: 'center',
                   }}>
                   {option.title}
-                  {/*{index !== items.length - 1 && (*/}
-                  {/*  <Text*/}
-                  {/*    style={{*/}
-                  {/*      fontSize: wp(4),*/}
-                  {/*      color: 'darkgray',*/}
-                  {/*      fontWeight: 'bold',*/}
-                  {/*    }}>*/}
-                  {/*    {`  |  `}*/}
-                  {/*  </Text>*/}
-                  {/*)}*/}
                 </Text>
               </TouchableOpacity>
             ))}
-
-            {/*<Menu.Item*/}
-            {/*  icon={IconUtils.getInfo(keys.SKIP_NEXT).name.default}*/}
-            {/*  title={labels.playNext}*/}
-            {/*  onPress={() => {*/}
-            {/*    alert(JSON.stringify(props));*/}
-            {/*    setShowMoreOptionForTrackId(null);*/}
-            {/*  }}*/}
-            {/*  style={{*/}
-            {/*    backgroundColor: 'lightblue',*/}
-            {/*    alignSelf: 'flex-start',*/}
-            {/*    margin: 0,*/}
-            {/*    padding: 0,*/}
-            {/*  }}*/}
-            {/*  contentStyle={{ backgroundColor: 'red', margin: 0, padding: 0 }}*/}
-            {/*/>*/}
-
-            {/*<Menu.Item*/}
-            {/*  icon={IconUtils.getInfo(keys.SKIP_NEXT).name.default}*/}
-            {/*  title={labels.playNext}*/}
-            {/*  onPress={() => {*/}
-            {/*    alert(JSON.stringify(props));*/}
-            {/*    setShowMoreOptionForTrackId(null);*/}
-            {/*  }}*/}
-            {/*  // style={{ zIndex: 999, backgroundColor: 'lightgreen' }}*/}
-            {/*/>*/}
-            {/*<Menu.Item*/}
-            {/*  icon={IconUtils.getInfo(keys.ADD_TO_PLAYLIST).name.default}*/}
-            {/*  title={labels.addToPlaylist}*/}
-            {/*  onPress={() => {*/}
-            {/*    setShowMoreOptionForTrackId(null);*/}
-            {/*    alert(JSON.stringify(props));*/}
-            {/*  }}*/}
-            {/*/>*/}
-            {/*<Menu.Item*/}
-            {/*  icon={IconUtils.getInfo(keys.ADD_TO_QUEUE).name.default}*/}
-            {/*  title={labels.addToQueue}*/}
-            {/*  onPress={() => {*/}
-            {/*    // alert(JSON.stringify(props));*/}
-            {/*    setShowMoreOptionForTrackId(null);*/}
-            {/*    ToastAndroid.show(labels.addedToQueue, ToastAndroid.SHORT);*/}
-            {/*  }}*/}
-            {/*/>*/}
-            {/*<Menu.Item*/}
-            {/*  icon={IconUtils.getInfo(keys.INFO).name.filled}*/}
-            {/*  title={labels.showInfo}*/}
-            {/*  onPress={() => {*/}
-            {/*    // alert(JSON.stringify(props));*/}
-            {/*    // navigation.navigate(screenNames.itemInfo, { type, data });*/}
-            {/*    // setInfoModalData({ type, data });*/}
-            {/*    setShowMoreOptionForTrackId(null);*/}
-            {/*  }}*/}
-            {/*/>*/}
           </View>
         </Animated.View>
-        {/*</View>*/}
       </View>
     );
   };
@@ -778,52 +696,13 @@ const Playlist = ({ style, name, tracks, setTracks }) => {
       showRemove = currentActions[rowData.item.key] === 'removing';
     }
 
-    // console.log(
-    //   `renderHiddenItem: rowData.item.key=${JSON.stringify(
-    //     rowData.item.key,
-    //   )}, currentActions=${JSON.stringify(
-    //     currentActions,
-    //   )}, showMove=${showMove}, showRemove=${showRemove}`,
-    // );
-
-    // let showMove, showRemove;
-    //
-    // if (
-    //   !currentAction ||
-    //   currentAction.key !== rowData.item.key ||
-    //   currentAction.event === 'moving'
-    // )
-    //   showMove = true;
-    // if (
-    //   !currentAction ||
-    //   currentAction.key !== rowData.item.key ||
-    //   currentAction.event === 'removing'
-    // )
-    //   showRemove = true;
-
     return (
       <View
         style={{
           ...styles.rowBack,
-
-          // opacity: 1,
-          // opacity: rowTranslateAnimatedValues[rowData.item.key]?.interpolate({
-          //   inputRange: [0, hp(8)],
-          //   outputRange: [0, 1],
-          // }),
-
-          // TODO Take the colors from colors object
-          // TODO Modify the colors intensity as per the value in the onSwipe* function
-          // flex: 1,
-          // alignSelf: 'center',
-          // alignItems: 'center',
-          // height: rowTranslateAnimatedValues[rowData.item.key],
-          // height: hp(8),
           backgroundColor: showMove ? 'blue' : showRemove ? 'red' : 'grey',
           borderRadius:
             currentlyPlayingTrackId === rowData.item.key ? wp(2) : 0,
-          // borderWidth: 1,
-          // borderColor: 'blue',
         }}>
         {showMove && (
           <View style={[styles.backRightBtn, styles.backRightBtnRight]}>
@@ -831,16 +710,12 @@ const Playlist = ({ style, name, tracks, setTracks }) => {
               style={{
                 flex: 1,
                 flexDirection: 'row',
-                // alignItems: 'center',
-                // justifyContent: 'space-between',
                 backgroundColor: 'blue',
-                // height: '100%',
                 height: hp(8),
                 width: '100%',
               }}>
               <View
                 style={{
-                  // backgroundColor: 'black',
                   justifyContent: 'space-between',
                   alignItems: 'center',
                   marginRight: wp(2),
@@ -869,7 +744,6 @@ const Playlist = ({ style, name, tracks, setTracks }) => {
 
               <View
                 style={{
-                  // backgroundColor: 'black',
                   justifyContent: 'space-between',
                   alignItems: 'center',
                   marginRight: wp(2),
@@ -882,13 +756,11 @@ const Playlist = ({ style, name, tracks, setTracks }) => {
                     rowData.index,
                     rearrangeActions.MOVE_TO_FIRST,
                   )}>
-                  {/*<Icon name="angle-double-up" type="FontAwesome5" />*/}
                   <Icon
                     name="first-page"
                     type="MaterialIcons"
                     size={wp(6)}
                     style={{
-                      // fontWeight: 'bold',
                       transform: [{ rotate: '90deg' }],
                     }}
                   />
@@ -901,7 +773,6 @@ const Playlist = ({ style, name, tracks, setTracks }) => {
                     rowData.index,
                     rearrangeActions.MOVE_TO_LAST,
                   )}>
-                  {/*<Icon name="angle-double-down" type="FontAwesome5" />*/}
                   <Icon
                     name="last-page"
                     type="MaterialIcons"
@@ -951,95 +822,164 @@ const Playlist = ({ style, name, tracks, setTracks }) => {
     );
   };
 
-  // console.log(
-  //   `list=${
-  //     list.current &&
-  //     JSON.stringify(Object.keys(list.current._listRef._scrollRef))
-  //   }`,
-  // );
-
   return (
-    <View style={[styles.container, style]}>
-      {/*<Text>currentAction: {JSON.stringify(currentActions)}</Text>*/}
-      <SwipeListView
-        listViewRef={list}
-        // simultaneousHandlers={simultaneousHandlers}
-        // disableRightSwipe
-        // leftActivationValue={{}}
-        // swipeRowStyle={{
-        //   backgroundColor: 'red',
-        //   borderRadius: 10
-        // }}
-        data={tracks}
-        renderItem={renderItem}
-        renderHiddenItem={renderHiddenItem}
-        leftOpenValue={wp(30)}
-        stopLeftSwipe={wp(30)}
-        rightOpenValue={-width} // uncomment this
-        // rightOpenValue={-150} // remove this
-        previewRowKey={tracks[0]?.key}
-        // previewRowIndex={0}
-        // previewFirstRow={true}
-        previewOpenValue={-wp(10)}
-        previewOpenDelay={500}
-        onSwipeValueChange={onSwipeValueChange}
-        closeOnRowBeginSwipe={true}
-        closeOnScroll={false}
-        useNativeDriver={false}
-        useAnimatedList={true}
-      />
+    <>
+      <View style={[styles.container, style]}>
+        {isEditingPlaylistName ? (
+          <TextInput
+            // // multiline
+            // ref={_ref => {
+            //   console.log(`djfjdsjfslsdlj `, _ref);
+            // }}
+            ref={playlistInput}
+            dense
+            autoFocus
+            mode="outlined"
+            placeholder={labels.playlistName}
+            label={labels.playlistName}
+            value={playlistName}
+            onBlur={savePlaylist}
+            onChangeText={name => {
+              // console.log(`[Current-Playlist/onChangeText] text=${name}, ASCII=`);
+              if (name.length <= MAX_PLAYLIST_NAME_LENGTH)
+                setPlaylistName(name);
+            }}
+            right={
+              <TextInput.Affix
+                text={`/${MAX_PLAYLIST_NAME_LENGTH - playlistName.length}`}
+              />
+            }
+            left={
+              <TextInput.Icon
+                name={IconUtils.getInfo(keys.PLAYLIST_EDIT).name.default}
+              />
+            }
+          />
+        ) : (
+          <Text
+            style={{
+              fontSize: wp(5),
+              textAlign: 'center',
+              marginVertical: hp(1.5),
+            }}>
+            {playlistName || labels.untitledPlaylist}
+          </Text>
+        )}
+
+        <View
+          style={{
+            // borderWidth: 1,
+            borderRadius: 10,
+            overflow: 'hidden',
+            // backgroundColor: 'green',
+            // marginBottom: hp(1),
+          }}>
+          <SwipeListView
+            listViewRef={list}
+            data={tracks}
+            renderItem={renderItem}
+            renderHiddenItem={renderHiddenItem}
+            leftOpenValue={wp(30)}
+            stopLeftSwipe={wp(30)}
+            rightOpenValue={-width}
+            previewRowKey={tracks[0]?.key}
+            previewOpenValue={-wp(10)}
+            previewOpenDelay={500}
+            onSwipeValueChange={onSwipeValueChange}
+            closeOnRowBeginSwipe={true}
+            closeOnScroll={false}
+            useNativeDriver={false}
+            useAnimatedList={true}
+          />
+        </View>
+      </View>
 
       <Snackbar
-        visible={Boolean(lastTrackRemoved)}
+        visible={Boolean(snackbarMessage)}
+        // visible={Boolean(lastTrackRemoved)}
         duration={2000}
-        // wrapperStyle={{
-        //   // backgroundColor: 'blue',
-        //   // zIndex: 100,
-        // }}
         style={{
-          // backgroundColor: 'red',
           opacity: 0.7,
-          // zIndex: 100,
+          // snackbarMessage?.type === snackbarMessageType.TRACK_REMOVED
+          //   ? 0.7
+          //   : 1,
+
+          // position: 'absolute',
+          // top: 0,
+          // left: 0,
         }}
-        onDismiss={setLastTrackRemoved.bind(this, null)}
-        action={{
-          label: labels.undo,
-          onPress: () => {
-            if (!lastTrackRemoved) return;
-
-            const _tracks = [...tracks];
-            _tracks.splice(lastTrackRemoved.index, 0, lastTrackRemoved.item);
-            setTracks(_tracks);
+        onDismiss={() => {
+          if (snackbarMessage?.type === snackbarMessageType.TRACK_REMOVED)
             setLastTrackRemoved(null);
-            // animationIsRunning = false;
+          setSnackbarMessage(null);
+        }}
+        action={{
+          label:
+            snackbarMessage?.type === snackbarMessageType.TRACK_REMOVED
+              ? labels.undo
+              : snackbarMessage?.type === snackbarMessageType.ERROR_MESSAGE &&
+                labels.OK,
+          onPress: () => {
+            if (snackbarMessage?.type === snackbarMessageType.TRACK_REMOVED) {
+              if (!lastTrackRemoved) return;
 
-            if (!animationIsRunning) {
-              animationIsRunning = true;
-              // rowTranslateAnimatedValues[lastTrackRemoved.item.key].setValue(0);
-              Animated.timing(
-                rowTranslateAnimatedValues[lastTrackRemoved.item.key].removal,
-                {
-                  toValue: hp(8),
-                  duration: 400,
-                  useNativeDriver: false,
-                },
-              ).start(() => {
-                animationIsRunning = false;
-              });
+              const _tracks = [...tracks];
+              _tracks.splice(lastTrackRemoved.index, 0, lastTrackRemoved.item);
+              setTracks(_tracks);
+              setLastTrackRemoved(null);
+
+              if (!animationIsRunning) {
+                animationIsRunning = true;
+                Animated.timing(
+                  rowTranslateAnimatedValues[lastTrackRemoved.item.key].removal,
+                  {
+                    toValue: 1,
+                    duration: 400,
+                    useNativeDriver: false,
+                  },
+                ).start(() => {
+                  animationIsRunning = false;
+                  setSnackbarMessage(null);
+                });
+              }
+            } else {
+              setSnackbarMessage(null);
             }
           },
         }}>
-        {labels.trackRemoved}
+        {snackbarMessage?.type === snackbarMessageType.TRACK_REMOVED
+          ? labels.trackRemoved
+          : snackbarMessage?.info}
       </Snackbar>
-    </View>
+
+      {/*<Portal>*/}
+      <FAB.Group
+        style={{
+          // zIndex: 9999,
+          // flex: 2,
+          paddingBottom: hp(6),
+          // opacity: isFABOpened ? 1 : 0.7,
+        }}
+        // visible={isFABVisible}
+        visible={true}
+        open={isFABOpened}
+        icon={
+          IconUtils.getInfo(keys.ACTION).name[
+            isFABOpened ? 'filled' : 'outlined'
+          ]
+        }
+        actions={fabActions}
+        onStateChange={state => {
+          console.log(`[Current Playlist] FAB state=${JSON.stringify(state)}`);
+        }}
+        onPress={setIsFABOpened.bind(this, val => !val)}
+      />
+      {/*</Portal>*/}
+    </>
   );
 };
 
 const styles = StyleSheet.create({
-  // container: {
-  //   // flex: 0.5,
-  //   borderWidth: 1,
-  // },
   leftAction: {
     backgroundColor: 'red',
     width: wp(80),
@@ -1049,17 +989,16 @@ const styles = StyleSheet.create({
     width: wp(80),
   },
   rowFrontContainer: {
-    // backgroundColor: 'green'
     width: wp(88),
     alignItems: 'center',
     textAlignVertical: 'center',
   },
   container: {
-    flex: 1,
-    borderWidth: 1,
+    // flex: 1,
+    flex: 0.9,
+    // borderWidth: 1,
     alignItems: 'center',
     justifyContent: 'space-between',
-    // backgroundColor: 'grey',
   },
   rowFront: {
     alignItems: 'center',
@@ -1074,7 +1013,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    // backgroundColor: 'green',
     paddingLeft: wp(4),
     overflow: 'hidden',
   },
@@ -1082,27 +1020,13 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
-    // bottom: 0,
     justifyContent: 'space-between',
-    // position: 'absolute',
-    // top: 0,
-    // width: 75,
-    // backgroundColor: 'blue',
   },
   backRightBtnRight: {
-    // backgroundColor: 'red',
     right: wp(2),
-    // left: 0,
-    // width: wp(50),
-    // zIndex: 10,
   },
   trackItemContainer: {
     alignItems: 'center',
-    // borderRadius: wp(2),
-    // paddingVertical: 0,
-    // backgroundColor: 'lightgreen',
-    // borderWidth: 1,
-    // paddingBottom: hp(5),
   },
   trackSubtitleText: {
     fontSize: wp(3.2),
