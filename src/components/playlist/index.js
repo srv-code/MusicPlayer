@@ -98,7 +98,6 @@ const Playlist = ({ style, id: _id, showIcon }) => {
   const [id, setID] = useState(null);
   const [isFABOpened, setIsFABOpened] = useState(false);
   const [isFABVisible, setIsFABVisible] = useState(true);
-  const [fabActions, setFABActions] = useState([]);
   const [isEditingPlaylistName, setIsEditingPlaylistName] = useState(false);
   const [playlistName, setPlaylistName] = useState('');
   const [lastTrackRemoved, setLastTrackRemoved] = useState(null);
@@ -142,39 +141,6 @@ const Playlist = ({ style, id: _id, showIcon }) => {
       /* Set currently playing track ID from this playlist */
       // FIXME Check if this is required as another useEffect is added with musicInfo.currentlyPlaying as a dep
       _setCurrentlyPlayingTrackId(_id);
-
-      /* Update action menu */
-      const actions = [
-        {
-          icon: IconUtils.getInfo(keys.SHUFFLE).name.default,
-          label: labels.shuffle,
-          onPress: () => console.log('Pressed star'),
-        },
-        {
-          icon: IconUtils.getInfo(keys.PLAY).name.default,
-          label: labels.play,
-          onPress: () => console.log('Pressed email'),
-        },
-      ];
-
-      if (!_id)
-        actions.push({
-          icon: IconUtils.getInfo(keys.SAVE).name.default,
-          label: labels.save,
-          onPress: () => {
-            setIsEditingPlaylistName(true);
-            playlistInput.current?.focus();
-            // console.log(
-            //   `[Current-Playlist] playlistTextInput.current=${playlistInput.current}`,
-            // );
-            // playlistInput.current.clear();
-            setIsFABOpened(false);
-          },
-          // small: false,
-          color: colors.red,
-        });
-
-      setFABActions(actions);
 
       /* Update tracks */
       let _tracks;
@@ -226,6 +192,43 @@ const Playlist = ({ style, id: _id, showIcon }) => {
     //    and the track is still not changed
     _setCurrentlyPlayingTrackId(id);
   }, [musicInfo.currentlyPlaying]);
+
+  // useEffect(() => {
+  //   /* Update action menu */
+  //   const actions = [
+  //     {
+  //       icon: IconUtils.getInfo(keys.SHUFFLE).name.default,
+  //       label: labels.shuffle,
+  //       onPress: () => console.log('Pressed star'),
+  //     },
+  //     {
+  //       icon: IconUtils.getInfo(keys.PLAY).name.default,
+  //       label: labels.play,
+  //       onPress: () => console.log('Pressed email'),
+  //     },
+  //     {
+  //       icon: IconUtils.getInfo(keys[id ? 'PLAYLIST_EDIT' : 'SAVE']).name
+  //         .default,
+  //       label: labels[id ? 'rename' : 'save'],
+  //       onPress: () => {
+  //         setIsEditingPlaylistName(true);
+  //         playlistInput.current?.focus();
+  //         // console.log(
+  //         //   `[Current-Playlist] playlistTextInput.current=${playlistInput.current}`,
+  //         // );
+  //         // playlistInput.current.clear();
+  //         setIsFABOpened(false);
+  //       },
+  //       // small: false,
+  //       color: id ? null : colors.red,
+  //     },
+  //   ];
+  //
+  //   // if (!_id)
+  //   //   actions.push();
+  //
+  //   setFABActions(actions);
+  // }, [id]);
 
   // useEffect(() => {
   //   // console.log(
@@ -825,47 +828,65 @@ const Playlist = ({ style, id: _id, showIcon }) => {
   return (
     <>
       <View style={[styles.container, style]}>
+        {/* [Component] Name Input/Label */}
         {isEditingPlaylistName ? (
-          <TextInput
-            // // multiline
-            // ref={_ref => {
-            //   console.log(`djfjdsjfslsdlj `, _ref);
-            // }}
-            ref={playlistInput}
-            dense
-            autoFocus
-            mode="outlined"
-            placeholder={labels.playlistName}
-            label={labels.playlistName}
-            value={playlistName}
-            onBlur={savePlaylist}
-            onChangeText={name => {
-              // console.log(`[Current-Playlist/onChangeText] text=${name}, ASCII=`);
-              if (name.length <= MAX_PLAYLIST_NAME_LENGTH)
-                setPlaylistName(name);
-            }}
-            right={
-              <TextInput.Affix
-                text={`/${MAX_PLAYLIST_NAME_LENGTH - playlistName.length}`}
-              />
-            }
-            left={
-              <TextInput.Icon
-                name={IconUtils.getInfo(keys.PLAYLIST_EDIT).name.default}
-              />
-            }
-          />
-        ) : (
-          <Text
+          <View
             style={{
-              fontSize: wp(5),
-              textAlign: 'center',
-              marginVertical: hp(1.5),
+              marginBottom: hp(1),
             }}>
-            {playlistName || labels.untitledPlaylist}
-          </Text>
+            <TextInput
+              // // multiline
+              // ref={_ref => {
+              //   console.log(`djfjdsjfslsdlj `, _ref);
+              // }}
+              style={{
+                width: wp(85),
+              }}
+              ref={playlistInput}
+              dense
+              autoFocus
+              mode="outlined"
+              placeholder={labels.playlistName}
+              label={labels.playlistName}
+              value={playlistName}
+              onBlur={savePlaylist}
+              onChangeText={name => {
+                // console.log(`[Current-Playlist/onChangeText] text=${name}, ASCII=`);
+                if (name.length <= MAX_PLAYLIST_NAME_LENGTH)
+                  setPlaylistName(name);
+              }}
+              right={
+                <TextInput.Affix
+                  text={`/${MAX_PLAYLIST_NAME_LENGTH - playlistName.length}`}
+                />
+              }
+              left={
+                <TextInput.Icon
+                  name={IconUtils.getInfo(keys.PLAYLIST_EDIT).name.default}
+                />
+              }
+            />
+          </View>
+        ) : (
+          <TouchableOpacity
+            style={{
+              marginVertical: hp(1.5),
+            }}
+            onPress={() => {
+              setIsEditingPlaylistName(true);
+              playlistInput.current?.focus();
+            }}>
+            <Text
+              style={{
+                fontSize: wp(5),
+                textAlign: 'center',
+              }}>
+              {playlistName || labels.untitledPlaylist}
+            </Text>
+          </TouchableOpacity>
         )}
 
+        {/* [Component] Track List */}
         <View
           style={{
             // borderWidth: 1,
@@ -894,6 +915,7 @@ const Playlist = ({ style, id: _id, showIcon }) => {
         </View>
       </View>
 
+      {/* [Component] Message Box */}
       <Snackbar
         visible={Boolean(snackbarMessage)}
         // visible={Boolean(lastTrackRemoved)}
@@ -952,6 +974,7 @@ const Playlist = ({ style, id: _id, showIcon }) => {
           : snackbarMessage?.info}
       </Snackbar>
 
+      {/* [Component] Floating Action Button */}
       {/*<Portal>*/}
       <FAB.Group
         style={{
@@ -960,15 +983,45 @@ const Playlist = ({ style, id: _id, showIcon }) => {
           paddingBottom: hp(6),
           // opacity: isFABOpened ? 1 : 0.7,
         }}
-        // visible={isFABVisible}
-        visible={true}
+        visible={isFABVisible}
+        // visible={true}
         open={isFABOpened}
         icon={
           IconUtils.getInfo(keys.ACTION).name[
             isFABOpened ? 'filled' : 'outlined'
           ]
         }
-        actions={fabActions}
+        // actions={fabActions}
+        actions={[
+          {
+            icon: IconUtils.getInfo(keys.SHUFFLE).name.default,
+            label: labels.shuffle,
+            onPress: () => console.log('Pressed star'),
+            color: colors.lightGrey,
+          },
+          {
+            icon: IconUtils.getInfo(keys.PLAY).name.default,
+            label: labels.play,
+            onPress: () => console.log('Pressed email'),
+            color: colors.lightGrey,
+          },
+          {
+            icon: IconUtils.getInfo(keys[id ? 'PLAYLIST_EDIT' : 'SAVE']).name
+              .default,
+            label: labels[id ? 'rename' : 'save'],
+            onPress: () => {
+              setIsEditingPlaylistName(true);
+              playlistInput.current?.focus();
+              // console.log(
+              //   `[Current-Playlist] playlistTextInput.current=${playlistInput.current}`,
+              // );
+              // playlistInput.current.clear();
+              setIsFABOpened(false);
+            },
+            // small: false,
+            color: colors[id ? 'lightGrey' : 'red'],
+          },
+        ]}
         onStateChange={state => {
           console.log(`[Current Playlist] FAB state=${JSON.stringify(state)}`);
         }}

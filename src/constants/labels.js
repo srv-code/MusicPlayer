@@ -70,6 +70,7 @@ const labels = {
   remove: 'Remove',
   playingFromPlaylist: 'Playing from playlist',
   trackRemoved: 'Track Removed',
+  rename: 'Rename',
 };
 
 export default labels;
