@@ -85,6 +85,7 @@ const MAX_PLAYLIST_NAME_LENGTH = 25;
 //  - Restructure all the playlist related functionalities here (from current-playlist screen & playlists)
 //  - Implement all pending props, update code as per the new set of props
 //  - Implement the show info button press logic
+//  - Implement the prop disabled
 
 // FIXME [Bugs]
 //  - When selecting a song from this component and pressing on the nav back button
@@ -95,7 +96,7 @@ const MAX_PLAYLIST_NAME_LENGTH = 25;
 //  - If all the unsaved changes are saved when required and also if its handled properly
 //      when the current playlist is from tracks (unsaved & untitled)
 
-const Playlist = ({ style, id: _id }) => {
+const Playlist = ({ style, id: _id, disabled, showItemInfo }) => {
   const { enabledDarkTheme } = useContext(PreferencesContext);
   const { musicInfo, setMusicInfo } = useContext(MusicContext);
   const { playerControls } = useContext(MusicContext);
@@ -229,7 +230,22 @@ const Playlist = ({ style, id: _id }) => {
         setName(originalName.current);
         setIsEditingPlaylistName(false);
       }
-      if (name !== '' && hasUnsavedChanges) savePlaylist();
+
+      if (name !== '' && hasUnsavedChanges)
+        save()
+          .then(data => {
+            ToastAndroid.show(
+              data.created ? labels.playlistCreated : labels.playlistUpdated,
+              ToastAndroid.SHORT,
+            );
+          })
+          .catch(err => {
+            ToastAndroid.show(
+              `${labels.couldntSavePlaylist}: ${err.message}`,
+              ToastAndroid.LONG,
+            );
+            throw err;
+          });
     }
 
     setIsFABVisible(isFocused);
@@ -291,8 +307,17 @@ const Playlist = ({ style, id: _id }) => {
   //   `rowTranslateAnimatedValues=${JSON.stringify(rowTranslateAnimatedValues)}`,
   // );
 
+  const getValidName = () =>
+    new Promise((resolve, reject) => {
+      const newName = name.trim();
+      if (newName === '') reject(labels.emptyPlaylistName);
+      if (musicInfo[keys.PLAYLISTS].some(info => info.name === newName))
+        reject(labels.sameNamePlaylist);
+      resolve(newName);
+    });
+
   // TODO Update with the newer scheme
-  const savePlaylist = () => {
+  const save = async () => {
     console.log(
       `[Playlist/savePlaylist] isFocused=${isFocused}, hasUnsavedChanges=${hasUnsavedChanges}, id=${id}, name=${name}, tracks=${tracks.map(
         t => t.title,
@@ -305,74 +330,62 @@ const Playlist = ({ style, id: _id }) => {
     //   )}`,
     // );
 
-    getValidName()
-      .then(_name => {
-        let isCreating;
-        let createdOn, newPlaylists;
+    const _name = await getValidName();
+    let isCreating;
+    let createdOn, newPlaylists, currentPlaylist;
 
-        if (id) {
-          /* Updating playlist */
-          isCreating = false;
-          newPlaylists = [...musicInfo[keys.PLAYLISTS]];
-          const currentPlaylist = newPlaylists.find(x => x.id === id);
-          currentPlaylist.name = _name;
-          currentPlaylist.track_ids = tracks.map(t => t.id);
-          currentPlaylist.last_updated = new Date().getTime();
-        } else {
-          /* Creating playlist */
-          isCreating = true;
-          createdOn = new Date().getTime();
-          newPlaylists = [
-            ...musicInfo[keys.PLAYLISTS],
-            {
-              id: createdOn,
-              name: _name,
-              track_ids: tracks.map(t => t.id),
-              created: createdOn,
-              last_updated: new Date().getTime(),
-            },
-          ];
-        }
+    if (id) {
+      /* Updating playlist */
+      isCreating = false;
+      newPlaylists = [...musicInfo[keys.PLAYLISTS]];
+      currentPlaylist = newPlaylists.find(x => x.id === id);
+      currentPlaylist.name = _name;
+      currentPlaylist.track_ids = tracks.map(t => t.id);
+      currentPlaylist.last_updated = new Date().getTime();
+    } else {
+      /* Creating playlist */
+      isCreating = true;
+      createdOn = new Date().getTime();
+      currentPlaylist = {
+        id: createdOn,
+        name: _name,
+        track_ids: tracks.map(t => t.id),
+        created: createdOn,
+        last_updated: new Date().getTime(),
+      };
+      newPlaylists = [...musicInfo[keys.PLAYLISTS], currentPlaylist];
+    }
 
-        console.log(
-          `[Playlist/useEffect] should write playlist data: ${JSON.stringify(
-            newPlaylists,
-          )}, _name=${_name}`,
-        );
+    console.log(
+      `[Playlist/useEffect] should write playlist data: ${JSON.stringify(
+        newPlaylists,
+      )}, _name=${_name}`,
+    );
 
-        AsyncStorage.setItem(keys.PLAYLISTS, JSON.stringify(newPlaylists))
-          .then(() => {
-            setMusicInfo(info => ({
-              ...info,
-              [keys.PLAYLISTS]: newPlaylists,
-            }));
-            if (isCreating) {
-              setID(createdOn);
-              setMusicInfo(data => ({
-                ...data,
-                currentlyPlaying: {
-                  ...data.currentlyPlaying,
-                  playlistId: createdOn,
-                },
-              }));
-            }
-            ToastAndroid.show(
-              isCreating ? labels.playlistCreated : labels.playlistUpdated,
-              ToastAndroid.SHORT,
-            );
-            setHasUnsavedChanges(false);
-          })
-          .catch(err => {
-            ToastAndroid.show(
-              `${labels.couldntSavePlaylist}: ${err.message}`,
-              ToastAndroid.LONG,
-            );
-            throw err;
-          });
-      })
-      .catch(e => {
-        throw e;
-      });
+    await AsyncStorage.setItem(keys.PLAYLISTS, JSON.stringify(newPlaylists));
+    setMusicInfo(info => ({
+      ...info,
+      [keys.PLAYLISTS]: newPlaylists,
+    }));
+
+    if (isCreating) {
+      setID(createdOn);
+      setMusicInfo(data => ({
+        ...data,
+        currentlyPlaying: {
+          ...data.currentlyPlaying,
+          playlistId: createdOn,
+        },
+      }));
+    }
+    setHasUnsavedChanges(false);
+
+    console.log(
+      `[Playlist/savePlaylist()] isCreating=${isCreating}, currentPlaylist=${JSON.stringify(
+        currentPlaylist,
+      )}`,
+    );
+    return { created: isCreating, info: currentPlaylist };
   };
 
   const rearrange = (item, fromIndex, action) => {
@@ -700,6 +713,10 @@ const Playlist = ({ style, id: _id }) => {
                 iconName: IconUtils.getInfo(keys.INFO).name.filled,
                 onPress: () => {
                   setShowMoreOptionForTrackId(null);
+                  showItemInfo({
+                    type: keys.TRACKS,
+                    data: data.item,
+                  });
                   // console.log(`navigator=${navigator}`);
                   // if (navigator)
                   //   navigator.navigate(screenNames.itemInfo, {
@@ -884,15 +901,6 @@ const Playlist = ({ style, id: _id }) => {
     );
   };
 
-  const getValidName = () =>
-    new Promise((resolve, reject) => {
-      const newName = name.trim();
-      if (newName === '') reject(labels.emptyPlaylistName);
-      if (musicInfo[keys.PLAYLISTS].some(info => info.name === newName))
-        reject(labels.sameNamePlaylist);
-      resolve(newName);
-    });
-
   return (
     <>
       <View style={[styles.container, style]}>
@@ -984,7 +992,32 @@ const Playlist = ({ style, id: _id }) => {
                   position: 'absolute',
                   right: 0,
                 }}
-                onPress={() => {}}>
+                onPress={() => {
+                  if (hasUnsavedChanges)
+                    save()
+                      .then(data => {
+                        ToastAndroid.show(
+                          data.created
+                            ? labels.playlistCreated
+                            : labels.playlistUpdated,
+                          ToastAndroid.SHORT,
+                        );
+
+                        showItemInfo({ type: keys.PLAYLISTS, data: data.info });
+                      })
+                      .catch(err => {
+                        ToastAndroid.show(
+                          `${labels.couldntSavePlaylist}: ${err.message}`,
+                          ToastAndroid.LONG,
+                        );
+                        throw err;
+                      });
+                  else
+                    showItemInfo({
+                      type: keys.PLAYLISTS,
+                      data: musicInfo[keys.PLAYLISTS].find(x => x.id === id),
+                    });
+                }}>
                 <Icon
                   type={IconUtils.getInfo(keys.INFO).type}
                   name={IconUtils.getInfo(keys.INFO).name.outlined}

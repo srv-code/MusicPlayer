@@ -14,7 +14,7 @@ import {
 } from 'react-native-responsive-screen';
 
 // const Playlists = ({ navigation }) => {
-const Folders = props => {
+const Folders = () => {
   const { enabledDarkTheme } = useContext(PreferencesContext);
 
   const dynamicStyles = {
@@ -33,14 +33,14 @@ const Folders = props => {
       <View style={dynamicStyles.container}>
         <Text>Folders screen</Text>
 
-        <Text>{JSON.stringify(Object.keys(props))}</Text>
+        {/*<Text>{JSON.stringify(Object.keys(props))}</Text>*/}
 
-        <Text
-          onPress={() => {
-            props.jumpTo(screenNames.tracks);
-          }}>
-          Jump to Tracks
-        </Text>
+        {/*<Text*/}
+        {/*  onPress={() => {*/}
+        {/*    props.jumpTo(screenNames.tracks);*/}
+        {/*  }}>*/}
+        {/*  Jump to Tracks*/}
+        {/*</Text>*/}
       </View>
     </ScreenContainer>
   );

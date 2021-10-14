@@ -45,7 +45,7 @@ import PlaylistControls from '../../components/playlist-controls';
 // FIXME Selecting another item should not show the same toast message ("selected from all tracks")
 // FIXME Selecting a track (which is not the first one) should not highlight the first one
 
-const Tracks = ({ navigation }) => {
+const Tracks = () => {
   const { enabledDarkTheme } = useContext(PreferencesContext);
   const { playerControls, musicInfo, bottomSheetMiniPositionIndex } =
     useContext(MusicContext);

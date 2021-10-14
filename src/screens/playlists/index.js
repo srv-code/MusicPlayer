@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { Animated, StyleSheet, View } from 'react-native';
 import {
   heightPercentageToDP as hp,
   widthPercentageToDP as wp,
@@ -15,8 +15,9 @@ import Modal from 'react-native-modal';
 import Playlist from '../../components/playlist';
 import PlaylistControls from '../../components/playlist-controls';
 import { SortingOptions, SortingOrders } from '../../constants/tracks';
+import { displayModes as ItemInfoDisplayModes } from '../item-info';
 
-const Playlists = ({ navigation }) => {
+const Playlists = () => {
   const { enabledDarkTheme } = useContext(PreferencesContext);
   const { musicInfo } = useContext(MusicContext);
 
@@ -25,6 +26,10 @@ const Playlists = ({ navigation }) => {
   const [editingPlaylistID, setEditingPlaylistID] = useState(null);
   const [sortBy, setSortBy] = useState(SortingOptions.TITLE);
   const [sortOrder, setSortOrder] = useState(SortingOrders.ASCENDING);
+  const [itemInfo, setItemInfo] = useState(null);
+  const [infoPanelAnimatedValue] = useState(new Animated.Value(0));
+
+  console.log(`playlists=${JSON.stringify(playlists)}`);
 
   useEffect(() => {
     if (musicInfo?.[keys.PLAYLISTS]?.length)
@@ -127,6 +132,47 @@ const Playlists = ({ navigation }) => {
   //   setEditingPlaylistInfo(info);
   // };
 
+  const showItemInfoPanel = ({ type, data }) => {
+    console.log(
+      `[showItemInfo] type=${type}, data=${JSON.stringify(
+        data,
+      )}, infoPanelAnimatedValue=${JSON.stringify(infoPanelAnimatedValue)}`,
+    );
+    // displayMode: ItemInfoDisplayModes.SCREEN,
+
+    // if (!itemInfo) setItemInfo({ type, data });
+    Animated.timing(infoPanelAnimatedValue, {
+      // Animated.spring(infoPanelAnimatedValue, { // TODO Implement this
+      // toValue: itemInfo ? 0 : 1,
+      toValue: 1,
+      duration: 400,
+      useNativeDriver: false,
+    }).start(() => {
+      setItemInfo({ type, data });
+    });
+
+    // }).start(() => {
+    //   // if (itemInfo) setItemInfo(null);
+    // });
+  };
+
+  const hideItemInfoPanel = () => {
+    console.log(
+      `[hideItemInfoPanel] itemInfo=${itemInfo}, infoPanelAnimatedValue=${JSON.stringify(
+        infoPanelAnimatedValue,
+      )}`,
+    );
+
+    // console.log(`[hideItemInfoPanel] itemInfo=${itemInfo}`);
+    setItemInfo(null);
+    Animated.timing(infoPanelAnimatedValue, {
+      // Animated.spring(infoPanelAnimatedValue, { // TODO Implement this
+      toValue: 0,
+      duration: 400,
+      useNativeDriver: false,
+    }).start();
+  };
+
   // FIXME Screen is not scrollable
   return (
     <>
@@ -169,38 +215,53 @@ const Playlists = ({ navigation }) => {
               alignItems: 'center',
               // alignContents: 'center',
             }}>
-            {playlists.map((info, index) => (
-              <PlaylistCover
-                key={index}
-                id={info.id}
-                onEdit={info => setEditingPlaylistID(info.id)}
-                // onEdit={fillEditingPlaylistInfo}
-                onPlay={onPlayPlaylist}
-                onShuffle={onShufflePlaylist}
-                onAddToQueue={onAddPlaylistToQueue}
-                onShowInfo={onShowPlaylistInfo}
-                onDelete={onDeletePlaylist}
-                // style={{
-                //   backgroundColor: 'lightblue',
-                //   // marginVertical: hp(1)
-                // }}
-              />
+            {!playlists.length ? (
+              <Text
+                style={{
+                  flex: 1,
+                  fontSize: wp(5),
+                  color: colors.lightGrey,
+                  textAlign: 'center',
+                  marginTop: hp(15),
+                }}>
+                Nothing yet
+              </Text>
+            ) : (
+              <>
+                {playlists.map((info, index) => (
+                  <PlaylistCover
+                    key={index}
+                    id={info.id}
+                    onEdit={info => setEditingPlaylistID(info.id)}
+                    // onEdit={fillEditingPlaylistInfo}
+                    onPlay={onPlayPlaylist}
+                    onShuffle={onShufflePlaylist}
+                    onAddToQueue={onAddPlaylistToQueue}
+                    onShowInfo={onShowPlaylistInfo}
+                    onDelete={onDeletePlaylist}
+                    // style={{
+                    //   backgroundColor: 'lightblue',
+                    //   // marginVertical: hp(1)
+                    // }}
+                  />
 
-              // <Text>ID: {info.id}</Text>
-              // <Text>Name: {info.name}</Text>
-              // <Text>Created On: {new Date(info.created).toString()}</Text>
-              // <Text>
-              //   Last Updated On: {new Date(info.last_updated).toString()}
-              // </Text>
-              // <Text>{`Tracks (${musicInfo[keys.TRACKS].length}):`}</Text>
-              // {info.track_ids.map((id, trackIndex) => (
-              //   <Text key={trackIndex}>
-              //     {`  [${id}] ${
-              //       musicInfo[keys.TRACKS].find(t => t.id === id).title
-              //     }`}
-              //   </Text>
-              // ))}
-            ))}
+                  // <Text>ID: {info.id}</Text>
+                  // <Text>Name: {info.name}</Text>
+                  // <Text>Created On: {new Date(info.created).toString()}</Text>
+                  // <Text>
+                  //   Last Updated On: {new Date(info.last_updated).toString()}
+                  // </Text>
+                  // <Text>{`Tracks (${musicInfo[keys.TRACKS].length}):`}</Text>
+                  // {info.track_ids.map((id, trackIndex) => (
+                  //   <Text key={trackIndex}>
+                  //     {`  [${id}] ${
+                  //       musicInfo[keys.TRACKS].find(t => t.id === id).title
+                  //     }`}
+                  //   </Text>
+                  // ))}
+                ))}
+              </>
+            )}
           </View>
         </View>
       </ScreenContainer>
@@ -255,10 +316,69 @@ const Playlists = ({ navigation }) => {
           {/*  }}*/}
           {/*/>*/}
 
-          <Text>{JSON.stringify(navigator)}</Text>
+          {/*<Text>{JSON.stringify(navigator)}</Text>*/}
 
-          <Playlist id={editingPlaylistID} navigator={navigation} />
+          {/*<View*/}
+          {/*  style={{*/}
+          {/*    flexDirection: 'row',*/}
+          {/*    alignItems: 'center',*/}
+          {/*  }}>*/}
+          <Playlist
+            id={editingPlaylistID}
+            disabled={Boolean(itemInfo)}
+            showItemInfo={showItemInfoPanel}
+          />
+
+          {/*<Animated.View*/}
+          {/*  style={{*/}
+          {/*    backgroundColor: 'grey',*/}
+          {/*    width: infoPanelAnimatedValue.interpolate({*/}
+          {/*      inputRange: [0, 1],*/}
+          {/*      outputRange: [0, wp(60)],*/}
+          {/*    }),*/}
+          {/*  }}>*/}
+          {/*  <Text>Info Panel</Text>*/}
+          {/*</Animated.View>*/}
+
+          <Animated.View
+            // elevation={50}
+            style={{
+              // width: wp(90),
+              width: infoPanelAnimatedValue.interpolate({
+                inputRange: [0, 1],
+                outputRange: [0, wp(90)],
+              }),
+              // height: hp(72),
+              borderRadius: 15,
+              overflow: 'hidden',
+              // paddingVertical: hp(2),
+              paddingVertical: infoPanelAnimatedValue.interpolate({
+                inputRange: [0, 1],
+                outputRange: [0, hp(2)],
+              }),
+              // paddingHorizontal: wp(4),
+              paddingHorizontal: infoPanelAnimatedValue.interpolate({
+                inputRange: [0, 1],
+                outputRange: [0, wp(4)],
+              }),
+              // flex: 1,
+              // borderWidth: 2,
+              // borderColor: 'blue',
+              backgroundColor: 'grey',
+              position: 'absolute',
+              zIndex: 999,
+              elevation: 10,
+              // bottom: 10,
+              right: wp(5),
+              bottom: hp(1.5),
+            }}>
+            <Text onPress={hideItemInfoPanel}>Close</Text>
+            <Text>Info Panel</Text>
+
+            <Text>{JSON.stringify(itemInfo)}</Text>
+          </Animated.View>
         </View>
+        {/*</View>*/}
       </Modal>
     </>
   );
