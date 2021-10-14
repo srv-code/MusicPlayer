@@ -18,7 +18,7 @@ import Icon from '../../components/icon';
 import { useFocusEffect } from '@react-navigation/native';
 import IconUtils from '../../utils/icon';
 
-export const DisplayModes = {
+export const displayModes = {
   SCREEN: 'SCREEN',
   MODAL: 'MODAL',
 };
@@ -41,6 +41,7 @@ export const getScreenTitle = type => {
 };
 
 // FIXME I suspect the scrolling in MODAL mode is off
+// TODO Add capability for playlists also
 const ItemInfo = ({ navigation, route, extraData }) => {
   const { enabledDarkTheme } = useContext(PreferencesContext);
 
@@ -53,13 +54,13 @@ const ItemInfo = ({ navigation, route, extraData }) => {
   );
 
   useEffect(() => {
-    if (displayMode === DisplayModes.MODAL && extraData.snapIndex < 2)
+    if (displayMode === displayModes.MODAL && extraData.snapIndex < 2)
       navigation.navigate(screenNames.nowPlaying);
   }, [extraData?.snapIndex]);
 
   const Container = ({ children }) => {
     switch (displayMode) {
-      case DisplayModes.SCREEN:
+      case displayModes.SCREEN:
         return (
           <ScreenContainer
             showHeader
@@ -69,7 +70,7 @@ const ItemInfo = ({ navigation, route, extraData }) => {
           </ScreenContainer>
         );
 
-      case DisplayModes.MODAL:
+      case displayModes.MODAL:
         return (
           <BottomSheetScrollView
             bounces={true}
@@ -159,9 +160,11 @@ const ItemInfo = ({ navigation, route, extraData }) => {
           },
         ];
 
+      // TODO Complete
       case keys.FOLDERS:
         return [];
 
+      // TODO Complete
       case keys.PLAYLISTS:
         return [];
 

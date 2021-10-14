@@ -29,7 +29,7 @@ import LinearGradient from 'react-native-linear-gradient';
 import MarqueeText from 'react-native-marquee';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import keys from '../../constants/keys';
-import { DisplayModes as ItemInfoDisplayModes } from '../item-info';
+import { displayModes as ItemInfoDisplayModes } from '../item-info';
 import { useBackHandler } from '@react-native-community/hooks';
 import { useFocusEffect, useIsFocused } from '@react-navigation/native';
 import IconUtils from '../../utils/icon';

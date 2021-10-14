@@ -33,7 +33,7 @@ import DateTimeUtils from '../../utils/datetime';
 import { PreferencesContext } from '../../context/preferences';
 import labels from '../../constants/labels';
 import keys from '../../constants/keys';
-import { DisplayModes as ItemInfoDisplayModes } from '../item-info';
+import { displayModes as ItemInfoDisplayModes } from '../item-info';
 import IconUtils from '../../utils/icon';
 
 // TODO Save the searched term in async-storage (avoid duplicates)
@@ -41,6 +41,7 @@ import IconUtils from '../../utils/icon';
 // TODO ** Apply TrackList here and remove duplicate codes
 // FIXME 'Synthetic reuse' on context menu press
 // FIXME Inputting space shows all results
+// TODO Add capability for playlists also
 
 const Search = ({ navigation }) => {
   const { musicInfo } = useContext(MusicContext);

@@ -4,10 +4,10 @@ import {
   heightPercentageToDP as hp,
   widthPercentageToDP as wp,
 } from 'react-native-responsive-screen';
+import { Text } from 'react-native-paper';
 import ScreenContainer from '../../components/screen-container';
 import colors from '../../constants/colors';
 import { PreferencesContext } from '../../context/preferences';
-
 import keys from '../../constants/keys';
 import { MusicContext } from '../../context/music';
 import PlaylistCover from '../../components/playlist-cover';
@@ -254,7 +254,10 @@ const Playlists = ({ navigation }) => {
           {/*    setEditingPlaylistInfo(prev => ({ ...prev, tracks }));*/}
           {/*  }}*/}
           {/*/>*/}
-          <Playlist id={editingPlaylistID} />
+
+          <Text>{JSON.stringify(navigator)}</Text>
+
+          <Playlist id={editingPlaylistID} navigator={navigation} />
         </View>
       </Modal>
     </>

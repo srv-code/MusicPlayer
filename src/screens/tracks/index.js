@@ -42,6 +42,9 @@ import PlaylistControls from '../../components/playlist-controls';
 // TODO Add a go up button (same as in Samsung Music)
 // TODO Add a scroll handle (same as in Samsung Music)
 // FIXME When shuffling the playlist skip to previous & next tracks player buttons are not correctly disabled
+// FIXME Selecting another item should not show the same toast message ("selected from all tracks")
+// FIXME Selecting a track (which is not the first one) should not highlight the first one
+
 const Tracks = ({ navigation }) => {
   const { enabledDarkTheme } = useContext(PreferencesContext);
   const { playerControls, musicInfo, bottomSheetMiniPositionIndex } =
