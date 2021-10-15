@@ -141,15 +141,14 @@ const Playlists = () => {
     // displayMode: ItemInfoDisplayModes.SCREEN,
 
     // if (!itemInfo) setItemInfo({ type, data });
+    setItemInfo({ type, data });
     Animated.timing(infoPanelAnimatedValue, {
       // Animated.spring(infoPanelAnimatedValue, { // TODO Implement this
       // toValue: itemInfo ? 0 : 1,
       toValue: 1,
       duration: 400,
       useNativeDriver: false,
-    }).start(() => {
-      setItemInfo({ type, data });
-    });
+    }).start();
 
     // }).start(() => {
     //   // if (itemInfo) setItemInfo(null);
@@ -164,13 +163,14 @@ const Playlists = () => {
     );
 
     // console.log(`[hideItemInfoPanel] itemInfo=${itemInfo}`);
-    setItemInfo(null);
     Animated.timing(infoPanelAnimatedValue, {
       // Animated.spring(infoPanelAnimatedValue, { // TODO Implement this
       toValue: 0,
       duration: 400,
       useNativeDriver: false,
-    }).start();
+    }).start(() => {
+      setItemInfo(null);
+    });
   };
 
   // FIXME Screen is not scrollable
@@ -318,16 +318,71 @@ const Playlists = () => {
 
           {/*<Text>{JSON.stringify(navigator)}</Text>*/}
 
-          {/*<View*/}
-          {/*  style={{*/}
-          {/*    flexDirection: 'row',*/}
-          {/*    alignItems: 'center',*/}
-          {/*  }}>*/}
-          <Playlist
-            id={editingPlaylistID}
-            disabled={Boolean(itemInfo)}
-            showItemInfo={showItemInfoPanel}
-          />
+          {/* FIXME Spoiling the styles of Playlist component */}
+          <View
+            style={{
+              flexDirection: 'row',
+              // alignItems: 'center',
+              // alignContents: 'center',
+              flex: 1,
+            }}>
+            <Animated.View
+              style={{
+                transform: [
+                  {
+                    // translateX: wp(45), // normal
+                    // translateX: -wp(50), // slided to the left
+
+                    translateX: infoPanelAnimatedValue.interpolate({
+                      inputRange: [0, 1],
+                      outputRange: [wp(45), -wp(50)],
+                    }),
+                  },
+                ],
+              }}>
+              <Playlist
+                // style={{
+                //   backgroundColor: 'lightgrey',
+                //   zIndex: 9999,
+                // }}
+                id={editingPlaylistID}
+                disabled={Boolean(itemInfo)}
+                showItemInfo={showItemInfoPanel}
+              />
+            </Animated.View>
+
+            <Animated.View
+              style={{
+                // position: 'absolute',
+                // flex: 1,
+                // alignSelf: 'flex-end',
+                // height: hp(70),
+                // width: wp(90),
+                width: wp(90),
+                backgroundColor: 'lightgrey',
+                borderRadius: 10,
+                overflow: 'hidden',
+                paddingVertical: hp(2),
+                paddingHorizontal: wp(4),
+                marginBottom: hp(0.7),
+                transform: [
+                  {
+                    // translateX: wp(60), // normal
+                    // translateX: -wp(45), // slided to the right
+
+                    translateX: infoPanelAnimatedValue.interpolate({
+                      inputRange: [0, 1],
+                      outputRange: [wp(50), -wp(45)],
+                    }),
+                  },
+                ],
+              }}>
+              <Text onPress={hideItemInfoPanel}>Close</Text>
+              <Text>Info Panel</Text>
+
+              <Text>{JSON.stringify(itemInfo)}</Text>
+            </Animated.View>
+          </View>
 
           {/*<Animated.View*/}
           {/*  style={{*/}
@@ -340,43 +395,92 @@ const Playlists = () => {
           {/*  <Text>Info Panel</Text>*/}
           {/*</Animated.View>*/}
 
-          <Animated.View
-            // elevation={50}
-            style={{
-              // width: wp(90),
-              width: infoPanelAnimatedValue.interpolate({
-                inputRange: [0, 1],
-                outputRange: [0, wp(90)],
-              }),
-              // height: hp(72),
-              borderRadius: 15,
-              overflow: 'hidden',
-              // paddingVertical: hp(2),
-              paddingVertical: infoPanelAnimatedValue.interpolate({
-                inputRange: [0, 1],
-                outputRange: [0, hp(2)],
-              }),
-              // paddingHorizontal: wp(4),
-              paddingHorizontal: infoPanelAnimatedValue.interpolate({
-                inputRange: [0, 1],
-                outputRange: [0, wp(4)],
-              }),
-              // flex: 1,
-              // borderWidth: 2,
-              // borderColor: 'blue',
-              backgroundColor: 'grey',
-              position: 'absolute',
-              zIndex: 999,
-              elevation: 10,
-              // bottom: 10,
-              right: wp(5),
-              bottom: hp(1.5),
-            }}>
-            <Text onPress={hideItemInfoPanel}>Close</Text>
-            <Text>Info Panel</Text>
+          {/*<Animated.View*/}
+          {/*  // elevation={50}*/}
+          {/*  style={{*/}
+          {/*    transform: [*/}
+          {/*      {*/}
+          {/*        translateX: infoPanelAnimatedValue.interpolate({*/}
+          {/*          inputRange: [0, 1],*/}
+          {/*          outputRange: [-wp(90), wp(90)],*/}
+          {/*        }),*/}
+          {/*      },*/}
+          {/*    ],*/}
 
-            <Text>{JSON.stringify(itemInfo)}</Text>
-          </Animated.View>
+          {/*    display: 'none',*/}
+
+          {/*    width: wp(90),*/}
+          {/*    // width: infoPanelAnimatedValue.interpolate({*/}
+          {/*    //   inputRange: [0, 1],*/}
+          {/*    //   outputRange: [0, wp(90)],*/}
+          {/*    // }),*/}
+          {/*    height: hp(72),*/}
+          {/*    borderRadius: 15,*/}
+          {/*    overflow: 'hidden',*/}
+          {/*    paddingVertical: hp(2),*/}
+          {/*    // paddingVertical: infoPanelAnimatedValue.interpolate({*/}
+          {/*    //   inputRange: [0, 1],*/}
+          {/*    //   outputRange: [0, hp(2)],*/}
+          {/*    // }),*/}
+          {/*    paddingHorizontal: wp(4),*/}
+          {/*    // paddingHorizontal: infoPanelAnimatedValue.interpolate({*/}
+          {/*    //   inputRange: [0, 1],*/}
+          {/*    //   outputRange: [0, wp(4)],*/}
+          {/*    // }),*/}
+          {/*    // flex: 1,*/}
+          {/*    // borderWidth: 2,*/}
+          {/*    // borderColor: 'blue',*/}
+          {/*    backgroundColor: 'grey',*/}
+          {/*    // position: 'absolute',*/}
+          {/*    // zIndex: 999,*/}
+          {/*    // elevation: 10,*/}
+          {/*    // bottom: 10,*/}
+          {/*    right: wp(5),*/}
+          {/*    bottom: hp(1.5),*/}
+          {/*  }}>*/}
+          {/*  <Text onPress={hideItemInfoPanel}>Close</Text>*/}
+          {/*  <Text>Info Panel</Text>*/}
+
+          {/*  <Text>{JSON.stringify(itemInfo)}</Text>*/}
+          {/*</Animated.View>*/}
+
+          {/*<Animated.View*/}
+          {/*  // elevation={50}*/}
+          {/*  style={{*/}
+          {/*    // width: wp(90),*/}
+          {/*    width: infoPanelAnimatedValue.interpolate({*/}
+          {/*      inputRange: [0, 1],*/}
+          {/*      outputRange: [0, wp(90)],*/}
+          {/*    }),*/}
+          {/*    // height: hp(72),*/}
+          {/*    borderRadius: 15,*/}
+          {/*    overflow: 'hidden',*/}
+          {/*    // paddingVertical: hp(2),*/}
+          {/*    paddingVertical: infoPanelAnimatedValue.interpolate({*/}
+          {/*      inputRange: [0, 1],*/}
+          {/*      outputRange: [0, hp(2)],*/}
+          {/*    }),*/}
+          {/*    // paddingHorizontal: wp(4),*/}
+          {/*    paddingHorizontal: infoPanelAnimatedValue.interpolate({*/}
+          {/*      inputRange: [0, 1],*/}
+          {/*      outputRange: [0, wp(4)],*/}
+          {/*    }),*/}
+          {/*    // flex: 1,*/}
+          {/*    // borderWidth: 2,*/}
+          {/*    // borderColor: 'blue',*/}
+          {/*    backgroundColor: 'grey',*/}
+          {/*    position: 'absolute',*/}
+          {/*    zIndex: 999,*/}
+          {/*    elevation: 10,*/}
+          {/*    // bottom: 10,*/}
+          {/*    right: wp(5),*/}
+          {/*    bottom: hp(1.5),*/}
+          {/*  }}>*/}
+          {/*  <Text onPress={hideItemInfoPanel}>Close</Text>*/}
+          {/*  <Text>Info Panel</Text>*/}
+
+          {/*  <Text>{JSON.stringify(itemInfo)}</Text>*/}
+          {/*</Animated.View>*/}
         </View>
         {/*</View>*/}
       </Modal>
