@@ -32,7 +32,7 @@ import labels from '../../constants/labels';
 import globalStyles from '../../styles';
 import DateTimeUtils from '../../utils/datetime';
 // import List from '../../components/track-list';
-import { SortingOptions, SortingOrders } from '../../constants/tracks';
+import { sortingOptions, sortingOrders } from '../../constants/tracks';
 import IconUtils from '../../utils/icon';
 import keys from '../../constants/keys';
 import PlayerUtils from '../../utils/player';
@@ -51,8 +51,8 @@ const Tracks = () => {
     useContext(MusicContext);
 
   // const [showSortingMenu, setShowSortingMenu] = useState(false);
-  const [sortBy, setSortBy] = useState(SortingOptions.TITLE);
-  const [sortOrder, setSortOrder] = useState(SortingOrders.ASCENDING);
+  const [sortBy, setSortBy] = useState(sortingOptions.TITLE);
+  const [sortOrder, setSortOrder] = useState(sortingOrders.ASCENDING);
   const [showMoreOptionForTrackId, setShowMoreOptionForTrackId] =
     useState(null);
   const [tracks, setTracks] = useState([]);
@@ -67,8 +67,8 @@ const Tracks = () => {
       );
       sortTracks(
         [...musicInfo[keys.TRACKS]],
-        SortingOptions.TITLE,
-        SortingOrders.ASCENDING,
+        sortingOptions.TITLE,
+        sortingOrders.ASCENDING,
       );
     }
   }, [musicInfo?.[keys.TRACKS]]);
@@ -172,14 +172,14 @@ const Tracks = () => {
   const renderTrackDescription = track => {
     const getText = () => {
       switch (sortBy) {
-        case SortingOptions.TITLE:
-        case SortingOptions.ARTIST:
+        case sortingOptions.TITLE:
+        case sortingOptions.ARTIST:
           return track.artist;
-        case SortingOptions.DURATION:
+        case sortingOptions.DURATION:
           return DateTimeUtils.msToTime(track.duration);
-        case SortingOptions.ALBUM:
+        case sortingOptions.ALBUM:
           return track.album;
-        case SortingOptions.FOLDER:
+        case sortingOptions.FOLDER:
           // return `${track.folder.name} (${track.folder.path)})`;
           return track.folder.name;
         default:
@@ -192,12 +192,12 @@ const Tracks = () => {
         <Icon
           name={
             IconUtils.getInfo(
-              sortBy === SortingOptions.TITLE ? SortingOptions.ARTIST : sortBy,
+              sortBy === sortingOptions.TITLE ? sortingOptions.ARTIST : sortBy,
             ).name.outlined
           }
           type={
             IconUtils.getInfo(
-              sortBy === SortingOptions.TITLE ? SortingOptions.ARTIST : sortBy,
+              sortBy === sortingOptions.TITLE ? sortingOptions.ARTIST : sortBy,
             ).type
           }
           size={wp(3.5)}
@@ -344,23 +344,23 @@ const Tracks = () => {
         return val;
       };
 
-      if (type === 'string' && order === SortingOrders.ASCENDING)
+      if (type === 'string' && order === sortingOrders.ASCENDING)
         compare = (a, b) =>
           getKeyValue(a) < getKeyValue(b)
             ? -1
             : getKeyValue(a) > getKeyValue(b)
             ? 1
             : 0;
-      else if (type === 'string' && order === SortingOrders.DECREASING)
+      else if (type === 'string' && order === sortingOrders.DECREASING)
         compare = (a, b) =>
           getKeyValue(b) < getKeyValue(a)
             ? -1
             : getKeyValue(b) > getKeyValue(a)
             ? 1
             : 0;
-      else if (type === 'number' && order === SortingOrders.ASCENDING)
+      else if (type === 'number' && order === sortingOrders.ASCENDING)
         compare = (a, b) => getKeyValue(a) - getKeyValue(b);
-      else if (type === 'number' && order === SortingOrders.DECREASING)
+      else if (type === 'number' && order === sortingOrders.DECREASING)
         compare = (a, b) => getKeyValue(b) - getKeyValue(a);
       else throw new Error(`Invalid type: ${type} or order: ${order}`);
 
@@ -368,19 +368,19 @@ const Tracks = () => {
     };
 
     switch (by) {
-      case SortingOptions.ARTIST:
+      case sortingOptions.ARTIST:
         _sort(['artist']);
         break;
-      case SortingOptions.TITLE:
+      case sortingOptions.TITLE:
         _sort(['title']);
         break;
-      case SortingOptions.DURATION:
+      case sortingOptions.DURATION:
         _sort(['duration'], 'number');
         break;
-      case SortingOptions.ALBUM:
+      case sortingOptions.ALBUM:
         _sort(['album']);
         break;
-      case SortingOptions.FOLDER:
+      case sortingOptions.FOLDER:
         _sort(['folder', 'path']);
         break;
       default:
@@ -445,11 +445,11 @@ const Tracks = () => {
           enabledDarkTheme={enabledDarkTheme}
           disabled={!tracks.length}
           sortKeys={[
-            SortingOptions.TITLE,
-            SortingOptions.ARTIST,
-            SortingOptions.ALBUM,
-            SortingOptions.DURATION,
-            SortingOptions.FOLDER,
+            sortingOptions.TITLE,
+            sortingOptions.ARTIST,
+            sortingOptions.ALBUM,
+            sortingOptions.DURATION,
+            sortingOptions.FOLDER,
           ]}
           sortOrder={sortOrder}
           onChangeSortOrder={order => sortTracks([...tracks], sortBy, order)}

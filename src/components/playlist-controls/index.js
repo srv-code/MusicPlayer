@@ -4,7 +4,7 @@ import { Menu, Text, ToggleButton } from 'react-native-paper';
 import Icon from '../icon';
 import colors from '../../constants/colors';
 import IconUtils from '../../utils/icon';
-import { SortingOrders } from '../../constants/tracks';
+import { sortingOrders } from '../../constants/tracks';
 import keys from '../../constants/keys';
 import {
   heightPercentageToDP as hp,
@@ -72,7 +72,7 @@ const PlaylistControls = ({
             <Icon
               name={
                 IconUtils.getInfo(
-                  sortOrder === SortingOrders.ASCENDING
+                  sortOrder === sortingOrders.ASCENDING
                     ? keys.SORT_ASCENDING_ALT
                     : keys.SORT_DESCENDING_ALT,
                 ).name.filled
@@ -91,7 +91,7 @@ const PlaylistControls = ({
         }>
         {/*<Text>{sortOrder}</Text>*/}
         <View style={styles.sortOrderContainer}>
-          {[SortingOrders.ASCENDING, SortingOrders.DECREASING].map(
+          {[sortingOrders.ASCENDING, sortingOrders.DECREASING].map(
             (key, index) => (
               <ToggleButton
                 key={index}

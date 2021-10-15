@@ -53,6 +53,7 @@ const Search = ({ navigation }) => {
   const [expandedKeys, setExpandedKeys] = useState([]);
   const [showMoreOptionFor, setShowMoreOptionFor] = useState(null);
   // const [showInfoInSnackBar, setShowInfoInSnackBar] = useState(null);
+
   const searchInput = useRef(null);
 
   console.log('[Search]', {

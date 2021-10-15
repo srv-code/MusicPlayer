@@ -71,6 +71,7 @@ const labels = {
   playingFromPlaylist: 'Playing from playlist',
   trackRemoved: 'Track Removed',
   rename: 'Rename',
+  trackCount: 'Track Count',
 };
 
 export default labels;

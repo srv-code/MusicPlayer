@@ -1,4 +1,11 @@
-import React, { useContext, useEffect, useRef, useState } from 'react';
+import React, {
+  forwardRef,
+  useContext,
+  useEffect,
+  useImperativeHandle,
+  useRef,
+  useState,
+} from 'react';
 import {
   Animated,
   StyleSheet,
@@ -12,8 +19,6 @@ import {
   FAB,
   IconButton,
   List,
-  Menu,
-  Portal,
   Snackbar,
   Text,
   TextInput,
@@ -33,11 +38,8 @@ import { MusicContext } from '../../context/music';
 import IconUtils from '../../utils/icon';
 import keys from '../../constants/keys';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useBackHandler } from '@react-native-community/hooks';
 import { useIsFocused } from '@react-navigation/native';
 import TrackPlayer from 'react-native-track-player';
-import screenNames from '../../constants/screen-names';
-import { displayModes as ItemInfoDisplayModes } from '../../screens/item-info';
 
 const rearrangeActions = {
   MOVE_UP: 'MOVE_UP',
@@ -85,18 +87,20 @@ const MAX_PLAYLIST_NAME_LENGTH = 25;
 //  - Restructure all the playlist related functionalities here (from current-playlist screen & playlists)
 //  - Implement all pending props, update code as per the new set of props
 //  - Implement the show info button press logic
-//  - Implement the prop disabled
+//  - Add a delete option when a prop deletable is passed
+//  - Make all the animations native (useNativeDriver: true) so that they become smoother
 
 // FIXME [Bugs]
 //  - When selecting a song from this component and pressing on the nav back button
 //      then bottom sheet is showing unexpected behaviour
+//  - When inside the modal (in playlists screen), FAB shadow is not covering up
 
 // TODO [Test]
 //  - Play sequence in current & other playlists
 //  - If all the unsaved changes are saved when required and also if its handled properly
 //      when the current playlist is from tracks (unsaved & untitled)
 
-const Playlist = ({ style, id: _id, disabled, showItemInfo }) => {
+const Playlist = forwardRef(({ style, id: _id, showItemInfo }, ref) => {
   const { enabledDarkTheme } = useContext(PreferencesContext);
   const { musicInfo, setMusicInfo } = useContext(MusicContext);
   const { playerControls } = useContext(MusicContext);
@@ -118,12 +122,25 @@ const Playlist = ({ style, id: _id, disabled, showItemInfo }) => {
     useState(null);
   const [snackbarMessage, setSnackbarMessage] = useState(null);
   // const [info, setInfo] = useState(null);
+
   const list = useRef(null);
   const playlistInput = useRef(null);
   const originalName = useRef(null);
 
   const isFocused = useIsFocused();
   let animationIsRunning = false;
+
+  useImperativeHandle(ref, () => ({
+    save: () => {
+      if (name !== '' && hasUnsavedChanges) return save();
+    },
+
+    // save: async () =>
+    //   new Promise((resolve, reject) => {
+    //     if (name !== '' && hasUnsavedChanges) return save();
+    //     else reject('No changes found');
+    //   }),
+  }));
 
   // useBackHandler(() => {
   //   if (isEditingPlaylistName)
@@ -224,6 +241,8 @@ const Playlist = ({ style, id: _id, disabled, showItemInfo }) => {
       //     originalName.current
       //   }`,
       // );
+
+      console.log(`[Playlist] gone out of focus, will save ${name} now...`);
 
       /* restore original name */
       if (isEditingPlaylistName) {
@@ -330,7 +349,7 @@ const Playlist = ({ style, id: _id, disabled, showItemInfo }) => {
     //   )}`,
     // );
 
-    const _name = await getValidName();
+    // const _name = await getValidName();
     let isCreating;
     let createdOn, newPlaylists, currentPlaylist;
 
@@ -339,7 +358,7 @@ const Playlist = ({ style, id: _id, disabled, showItemInfo }) => {
       isCreating = false;
       newPlaylists = [...musicInfo[keys.PLAYLISTS]];
       currentPlaylist = newPlaylists.find(x => x.id === id);
-      currentPlaylist.name = _name;
+      currentPlaylist.name = name;
       currentPlaylist.track_ids = tracks.map(t => t.id);
       currentPlaylist.last_updated = new Date().getTime();
     } else {
@@ -348,7 +367,7 @@ const Playlist = ({ style, id: _id, disabled, showItemInfo }) => {
       createdOn = new Date().getTime();
       currentPlaylist = {
         id: createdOn,
-        name: _name,
+        name,
         track_ids: tracks.map(t => t.id),
         created: createdOn,
         last_updated: new Date().getTime(),
@@ -359,7 +378,7 @@ const Playlist = ({ style, id: _id, disabled, showItemInfo }) => {
     console.log(
       `[Playlist/useEffect] should write playlist data: ${JSON.stringify(
         newPlaylists,
-      )}, _name=${_name}`,
+      )}, _name=${name}`,
     );
 
     await AsyncStorage.setItem(keys.PLAYLISTS, JSON.stringify(newPlaylists));
@@ -985,7 +1004,6 @@ const Playlist = ({ style, id: _id, disabled, showItemInfo }) => {
               </Text>
             </TouchableOpacity>
 
-            {/* TODO Complete */}
             {Boolean(name) && (
               <TouchableOpacity
                 style={{
@@ -1172,7 +1190,7 @@ const Playlist = ({ style, id: _id, disabled, showItemInfo }) => {
       {/*</Portal>*/}
     </>
   );
-};
+});
 
 const styles = StyleSheet.create({
   leftAction: {

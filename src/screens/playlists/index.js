@@ -1,5 +1,12 @@
-import React, { useContext, useEffect, useState } from 'react';
-import { Animated, StyleSheet, View } from 'react-native';
+import React, { useContext, useEffect, useRef, useState } from 'react';
+import {
+  Animated,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import {
   heightPercentageToDP as hp,
   widthPercentageToDP as wp,
@@ -14,20 +21,25 @@ import PlaylistCover from '../../components/playlist-cover';
 import Modal from 'react-native-modal';
 import Playlist from '../../components/playlist';
 import PlaylistControls from '../../components/playlist-controls';
-import { SortingOptions, SortingOrders } from '../../constants/tracks';
+import { sortingOptions, sortingOrders } from '../../constants/tracks';
 import { displayModes as ItemInfoDisplayModes } from '../item-info';
+import Icon from '../../components/icon';
+import IconUtils from '../../utils/icon';
+import labels from '../../constants/labels';
+import Info from '../../components/info';
 
 const Playlists = () => {
   const { enabledDarkTheme } = useContext(PreferencesContext);
   const { musicInfo } = useContext(MusicContext);
 
   const [playlists, setPlaylists] = useState([]);
-  // const [editingPlaylistInfo, setEditingPlaylistInfo] = useState(null);
   const [editingPlaylistID, setEditingPlaylistID] = useState(null);
-  const [sortBy, setSortBy] = useState(SortingOptions.TITLE);
-  const [sortOrder, setSortOrder] = useState(SortingOrders.ASCENDING);
+  const [sortBy, setSortBy] = useState(sortingOptions.TITLE);
+  const [sortOrder, setSortOrder] = useState(sortingOrders.ASCENDING);
   const [itemInfo, setItemInfo] = useState(null);
   const [infoPanelAnimatedValue] = useState(new Animated.Value(0));
+
+  const playlist = useRef(null);
 
   console.log(`playlists=${JSON.stringify(playlists)}`);
 
@@ -35,9 +47,12 @@ const Playlists = () => {
     if (musicInfo?.[keys.PLAYLISTS]?.length)
       sortAllPlaylists(
         [...musicInfo?.[keys.PLAYLISTS]],
-        SortingOptions.TITLE,
-        SortingOrders.ASCENDING,
+        sortingOptions.TITLE,
+        sortingOrders.ASCENDING,
       );
+
+    /* close if not properly closed while dismissing the modal */
+    hideItemInfoPanel();
   }, [musicInfo?.[keys.PLAYLISTS]]);
 
   const onPlayPlaylist = (id, playNext) => {};
@@ -54,14 +69,14 @@ const Playlists = () => {
     const _sort = (getValue, type = 'string') => {
       let compare;
       if (type === 'string') {
-        if (order === SortingOrders.ASCENDING)
+        if (order === sortingOrders.ASCENDING)
           compare = (a, b) =>
             getValue(a) < getValue(b) ? -1 : getValue(a) > getValue(b) ? 1 : 0;
         else
           compare = (a, b) =>
             getValue(b) < getValue(a) ? -1 : getValue(b) > getValue(a) ? 1 : 0;
       } else if (type === 'number') {
-        if (order === SortingOrders.ASCENDING)
+        if (order === sortingOrders.ASCENDING)
           compare = (a, b) => getValue(a) - getValue(b);
         else compare = (a, b) => getValue(b) - getValue(a);
       } else throw new Error(`Invalid type: ${type} or order: ${order}`);
@@ -70,13 +85,13 @@ const Playlists = () => {
     };
 
     switch (by) {
-      case SortingOptions.TITLE:
+      case sortingOptions.TITLE:
         _sort(x => x.name);
         break;
-      case SortingOptions.TRACKS:
+      case sortingOptions.TRACKS:
         _sort(x => x.track_ids.length, 'number');
         break;
-      case SortingOptions.DURATION:
+      case sortingOptions.DURATION:
         _sort(x => {
           let totalDuration = 0;
           x.track_ids.forEach(
@@ -87,10 +102,10 @@ const Playlists = () => {
           return totalDuration;
         }, 'number');
         break;
-      case SortingOptions.CREATED_ON:
+      case sortingOptions.CREATED_ON:
         _sort(x => x.created, 'number');
         break;
-      case SortingOptions.UPDATED_ON:
+      case sortingOptions.UPDATED_ON:
         _sort(x => x.last_updated, 'number');
         break;
       default:
@@ -115,7 +130,19 @@ const Playlists = () => {
   };
 
   const closeEditModal = () => {
-    // setEditingPlaylistInfo(null);
+    console.log(`[Playlists/closeEditModal] force saving playlist`);
+    playlist.current.save();
+    // .then(res => {
+    //   console.log(
+    //     `[Playlists/closeEditModal] save: res: ${JSON.stringify(res)}`,
+    //   );
+    // })
+    // .catch(err => {
+    //   console.log(
+    //     `[Playlists/closeEditModal] save: err: ${JSON.stringify(err)}`,
+    //   );
+    // });
+    hideItemInfoPanel();
     setEditingPlaylistID(null);
   };
 
@@ -147,7 +174,7 @@ const Playlists = () => {
       // toValue: itemInfo ? 0 : 1,
       toValue: 1,
       duration: 400,
-      useNativeDriver: false,
+      useNativeDriver: true,
     }).start();
 
     // }).start(() => {
@@ -167,13 +194,20 @@ const Playlists = () => {
       // Animated.spring(infoPanelAnimatedValue, { // TODO Implement this
       toValue: 0,
       duration: 400,
-      useNativeDriver: false,
+      useNativeDriver: true,
     }).start(() => {
       setItemInfo(null);
     });
   };
 
   // FIXME Screen is not scrollable
+  const getInfoPanelHeaderText = type =>
+    `${
+      type === keys.TRACKS
+        ? labels.track
+        : type === keys.PLAYLISTS && labels.playlist
+    } Info`;
+
   return (
     <>
       <ScreenContainer style={dynamicStyles.screen}>
@@ -189,11 +223,11 @@ const Playlists = () => {
             enabledDarkTheme={enabledDarkTheme}
             disabled={!musicInfo?.[keys.PLAYLISTS]?.length}
             sortKeys={[
-              SortingOptions.TITLE,
-              SortingOptions.TRACKS,
-              SortingOptions.DURATION,
-              SortingOptions.CREATED_ON,
-              SortingOptions.UPDATED_ON,
+              sortingOptions.TITLE,
+              sortingOptions.TRACKS,
+              sortingOptions.DURATION,
+              sortingOptions.CREATED_ON,
+              sortingOptions.UPDATED_ON,
             ]}
             sortOrder={sortOrder}
             onChangeSortOrder={order =>
@@ -341,12 +375,8 @@ const Playlists = () => {
                 ],
               }}>
               <Playlist
-                // style={{
-                //   backgroundColor: 'lightgrey',
-                //   zIndex: 9999,
-                // }}
+                ref={playlist}
                 id={editingPlaylistID}
-                disabled={Boolean(itemInfo)}
                 showItemInfo={showItemInfoPanel}
               />
             </Animated.View>
@@ -359,10 +389,11 @@ const Playlists = () => {
                 // height: hp(70),
                 // width: wp(90),
                 width: wp(90),
-                backgroundColor: 'lightgrey',
+                backgroundColor: colors[enabledDarkTheme ? 'darker' : 'white'],
                 borderRadius: 10,
                 overflow: 'hidden',
-                paddingVertical: hp(2),
+                paddingTop: hp(2),
+                paddingBottom: hp(1),
                 paddingHorizontal: wp(4),
                 marginBottom: hp(0.7),
                 transform: [
@@ -377,10 +408,50 @@ const Playlists = () => {
                   },
                 ],
               }}>
-              <Text onPress={hideItemInfoPanel}>Close</Text>
-              <Text>Info Panel</Text>
+              <View
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  marginBottom: hp(1),
+                }}>
+                <TouchableOpacity onPress={hideItemInfoPanel}>
+                  <Icon
+                    type={IconUtils.getInfo(keys.BACK_ANDROID).type}
+                    name={
+                      IconUtils.getInfo(
+                        keys[
+                          Platform.OS === 'ios' ? 'BACK_IOS' : 'BACK_ANDROID'
+                        ],
+                      ).name.filled
+                    }
+                    color={colors[enabledDarkTheme ? 'light' : 'dark']}
+                  />
+                </TouchableOpacity>
 
-              <Text>{JSON.stringify(itemInfo)}</Text>
+                <Text
+                  style={{
+                    fontSize: wp(6),
+                    color: colors[enabledDarkTheme ? 'light' : 'dark'],
+                    marginLeft: wp(20),
+                  }}>
+                  {getInfoPanelHeaderText(itemInfo?.type)}
+                </Text>
+              </View>
+
+              {/*<Text>{JSON.stringify(itemInfo)}</Text>*/}
+
+              <ScrollView
+                style={{
+                  flex: 1,
+                }}>
+                {itemInfo && (
+                  <Info
+                    type={itemInfo.type}
+                    data={itemInfo.data}
+                    artworkSize={hp(20)}
+                  />
+                )}
+              </ScrollView>
             </Animated.View>
           </View>
 

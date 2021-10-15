@@ -1,7 +1,7 @@
 import labels from './labels';
 import keys from './keys';
 
-const SortingOptions = {
+const sortingOptions = {
   TITLE: labels.title,
   TRACKS: labels.tracks,
   CREATED_ON: labels.createdOn,
@@ -12,9 +12,9 @@ const SortingOptions = {
   FOLDER: labels.folder,
 };
 
-const SortingOrders = {
+const sortingOrders = {
   ASCENDING: keys.SORT_ASCENDING,
   DECREASING: keys.SORT_DESCENDING,
 };
 
-export { SortingOptions, SortingOrders };
+export { sortingOptions, sortingOrders };

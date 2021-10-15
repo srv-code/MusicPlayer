@@ -1,4 +1,7 @@
 export default class DateTimeUtils {
+  static msToDateTimeString = ms =>
+    `${new Date(ms).toLocaleDateString()} ${new Date(ms).toLocaleTimeString()}`;
+
   static msToTime = s => {
     const pad = (n, z = 2) => ('00' + n).slice(-z);
 

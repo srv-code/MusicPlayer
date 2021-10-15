@@ -37,11 +37,12 @@ const App = () => {
     // true,
   );
   const [musicInfo, setMusicInfo] = useState(null);
-  const _playerBottomSheet = useRef(null);
   const [playerControls, setPlayerControls] = useState({});
   const [showSplash, setShowSplash] = useState(true);
   const [bottomSheetMiniPositionIndex, setBottomSheetMiniPositionIndex] =
     useState(-1);
+
+  const _playerBottomSheet = useRef(null);
 
   const musicContextValue = useMemo(
     () => ({

@@ -1,10 +1,10 @@
-import { SortingOptions } from '../constants/tracks';
+import { sortingOptions } from '../constants/tracks';
 import keys from '../constants/keys';
 import { Platform } from 'react-native';
 
 export default class IconUtils {
-  static getInfo = type => {
-    switch (type) {
+  static getInfo = key => {
+    switch (key) {
       case keys.FAVORITE:
         return {
           type: 'MaterialCommunityIcons',
@@ -44,25 +44,25 @@ export default class IconUtils {
         };
 
       case keys.TITLE:
-      case SortingOptions.TITLE:
+      case sortingOptions.TITLE:
         return {
           type: 'MaterialCommunityIcons',
           name: { outlined: 'format-text', default: 'format-text' },
         };
 
-      case SortingOptions.CREATED_ON:
+      case sortingOptions.CREATED_ON:
         return {
           type: 'Ionicons',
           name: { outlined: 'create-outline' },
         };
 
-      case SortingOptions.UPDATED_ON:
+      case sortingOptions.UPDATED_ON:
         return {
           type: 'MaterialCommunityIcons',
           name: { outlined: 'update' },
         };
 
-      case SortingOptions.TRACKS:
+      case sortingOptions.TRACKS:
         return {
           type: 'Feather',
           name: {
@@ -71,7 +71,7 @@ export default class IconUtils {
         };
 
       case keys.DURATION:
-      case SortingOptions.DURATION:
+      case sortingOptions.DURATION:
         return {
           type: 'MaterialCommunityIcons',
           name: {
@@ -81,7 +81,7 @@ export default class IconUtils {
         };
 
       case keys.ALBUMS:
-      case SortingOptions.ALBUM:
+      case sortingOptions.ALBUM:
         return {
           type: 'Ionicons',
           name: {
@@ -92,7 +92,7 @@ export default class IconUtils {
         };
 
       case keys.ARTISTS:
-      case SortingOptions.ARTIST:
+      case sortingOptions.ARTIST:
         return {
           type: 'MaterialCommunityIcons',
           name: {
@@ -103,7 +103,7 @@ export default class IconUtils {
         };
 
       case keys.FOLDERS:
-      case SortingOptions.FOLDER:
+      case sortingOptions.FOLDER:
         return {
           type: 'MaterialCommunityIcons',
           name: {
@@ -221,6 +221,22 @@ export default class IconUtils {
           name: {
             filled: 'shuffle',
             default: 'shuffle-variant',
+          },
+        };
+
+      case keys.BACK_ANDROID:
+        return {
+          type: 'MaterialIcons',
+          name: {
+            filled: 'arrow-back',
+          },
+        };
+
+      case keys.BACK_IOS:
+        return {
+          type: 'MaterialIcons',
+          name: {
+            filled: 'arrow-back-ios',
           },
         };
 
@@ -362,7 +378,7 @@ export default class IconUtils {
         };
 
       default:
-        throw new Error(`Invalid type: ${type}`);
+        throw new Error(`Invalid key: ${key}`);
     }
   };
 }

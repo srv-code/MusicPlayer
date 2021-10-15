@@ -22,5 +22,7 @@ const colors = {
   green1: '#007600',
   darkGreen: '#4e4e00',
   lightGreen: '#898976',
+  circularLinearGradientDark: ['#767676', '#595959', '#323232'], // excluded: '#282828',
+  circularLinearGradientLight: ['#d4d4d4', '#999999', '#7b7b7b', '#373737'],
 };
 export default colors;

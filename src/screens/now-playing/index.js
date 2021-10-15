@@ -529,9 +529,11 @@ const NowPlaying = ({ navigation, extraData: { snapIndex, setSnapIndex } }) => {
       {/* Renders artwork */}
       <LinearGradient
         colors={
-          enabledDarkTheme
-            ? ['#767676', '#595959', '#323232'] // excluded: '#282828'
-            : ['#d4d4d4', '#999999', '#7b7b7b', '#373737']
+          colors[
+            enabledDarkTheme
+              ? 'circularLinearGradientDark'
+              : 'circularLinearGradientLight'
+          ]
         }
         style={{
           elevation: 10,
