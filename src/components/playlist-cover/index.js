@@ -37,12 +37,12 @@ const TEXT_BG_COLORS = [
 const PlaylistCover = ({
   style,
   playlistID,
-  onEdit = () => {},
-  onPlay = () => {},
-  onShuffle = () => {},
-  onAddToQueue = () => {},
-  onShowInfo = () => {},
-  onDelete = () => {},
+  onEdit,
+  onPlay,
+  onShuffle,
+  onAddToQueue,
+  // onShowInfo,
+  onDelete,
 }) => {
   const { musicInfo } = useContext(MusicContext);
   const { enabledDarkTheme } = useContext(PreferencesContext);
@@ -363,7 +363,7 @@ const PlaylistCover = ({
             icon={IconUtils.getInfo(keys.PLAY).name.default}
             title={labels.play}
             onPress={() => {
-              onPlay(false);
+              onPlay(playlistID);
               setShowMenu(false);
             }}
           />
@@ -396,18 +396,18 @@ const PlaylistCover = ({
             icon={IconUtils.getInfo(keys.DELETE).name.default}
             title={labels.delete}
             onPress={() => {
-              onDelete();
+              onDelete(playlistID);
               setShowMenu(false);
             }}
           />
-          <Menu.Item
-            icon={IconUtils.getInfo(keys.INFO).name.default}
-            title={labels.showInfo}
-            onPress={() => {
-              onShowInfo();
-              setShowMenu(false);
-            }}
-          />
+          {/*<Menu.Item*/}
+          {/*  icon={IconUtils.getInfo(keys.INFO).name.default}*/}
+          {/*  title={labels.showInfo}*/}
+          {/*  onPress={() => {*/}
+          {/*    onShowInfo();*/}
+          {/*    setShowMenu(false);*/}
+          {/*  }}*/}
+          {/*/>*/}
         </Menu>
       </View>
     </TouchableOpacity>

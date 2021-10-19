@@ -11,7 +11,7 @@ import {
   heightPercentageToDP as hp,
   widthPercentageToDP as wp,
 } from 'react-native-responsive-screen';
-import { Text } from 'react-native-paper';
+import { Snackbar, Text } from 'react-native-paper';
 import ScreenContainer from '../../components/screen-container';
 import colors from '../../constants/colors';
 import { PreferencesContext } from '../../context/preferences';
@@ -27,10 +27,11 @@ import Icon from '../../components/icon';
 import IconUtils from '../../utils/icon';
 import labels from '../../constants/labels';
 import Info from '../../components/info';
+import PlaylistUtils from '../../utils/playlist';
 
 const Playlists = () => {
   const { enabledDarkTheme } = useContext(PreferencesContext);
-  const { musicInfo } = useContext(MusicContext);
+  const { musicInfo, setMusicInfo } = useContext(MusicContext);
 
   const [playlists, setPlaylists] = useState([]);
   const [editingPlaylistID, setEditingPlaylistID] = useState(null);
@@ -38,10 +39,15 @@ const Playlists = () => {
   const [sortOrder, setSortOrder] = useState(sortingOrders.ASCENDING);
   const [itemInfo, setItemInfo] = useState(null);
   const [infoPanelAnimatedValue] = useState(new Animated.Value(0));
+  const [snackbarMessage, setSnackbarMessage] = useState(null);
 
   const playlist = useRef(null);
 
-  console.log(`playlists=${JSON.stringify(playlists)}`);
+  // console.log(
+  //   `[Playlists] playlists=${JSON.stringify(
+  //     playlists,
+  //   )}, musicInfo.playlists=${JSON.stringify(musicInfo?.[keys.PLAYLISTS])}`,
+  // );
 
   useEffect(() => {
     if (musicInfo?.[keys.PLAYLISTS]?.length)
@@ -50,20 +56,34 @@ const Playlists = () => {
         sortingOptions.TITLE,
         sortingOrders.ASCENDING,
       );
+    else setPlaylists([]);
 
     /* close if not properly closed while dismissing the modal */
     hideItemInfoPanel();
   }, [musicInfo?.[keys.PLAYLISTS]]);
 
-  const onPlayPlaylist = (id, playNext) => {};
+  const onPlayPlaylist = id => {};
 
   const onShufflePlaylist = id => {};
 
   const onAddPlaylistToQueue = id => {};
 
-  const onShowPlaylistInfo = id => {};
-
-  const onDeletePlaylist = id => {};
+  const onDeletePlaylist = id => {
+    console.log(`[Playlists] delete playlist id ${id}`);
+    PlaylistUtils.delete(id, playlists, musicInfo, setMusicInfo)
+      .then(() => {
+        setSnackbarMessage({ info: labels.playlistDeletedSuccessfully });
+      })
+      .catch(err => {
+        console.log(
+          `[Playlists] ${labels.errorDeletingPlaylist}: ${JSON.stringify(err)}`,
+        );
+        setSnackbarMessage({
+          isError: true,
+          info: `${labels.errorDeletingPlaylist}: ${err.message}`,
+        });
+      });
+  };
 
   const sortAllPlaylists = (list, by, order) => {
     const _sort = (getValue, type = 'string') => {
@@ -271,7 +291,7 @@ const Playlists = () => {
                     onPlay={onPlayPlaylist}
                     onShuffle={onShufflePlaylist}
                     onAddToQueue={onAddPlaylistToQueue}
-                    onShowInfo={onShowPlaylistInfo}
+                    // onShowInfo={onShowPlaylistInfo}
                     onDelete={onDeletePlaylist}
                     // style={{
                     //   backgroundColor: 'lightblue',
@@ -558,6 +578,24 @@ const Playlists = () => {
         </View>
         {/*</View>*/}
       </Modal>
+
+      <Snackbar
+        visible={Boolean(snackbarMessage)}
+        duration={snackbarMessage?.isError ? 4000 : 2000}
+        style={{
+          opacity: 0.7,
+          backgroundColor: colors[snackbarMessage?.isError ? 'red' : 'black'],
+        }}
+        onDismiss={setSnackbarMessage.bind(this, null)}
+        // wrapperStyle={{
+        //   backgroundColor: 'red',
+        // }}
+        action={{
+          label: labels.OK,
+          onPress: setSnackbarMessage.bind(this, null),
+        }}>
+        {snackbarMessage?.info}
+      </Snackbar>
     </>
   );
 };

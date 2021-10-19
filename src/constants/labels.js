@@ -73,6 +73,8 @@ const labels = {
   rename: 'Rename',
   trackCount: 'Track Count',
   nothingYet: 'Nothing yet',
+  playlistDeletedSuccessfully: 'Playlist deleted successfully',
+  errorDeletingPlaylist: 'Error deleting playlist',
 };
 
 export default labels;
