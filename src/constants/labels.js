@@ -72,6 +72,7 @@ const labels = {
   trackRemoved: 'Track Removed',
   rename: 'Rename',
   trackCount: 'Track Count',
+  nothingYet: 'Nothing yet',
 };
 
 export default labels;

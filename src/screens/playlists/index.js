@@ -258,14 +258,14 @@ const Playlists = () => {
                   textAlign: 'center',
                   marginTop: hp(15),
                 }}>
-                Nothing yet
+                {labels.nothingYet}
               </Text>
             ) : (
               <>
                 {playlists.map((info, index) => (
                   <PlaylistCover
                     key={index}
-                    id={info.id}
+                    playlistID={info.id}
                     onEdit={info => setEditingPlaylistID(info.id)}
                     // onEdit={fillEditingPlaylistInfo}
                     onPlay={onPlayPlaylist}
@@ -373,6 +373,9 @@ const Playlists = () => {
                     }),
                   },
                 ],
+                borderTopStartRadius: 15,
+                borderTopEndRadius: 15,
+                overflow: 'hidden',
               }}>
               <Playlist
                 ref={playlist}

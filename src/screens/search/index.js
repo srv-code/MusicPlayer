@@ -41,7 +41,7 @@ import IconUtils from '../../utils/icon';
 // TODO ** Apply TrackList here and remove duplicate codes
 // FIXME 'Synthetic reuse' on context menu press
 // FIXME Inputting space shows all results
-// TODO Add capability for playlists also
+// TODO Add discovery for playlists, folders, settings also
 
 const Search = ({ navigation }) => {
   const { musicInfo } = useContext(MusicContext);

@@ -35,14 +35,14 @@ const TEXT_BG_COLORS = [
 ];
 
 const PlaylistCover = ({
-  id,
-  onEdit,
-  onPlay,
-  onShuffle,
-  onAddToQueue,
-  onShowInfo,
-  onDelete,
   style,
+  playlistID,
+  onEdit = () => {},
+  onPlay = () => {},
+  onShuffle = () => {},
+  onAddToQueue = () => {},
+  onShowInfo = () => {},
+  onDelete = () => {},
 }) => {
   const { musicInfo } = useContext(MusicContext);
   const { enabledDarkTheme } = useContext(PreferencesContext);
@@ -53,10 +53,10 @@ const PlaylistCover = ({
   const [showMenu, setShowMenu] = useState(false);
 
   useEffect(() => {
-    if (id && musicInfo?.[keys.TRACKS]?.length) {
-      const _info = musicInfo[keys.PLAYLISTS].find(pl => pl.id === id);
+    if (playlistID && musicInfo?.[keys.TRACKS]?.length) {
+      const _info = musicInfo[keys.PLAYLISTS].find(pl => pl.id === playlistID);
       setInfo(_info);
-      setIsPlaying(musicInfo.currentlyPlaying?.playlistId === id);
+      setIsPlaying(musicInfo.currentlyPlaying?.playlistId === playlistID);
 
       TEXT_BG_COLORS.sort(() => 0.5 - Math.random());
       const artworks = [];
@@ -125,7 +125,7 @@ const PlaylistCover = ({
       artworks.splice(count);
       setCoverContents(artworks);
     }
-  }, [id]);
+  }, [playlistID]);
 
   // console.log(
   //   `[Playlist-Cover] coverContents=${JSON.stringify(coverContents)}`,
@@ -299,7 +299,7 @@ const PlaylistCover = ({
     );
   };
 
-  if (!id) return null;
+  if (!playlistID) return null;
   return (
     <TouchableOpacity
       onPress={onEdit.bind(this, info)}

@@ -88,7 +88,7 @@ const MAX_PLAYLIST_NAME_LENGTH = 25;
 //  - Implement all pending props, update code as per the new set of props
 //  - Implement the show info button press logic
 //  - Add a delete option when a prop deletable is passed
-//  - Make all the animations native (useNativeDriver: true) so that they become smoother
+//  - Make all the animations native (useNativeDriver: true) so that the track row closing become smoother
 
 // FIXME [Bugs]
 //  - When selecting a song from this component and pressing on the nav back button

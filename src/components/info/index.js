@@ -15,6 +15,7 @@ import Icon from '../../components/icon';
 import IconUtils from '../../utils/icon';
 import { sortingOptions } from '../../constants/tracks';
 import { MusicContext } from '../../context/music';
+import PlaylistCover from '../playlist-cover';
 
 // TODO Move all the hardcoded color values to colors.js file
 
@@ -132,48 +133,90 @@ const Info = ({ type, data, artworkSize = hp(30) }) => {
     }
   };
 
-  // TODO For Playlists, Albums, Artists render Playlist-Cover else this
-  const renderArtwork = () => (
-    <LinearGradient
-      colors={
-        colors[
-          enabledDarkTheme
-            ? 'circularLinearGradientDark'
-            : 'circularLinearGradientLight'
-        ]
-      }
-      style={{
-        elevation: 10,
-        borderRadius: hp(20),
-        padding: wp(2),
-        marginVertical: hp(1),
-        alignItems: 'center',
-      }}>
-      <View
+  // TODO For Playlists, Albums, Artists & Folders render Playlist-Cover else this
+  const renderArtwork = () => {
+    // const renderBody = () => {
+    //   switch (type) {
+    //     // render multiple image in cover
+    //     case keys.PLAYLISTS:
+    //     case keys.ALBUMS:
+    //     case keys.ARTISTS:
+    //     case keys.FOLDERS:
+    //       return <Text>Show thumbs</Text>;
+    //       return <PlaylistCover playlistID={info.id} />;
+    //
+    //     case keys.TRACKS:
+    //       return (
+    //         <>
+    //           {type === keys.TRACKS && data.artwork ? (
+    //             <Avatar.Image
+    //               size={artworkSize}
+    //               source={{ uri: `file://${data.artwork}` }}
+    //             />
+    //           ) : (
+    //             <Avatar.Icon
+    //               size={artworkSize}
+    //               icon={
+    //                 IconUtils.getInfo(type).name[
+    //                   type === keys.TRACKS || type === keys.ALBUMS
+    //                     ? 'default'
+    //                     : 'filled'
+    //                 ]
+    //               }
+    //               style={styles.musicIcon}
+    //             />
+    //           )}
+    //         </>
+    //       );
+    //
+    //     default:
+    //       throw new Error(`Invalid type: ${type}`);
+    //   }
+    // };
+
+    return (
+      <LinearGradient
+        colors={
+          colors[
+            enabledDarkTheme
+              ? 'circularLinearGradientDark'
+              : 'circularLinearGradientLight'
+          ]
+        }
         style={{
+          elevation: 10,
           borderRadius: hp(20),
+          padding: wp(2),
+          marginVertical: hp(1),
+          alignItems: 'center',
         }}>
-        {type === keys.TRACKS && data.artwork ? (
-          <Avatar.Image
-            size={artworkSize}
-            source={{ uri: `file://${data.artwork}` }}
-          />
-        ) : (
-          <Avatar.Icon
-            size={artworkSize}
-            icon={
-              IconUtils.getInfo(type).name[
-                type === keys.TRACKS || type === keys.ALBUMS
-                  ? 'default'
-                  : 'filled'
-              ]
-            }
-            style={styles.musicIcon}
-          />
-        )}
-      </View>
-    </LinearGradient>
-  );
+        <View
+          style={{
+            borderRadius: hp(20),
+          }}>
+          {/*{renderBody()}*/}
+          {type === keys.TRACKS && data.artwork ? (
+            <Avatar.Image
+              size={artworkSize}
+              source={{ uri: `file://${data.artwork}` }}
+            />
+          ) : (
+            <Avatar.Icon
+              size={artworkSize}
+              icon={
+                IconUtils.getInfo(type).name[
+                  type === keys.TRACKS || type === keys.ALBUMS
+                    ? 'default'
+                    : 'filled'
+                ]
+              }
+              style={styles.musicIcon}
+            />
+          )}
+        </View>
+      </LinearGradient>
+    );
+  };
 
   const renderContent = () => {
     if (data)
