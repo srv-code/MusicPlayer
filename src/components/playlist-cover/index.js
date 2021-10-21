@@ -36,7 +36,7 @@ const TEXT_BG_COLORS = [
 
 const PlaylistCover = ({
   style,
-  playlistID,
+  playlistId,
   onEdit,
   onPlay,
   onShuffle,
@@ -53,10 +53,13 @@ const PlaylistCover = ({
   const [showMenu, setShowMenu] = useState(false);
 
   useEffect(() => {
-    if (playlistID && musicInfo?.[keys.TRACKS]?.length) {
-      const _info = musicInfo[keys.PLAYLISTS].find(pl => pl.id === playlistID);
+    if (playlistId && musicInfo?.[keys.TRACKS]?.length) {
+      const _info = musicInfo[keys.PLAYLISTS].find(pl => pl.id === playlistId);
       setInfo(_info);
-      setIsPlaying(musicInfo.currentlyPlaying?.playlistId === playlistID);
+      console.log(
+        `[Playlist-Cover] musicInfo.currentlyPlaying?.playlistId=${musicInfo.currentlyPlaying?.playlistId}, playlistId=${playlistId}`,
+      );
+      setIsPlaying(musicInfo.currentlyPlaying?.playlistId === playlistId);
 
       TEXT_BG_COLORS.sort(() => 0.5 - Math.random());
       const artworks = [];
@@ -125,7 +128,7 @@ const PlaylistCover = ({
       artworks.splice(count);
       setCoverContents(artworks);
     }
-  }, [playlistID]);
+  }, [playlistId]);
 
   // console.log(
   //   `[Playlist-Cover] coverContents=${JSON.stringify(coverContents)}`,
@@ -279,7 +282,7 @@ const PlaylistCover = ({
           }}>
           <Icon
             name={
-              IconUtils.getInfo(isPlaying ? keys.PAUSE : keys.PLAY).name
+              IconUtils.getInfo(keys[isPlaying ? 'PAUSE' : 'PLAY']).name
                 .outlined
             }
             // name="ios-play-circle"
@@ -299,7 +302,7 @@ const PlaylistCover = ({
     );
   };
 
-  if (!playlistID) return null;
+  if (!playlistId) return null;
   return (
     <TouchableOpacity
       onPress={onEdit.bind(this, info)}
@@ -363,7 +366,7 @@ const PlaylistCover = ({
             icon={IconUtils.getInfo(keys.PLAY).name.default}
             title={labels.play}
             onPress={() => {
-              onPlay(playlistID);
+              onPlay(playlistId);
               setShowMenu(false);
             }}
           />
@@ -396,7 +399,7 @@ const PlaylistCover = ({
             icon={IconUtils.getInfo(keys.DELETE).name.default}
             title={labels.delete}
             onPress={() => {
-              onDelete(playlistID);
+              onDelete(playlistId);
               setShowMenu(false);
             }}
           />

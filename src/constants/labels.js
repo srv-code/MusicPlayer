@@ -72,7 +72,7 @@ const labels = {
   trackRemoved: 'Track Removed',
   rename: 'Rename',
   trackCount: 'Track Count',
-  nothingYet: 'Nothing yet',
+  nothingHere: 'Nothing Here',
   playlistDeletedSuccessfully: 'Playlist deleted successfully',
   errorDeletingPlaylist: 'Error deleting playlist',
 };

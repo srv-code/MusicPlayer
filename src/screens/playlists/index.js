@@ -27,14 +27,16 @@ import Icon from '../../components/icon';
 import IconUtils from '../../utils/icon';
 import labels from '../../constants/labels';
 import Info from '../../components/info';
-import PlaylistUtils from '../../utils/playlist';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import PlayerUtils from '../../utils/player';
+import TrackPlayer from 'react-native-track-player';
 
 const Playlists = () => {
   const { enabledDarkTheme } = useContext(PreferencesContext);
-  const { musicInfo, setMusicInfo } = useContext(MusicContext);
+  const { playerControls, musicInfo, setMusicInfo } = useContext(MusicContext);
 
   const [playlists, setPlaylists] = useState([]);
-  const [editingPlaylistID, setEditingPlaylistID] = useState(null);
+  const [editingPlaylistId, setEditingPlaylistId] = useState(null);
   const [sortBy, setSortBy] = useState(sortingOptions.TITLE);
   const [sortOrder, setSortOrder] = useState(sortingOrders.ASCENDING);
   const [itemInfo, setItemInfo] = useState(null);
@@ -69,9 +71,25 @@ const Playlists = () => {
   const onAddPlaylistToQueue = id => {};
 
   const onDeletePlaylist = id => {
-    console.log(`[Playlists] delete playlist id ${id}`);
-    PlaylistUtils.delete(id, playlists, musicInfo, setMusicInfo)
+    const isCurrentPlaylist = musicInfo.currentlyPlaying?.playlistId === id;
+
+    console.log(
+      `[Playlist/onDeletePlaylist] id=${id}, musicInfo=${JSON.stringify(
+        musicInfo.currentlyPlaying,
+      )}, is current playlist=${isCurrentPlaylist}`,
+    );
+
+    const newList = playlists.filter(pl => pl.id !== id);
+    AsyncStorage.setItem(keys.PLAYLISTS, JSON.stringify(newList))
       .then(() => {
+        setMusicInfo(info => {
+          const _info = { ...info };
+          _info[keys.PLAYLISTS] = newList;
+          if (isCurrentPlaylist) _info.currentlyPlaying = null;
+          return _info;
+        });
+        if (musicInfo.currentlyPlaying?.playlistId === id)
+          playerControls.close();
         setSnackbarMessage({ info: labels.playlistDeletedSuccessfully });
       })
       .catch(err => {
@@ -163,7 +181,7 @@ const Playlists = () => {
     //   );
     // });
     hideItemInfoPanel();
-    setEditingPlaylistID(null);
+    setEditingPlaylistId(null);
   };
 
   // console.log(
@@ -278,15 +296,15 @@ const Playlists = () => {
                   textAlign: 'center',
                   marginTop: hp(15),
                 }}>
-                {labels.nothingYet}
+                {labels.nothingHere}
               </Text>
             ) : (
               <>
                 {playlists.map((info, index) => (
                   <PlaylistCover
                     key={index}
-                    playlistID={info.id}
-                    onEdit={info => setEditingPlaylistID(info.id)}
+                    playlistId={info.id}
+                    onEdit={info => setEditingPlaylistId(info.id)}
                     // onEdit={fillEditingPlaylistInfo}
                     onPlay={onPlayPlaylist}
                     onShuffle={onShufflePlaylist}
@@ -323,7 +341,7 @@ const Playlists = () => {
       <Modal
         testID={'modal'}
         // isVisible={Boolean(editingPlaylistInfo)}
-        isVisible={Boolean(editingPlaylistID)}
+        isVisible={Boolean(editingPlaylistId)}
         // isVisible={false}
         onSwipeComplete={closeEditModal}
         swipeDirection={['down']}
@@ -399,7 +417,7 @@ const Playlists = () => {
               }}>
               <Playlist
                 ref={playlist}
-                id={editingPlaylistID}
+                id={editingPlaylistId}
                 showItemInfo={showItemInfoPanel}
               />
             </Animated.View>

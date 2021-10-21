@@ -60,7 +60,11 @@ const NowPlaying = ({ navigation, extraData: { snapIndex, setSnapIndex } }) => {
     return false; /* default handling */
   });
 
-  // console.log(`>> Progress: ${JSON.stringify(trackProgress)}`);
+  // console.log(
+  //   `[Now-Playing] musicInfo.${keys.PLAYLISTS}=${JSON.stringify(
+  //     musicInfo?.[keys.PLAYLISTS],
+  //   )}`,
+  // );
 
   useEffect(async () => {
     if (snapIndex === -1) {
@@ -114,7 +118,9 @@ const NowPlaying = ({ navigation, extraData: { snapIndex, setSnapIndex } }) => {
         TrackPlayer.getTrack(event.nextTrack)
           .then(track => {
             console.log(
-              `[Now Playing] changed to track=${JSON.stringify(track)}`,
+              `[Now Playing] changed to track=${JSON.stringify(track)}, id=${
+                track.id
+              }`,
             );
             setTrackInfo({
               ...track,
@@ -123,15 +129,14 @@ const NowPlaying = ({ navigation, extraData: { snapIndex, setSnapIndex } }) => {
                 id => id === track.id,
               ),
             });
-            setMusicInfo(data => ({
-              ...data,
-              currentlyPlaying: {
-                track: track,
-                // indexInPlaylist: event.nextTrack,
-                playlistId: null,
-                markedFavorite: false,
-              },
-            }));
+            setMusicInfo(data => {
+              const _data = { ...data };
+              _data.currentlyPlaying = {
+                trackId: track.id,
+                playlistId: _data.currentlyPlaying?.playlistId,
+              };
+              return _data;
+            });
           })
           .catch(err => {
             throw err;

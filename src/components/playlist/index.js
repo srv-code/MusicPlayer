@@ -106,7 +106,7 @@ const Playlist = forwardRef(({ style, id: _id, showItemInfo }, ref) => {
   const { playerControls } = useContext(MusicContext);
 
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
-  const [id, setID] = useState(null);
+  const [id, setId] = useState(null);
   const [name, setName] = useState('');
   const [tracks, setTracks] = useState([]);
   const [isFABOpened, setIsFABOpened] = useState(false);
@@ -170,7 +170,7 @@ const Playlist = forwardRef(({ style, id: _id, showItemInfo }, ref) => {
 
   const _setCurrentlyPlayingTrackId = playlistId => {
     if (playlistId === musicInfo.currentlyPlaying?.playlistId)
-      setCurrentlyPlayingTrackId(musicInfo.currentlyPlaying.track.id);
+      setCurrentlyPlayingTrackId(musicInfo.currentlyPlaying.trackId);
   };
 
   useEffect(async () => {
@@ -179,7 +179,7 @@ const Playlist = forwardRef(({ style, id: _id, showItemInfo }, ref) => {
     );
 
     if (isFocused) {
-      setID(_id);
+      setId(_id);
       const _info = _id && musicInfo[keys.PLAYLISTS].find(pl => pl.id === _id);
 
       console.log(
@@ -378,25 +378,20 @@ const Playlist = forwardRef(({ style, id: _id, showItemInfo }, ref) => {
     console.log(
       `[Playlist/useEffect] should write playlist data: ${JSON.stringify(
         newPlaylists,
-      )}, _name=${name}`,
+      )}, name=${name}`,
     );
 
     await AsyncStorage.setItem(keys.PLAYLISTS, JSON.stringify(newPlaylists));
-    setMusicInfo(info => ({
-      ...info,
-      [keys.PLAYLISTS]: newPlaylists,
-    }));
 
-    if (isCreating) {
-      setID(createdOn);
-      setMusicInfo(data => ({
-        ...data,
-        currentlyPlaying: {
-          ...data.currentlyPlaying,
-          playlistId: createdOn,
-        },
-      }));
-    }
+    setMusicInfo(info => {
+      const _info = { ...info };
+      _info[keys.PLAYLISTS] = newPlaylists;
+      if (isCreating) {
+        setId(createdOn);
+        _info.currentlyPlaying.playlistId = createdOn;
+      }
+      return _info;
+    });
     setHasUnsavedChanges(false);
 
     console.log(

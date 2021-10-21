@@ -72,9 +72,11 @@ const PlaylistControls = ({
             <Icon
               name={
                 IconUtils.getInfo(
-                  sortOrder === sortingOrders.ASCENDING
-                    ? keys.SORT_ASCENDING_ALT
-                    : keys.SORT_DESCENDING_ALT,
+                  keys[
+                    sortOrder === sortingOrders.ASCENDING
+                      ? 'SORT_ASCENDING_ALT'
+                      : 'SORT_DESCENDING_ALT'
+                  ],
                 ).name.filled
               }
               type={IconUtils.getInfo(keys.SORT_ASCENDING_ALT).type}

@@ -75,11 +75,9 @@ const Tracks = () => {
 
   useEffect(() => {
     // console.log(
-    //   `>> currentlyPlayingTrack=${JSON.stringify(
-    //     musicInfo.currentlyPlayingTrack,
-    //   )}`,
+    //   `>> [Tracks] currentlyPlaying.trackId=${musicInfo.currentlyPlaying?.trackId}`,
     // );
-    setCurrentlyPlayingTrackId(musicInfo.currentlyPlaying?.track.id);
+    setCurrentlyPlayingTrackId(musicInfo.currentlyPlaying?.trackId);
   }, [musicInfo.currentlyPlaying]);
 
   // TODO apply useMemo later
