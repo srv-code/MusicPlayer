@@ -250,13 +250,6 @@ const Playlists = () => {
     <>
       <ScreenContainer style={dynamicStyles.screen}>
         <View style={dynamicStyles.container}>
-          {/*<Text>Playlists screen</Text>*/}
-
-          {/*<Text*/}
-          {/*  onPress={navigation.navigate.bind(this, screenNames.editPlaylist)}>*/}
-          {/*  Go to info screen*/}
-          {/*</Text>*/}
-
           <PlaylistControls
             enabledDarkTheme={enabledDarkTheme}
             disabled={!musicInfo?.[keys.PLAYLISTS]?.length}
@@ -620,7 +613,7 @@ const Playlists = () => {
 
 const styles = StyleSheet.create({
   screen: {
-    flex: 1,
+    // flex: 1,
     paddingHorizontal: 0,
     paddingVertical: 0,
   },

@@ -8,39 +8,67 @@ import { Text } from 'react-native-paper';
 import IconUtils from '../../utils/icon';
 import keys from '../../constants/keys';
 import labels from '../../constants/labels';
+import {
+  heightPercentageToDP as hp,
+  widthPercentageToDP as wp,
+} from 'react-native-responsive-screen';
 
-// const Playlists = ({ navigation }) => {
 const Artists = () => {
   const { enabledDarkTheme } = useContext(PreferencesContext);
 
-  const [showSearch, setShowSearch] = useState(false);
-  const [searchedTerm, setSearchedTerm] = useState('');
-
-  const toggleSearch = () => {
-    setShowSearch(!showSearch);
-    setSearchedTerm('');
+  const dynamicStyles = {
+    screen: {
+      ...styles.screen,
+      backgroundColor: enabledDarkTheme ? colors.darker : colors.lighter,
+      // backgroundColor: 'blue',
+    },
+    container: {
+      ...styles.container,
+      backgroundColor: enabledDarkTheme ? colors.darkest : colors.light,
+      // backgroundColor: 'red',
+    },
   };
 
   return (
-    <ScreenContainer
-      showHeader
-      title={screenNames.playlists}
-      subtitle={labels.playlistSubtitle}
-      actionIcons={[
-        {
-          name: IconUtils.getInfo(keys.SEARCH).name.default,
-          onPress: toggleSearch,
-        },
-      ]}>
-      <View style={styles.container}>
+    <ScreenContainer style={dynamicStyles.screen}>
+      <View style={dynamicStyles.container}>
         <Text>Artists screen</Text>
+
+        {/*<View style={{ flex: 1 }}>*/}
+        {Array(22)
+          .fill()
+          .map((e, index) => (
+            <View
+              key={index}
+              style={{
+                height: hp(5),
+                backgroundColor: 'pink',
+                marginBottom: hp(0.5),
+              }}>
+              <Text>{`element ${index + 1}`}</Text>
+            </View>
+          ))}
+        {/*</View>*/}
       </View>
     </ScreenContainer>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {},
+  screen: {
+    flexGrow: 1,
+    paddingHorizontal: 0,
+    paddingVertical: 0,
+  },
+  container: {
+    flex: 1,
+    borderTopStartRadius: 25,
+    borderTopEndRadius: 25,
+    elevation: 4,
+    marginTop: hp(0.4),
+    paddingHorizontal: wp(3),
+    paddingVertical: hp(2),
+  },
 });
 
 export default Artists;

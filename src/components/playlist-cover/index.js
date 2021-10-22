@@ -34,6 +34,11 @@ const TEXT_BG_COLORS = [
   '#cd00cd',
 ];
 
+// FIXME Disintegrate the lower panel (which holds the name, menu etc.)
+//  and keep only the cover portion rendering
+// FIXME Showing pause icon on the incorrect playlist cover
+//  (than the one currently being played)
+
 const PlaylistCover = ({
   style,
   playlistId,
@@ -280,6 +285,7 @@ const PlaylistCover = ({
             // top: '50%',
             opacity: 1,
           }}>
+          {/* TODO Add a playing animation like in Google Music along with the pause icon */}
           <Icon
             name={
               IconUtils.getInfo(keys[isPlaying ? 'PAUSE' : 'PLAY']).name

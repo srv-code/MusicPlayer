@@ -56,14 +56,16 @@ const ScreenContainer = ({
           {children}
         </View>
       ) : (
-        <ScrollView
-          keyboardDismissMode={'on-drag'} /* experimental */
-          keyboardShouldPersistTaps={'handled'} /* experimental */
-          contentInsetAdjustmentBehavior="automatic"
-          style={styles.scrollView}
-          contentContainerStyle={[styles.scrollViewContent, style]}>
-          {children}
-        </ScrollView>
+        <View style={{ flex: 1 }}>
+          <ScrollView
+            keyboardDismissMode={'on-drag'} /* experimental */
+            keyboardShouldPersistTaps={'handled'} /* experimental */
+            contentInsetAdjustmentBehavior="automatic"
+            style={styles.scrollView}
+            contentContainerStyle={[styles.scrollViewContent, style]}>
+            {children}
+          </ScrollView>
+        </View>
       )}
     </SafeAreaView>
   );
@@ -82,9 +84,13 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scrollViewContent: {
-    // backgroundColor: 'red',
+    // flex: 1,
     paddingHorizontal: wp(5),
     paddingVertical: hp(2),
+
+    // backgroundColor: 'red',
+    // borderWidth: 2,
+    // borderColor: 'blue',
   },
 });
 

@@ -91,7 +91,7 @@ const Folders = () => {
 
 const styles = StyleSheet.create({
   screen: {
-    flex: 1,
+    // flex: 1,
     paddingHorizontal: 0,
     paddingVertical: 0,
   },

@@ -673,8 +673,9 @@ const NowPlaying = ({ navigation, extraData: { snapIndex, setSnapIndex } }) => {
             }}>
             {`${showRemainingTime ? '-' : ''} ${DateTimeUtils.msToTime(
               (showRemainingTime
-                ? trackProgress.duration - trackProgress.position
-                : trackProgress.duration) * 1000,
+                ? Math.floor(trackProgress.duration) -
+                  Math.floor(trackProgress.position)
+                : Math.floor(trackProgress.duration)) * 1000,
             )}`}
           </Text>
         </TouchableOpacity>
