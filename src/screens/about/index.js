@@ -17,6 +17,7 @@ const About = ({ navigation }) => {
       showHeader
       title={screenNames.about}
       iconName={IconUtils.getInfo(keys.INFO).name.default}
+      fixedHeight
       onBackPress={navigation.goBack}>
       <View style={styles.iconContainer}>
         <Icon name={IconUtils.getInfo(keys.INFO).name.default} size={hp(20)} />

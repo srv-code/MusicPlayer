@@ -27,6 +27,7 @@ const inProgressKeys = {
 const AppInfo = ({ navigation }) => {
   const musicContext = useContext(MusicContext);
   const preferencesContext = useContext(PreferencesContext);
+  const { enabledDarkTheme } = useContext(PreferencesContext);
 
   const [showSearch, setShowSearch] = useState(false);
   const [searchedTerm, setSearchedTerm] = useState('');
@@ -145,6 +146,9 @@ const AppInfo = ({ navigation }) => {
             onPress={toggleAccordionExpansion.bind(this, keys.TRACKS)}
             title={`${keys.TRACKS} (${musicData?.[keys.TRACKS]?.length || 0})`}
             titleStyle={styles.accordionTitleText}
+            style={{
+              backgroundColor: colors[enabledDarkTheme ? 'darkest' : 'light'],
+            }}
             left={props => (
               <List.Icon
                 {...props}
@@ -185,6 +189,9 @@ const AppInfo = ({ navigation }) => {
             expanded={isAccordionExpanded(keys.ALBUMS)}
             onPress={toggleAccordionExpansion.bind(this, keys.ALBUMS)}
             title={`${keys.ALBUMS} (${musicData?.[keys.ALBUMS]?.length || 0})`}
+            style={{
+              backgroundColor: colors[enabledDarkTheme ? 'darkest' : 'light'],
+            }}
             titleStyle={styles.accordionTitleText}
             left={props => (
               <List.Icon
@@ -238,6 +245,10 @@ const AppInfo = ({ navigation }) => {
             expanded={isAccordionExpanded(keys.ARTISTS)}
             onPress={toggleAccordionExpansion.bind(this, keys.ARTISTS)}
             title={`Artists (${musicData?.[keys.ARTISTS]?.length || 0})`}
+            titleStyle={styles.accordionTitleText}
+            style={{
+              backgroundColor: colors[enabledDarkTheme ? 'darkest' : 'light'],
+            }}
             left={props => (
               <List.Icon
                 {...props}
@@ -289,8 +300,13 @@ const AppInfo = ({ navigation }) => {
             id={keys.FOLDERS}
             expanded={isAccordionExpanded(keys.FOLDERS)}
             onPress={toggleAccordionExpansion.bind(this, keys.FOLDERS)}
-            title={`${keys.FOLDERS} (${musicData?.[keys.FOLDERS]?.length || 0})`}
+            title={`${keys.FOLDERS} (${
+              musicData?.[keys.FOLDERS]?.length || 0
+            })`}
             titleStyle={styles.accordionTitleText}
+            style={{
+              backgroundColor: colors[enabledDarkTheme ? 'darkest' : 'light'],
+            }}
             left={props => (
               <List.Icon
                 {...props}
@@ -375,6 +391,7 @@ const AppInfo = ({ navigation }) => {
       showHeader
       title={labels.appInfo}
       iconName={IconUtils.getInfo(keys.DEBUG).name.default}
+      fixedHeight
       onBackPress={navigation.goBack}
       actionIcons={[
         {

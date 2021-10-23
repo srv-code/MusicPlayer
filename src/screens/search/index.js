@@ -120,13 +120,13 @@ const Search = ({ navigation }) => {
       (localMusicInfo?.[keys.FOLDERS]?.length || 0);
 
     const renderList = (type, index) => {
-      console.log(
-        `[Search/renderList] cond=${
-          !localMusicInfo || !localMusicInfo[type]?.length
-        }, type=${type}, type data=${JSON.stringify(
-          localMusicInfo[type],
-        )}, length=${localMusicInfo[type]?.length}`,
-      );
+      // console.log(
+      //   `[Search/renderList] cond=${
+      //     !localMusicInfo || !localMusicInfo[type]?.length
+      //   }, type=${type}, type data=${JSON.stringify(
+      //     localMusicInfo[type],
+      //   )}, length=${localMusicInfo[type]?.length}`,
+      // );
 
       if (!localMusicInfo || !localMusicInfo[type]?.length) return null;
 
@@ -498,6 +498,9 @@ const Search = ({ navigation }) => {
           id={type}
           expanded={isAccordionExpanded(type)}
           onPress={toggleAccordionExpansion.bind(this, type)}
+          style={{
+            backgroundColor: colors[enabledDarkTheme ? 'darkest' : 'light'],
+          }}
           title={`${type} (${localMusicInfo[type].length})`}
           titleStyle={styles.accordionTitleText}
           left={props => (
@@ -526,7 +529,7 @@ const Search = ({ navigation }) => {
                   left={props => renderLeftComponent(item, props)}
                   right={props => renderRightComponent(item, props, itemIndex)}
                 />
-                {index === localMusicInfo[type].length - 1 ? (
+                {itemIndex === localMusicInfo[type].length - 1 ? (
                   <View style={styles.listItemEndSmallBar} />
                 ) : (
                   <Divider inset />
@@ -670,6 +673,7 @@ const Search = ({ navigation }) => {
         showHeader
         title={screenNames.search}
         iconName={IconUtils.getInfo(keys.TEXT_SEARCH).name.default}
+        fixedHeight
         onBackPress={navigation.goBack}
         actionIcons={[
           {

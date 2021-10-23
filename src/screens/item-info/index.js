@@ -61,6 +61,7 @@ const ItemInfo = ({ navigation, route, extraData }) => {
         return (
           <ScreenContainer
             showHeader
+            fixedHeight
             title={getScreenTitle(type)}
             onBackPress={navigation.goBack}>
             <View style={styles.container}>{children}</View>

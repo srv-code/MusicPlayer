@@ -1,6 +1,7 @@
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import {
   Animated,
+  FlatList,
   Platform,
   ScrollView,
   StyleSheet,
@@ -30,6 +31,11 @@ import Info from '../../components/info';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import PlayerUtils from '../../utils/player';
 import TrackPlayer from 'react-native-track-player';
+
+// FIXME The corner of the playlist covers are getting cut off
+// FIXME Render the panel below playlist covers here and also provide
+//    some vertical & horizontal margins to avoid colliding witht the
+//    adjacent ones
 
 const Playlists = () => {
   const { enabledDarkTheme } = useContext(PreferencesContext);
@@ -156,17 +162,6 @@ const Playlists = () => {
 
   const onPlayAllPlaylists = () => {};
 
-  const dynamicStyles = {
-    screen: {
-      ...styles.screen,
-      backgroundColor: enabledDarkTheme ? colors.darker : colors.lighter,
-    },
-    container: {
-      ...styles.container,
-      backgroundColor: enabledDarkTheme ? colors.darkest : colors.light,
-    },
-  };
-
   const closeEditModal = () => {
     console.log(`[Playlists/closeEditModal] force saving playlist`);
     playlist.current.save();
@@ -248,86 +243,124 @@ const Playlists = () => {
 
   return (
     <>
-      <ScreenContainer style={dynamicStyles.screen}>
-        <View style={dynamicStyles.container}>
-          <PlaylistControls
-            enabledDarkTheme={enabledDarkTheme}
-            disabled={!musicInfo?.[keys.PLAYLISTS]?.length}
-            sortKeys={[
-              sortingOptions.TITLE,
-              sortingOptions.TRACKS,
-              sortingOptions.DURATION,
-              sortingOptions.CREATED_ON,
-              sortingOptions.UPDATED_ON,
-            ]}
-            sortOrder={sortOrder}
-            onChangeSortOrder={order =>
-              sortAllPlaylists([...playlists], sortBy, order)
-            }
-            sortBy={sortBy}
-            onChangeSortBy={by =>
-              sortAllPlaylists([...playlists], by, sortOrder)
-            }
-            onShuffle={onShufflePlaylist}
-            onPlay={onPlayAllPlaylists}
-          />
+      <ScreenContainer
+        customStyles={{ wrapper: { flex: 1 } }}
+        noScroll
+        hasRoundedContainer
+        varHeights={{ collapsed: hp(15), closed: hp(5) }}>
+        <PlaylistControls
+          enabledDarkTheme={enabledDarkTheme}
+          disabled={!musicInfo?.[keys.PLAYLISTS]?.length}
+          sortKeys={[
+            sortingOptions.TITLE,
+            sortingOptions.TRACKS,
+            sortingOptions.DURATION,
+            sortingOptions.CREATED_ON,
+            sortingOptions.UPDATED_ON,
+          ]}
+          sortOrder={sortOrder}
+          onChangeSortOrder={order =>
+            sortAllPlaylists([...playlists], sortBy, order)
+          }
+          sortBy={sortBy}
+          onChangeSortBy={by => sortAllPlaylists([...playlists], by, sortOrder)}
+          onShuffle={onShufflePlaylist}
+          onPlay={onPlayAllPlaylists}
+        />
 
-          <View
-            style={{
-              flexDirection: 'row',
-              flexWrap: 'wrap',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              // alignContents: 'center',
-            }}>
-            {!playlists.length ? (
-              <Text
-                style={{
-                  flex: 1,
-                  fontSize: wp(5),
-                  color: colors.lightGrey,
-                  textAlign: 'center',
-                  marginTop: hp(15),
-                }}>
-                {labels.nothingHere}
-              </Text>
-            ) : (
-              <>
-                {playlists.map((info, index) => (
-                  <PlaylistCover
-                    key={index}
-                    playlistId={info.id}
-                    onEdit={info => setEditingPlaylistId(info.id)}
-                    // onEdit={fillEditingPlaylistInfo}
-                    onPlay={onPlayPlaylist}
-                    onShuffle={onShufflePlaylist}
-                    onAddToQueue={onAddPlaylistToQueue}
-                    // onShowInfo={onShowPlaylistInfo}
-                    onDelete={onDeletePlaylist}
-                    // style={{
-                    //   backgroundColor: 'lightblue',
-                    //   // marginVertical: hp(1)
-                    // }}
-                  />
+        <View
+          style={{
+            // flex:1,
+            flexDirection: 'row',
+            flexWrap: 'wrap',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            // alignContents: 'center',
+          }}>
+          {!playlists.length ? (
+            <Text
+              style={{
+                flex: 1,
+                fontSize: wp(5),
+                color: colors.lightGrey,
+                textAlign: 'center',
+                marginTop: hp(15),
+              }}>
+              {labels.nothingHere}
+            </Text>
+          ) : (
+            <FlatList
+              // horizontal
+              style={{
+                flex: 1,
+                flexDirection: 'row',
+                alignContent: 'center',
+                // backgroundColor: 'blue',
+              }}
+              contentContainerStyle={{
+                flex: 1,
+                flexDirection: 'row',
+                alignContent: 'center',
+                flexWrap: 'wrap',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                // backgroundColor: 'red',
+              }}
+              data={playlists}
+              keyExtractor={(_, index) => index.toString()}
+              renderItem={({ item }) => (
+                <PlaylistCover
+                  playlistId={item.id}
+                  onEdit={info => setEditingPlaylistId(info.id)}
+                  // onEdit={fillEditingPlaylistInfo}
+                  onPlay={onPlayPlaylist}
+                  onShuffle={onShufflePlaylist}
+                  onAddToQueue={onAddPlaylistToQueue}
+                  // onShowInfo={onShowPlaylistInfo}
+                  onDelete={onDeletePlaylist}
+                  // style={{
+                  //   backgroundColor: 'lightblue',
+                  //   // marginVertical: hp(1)
+                  // }}
+                />
+              )}
+            />
 
-                  // <Text>ID: {info.id}</Text>
-                  // <Text>Name: {info.name}</Text>
-                  // <Text>Created On: {new Date(info.created).toString()}</Text>
-                  // <Text>
-                  //   Last Updated On: {new Date(info.last_updated).toString()}
-                  // </Text>
-                  // <Text>{`Tracks (${musicInfo[keys.TRACKS].length}):`}</Text>
-                  // {info.track_ids.map((id, trackIndex) => (
-                  //   <Text key={trackIndex}>
-                  //     {`  [${id}] ${
-                  //       musicInfo[keys.TRACKS].find(t => t.id === id).title
-                  //     }`}
-                  //   </Text>
-                  // ))}
-                ))}
-              </>
-            )}
-          </View>
+            // <>
+            //   {playlists.map((info, index) => (
+            //     <PlaylistCover
+            //       key={index}
+            //       playlistId={info.id}
+            //       onEdit={info => setEditingPlaylistId(info.id)}
+            //       // onEdit={fillEditingPlaylistInfo}
+            //       onPlay={onPlayPlaylist}
+            //       onShuffle={onShufflePlaylist}
+            //       onAddToQueue={onAddPlaylistToQueue}
+            //       // onShowInfo={onShowPlaylistInfo}
+            //       onDelete={onDeletePlaylist}
+            //       // style={{
+            //       //   backgroundColor: 'lightblue',
+            //       //   // marginVertical: hp(1)
+            //       // }}
+            //     />
+            //
+            //     // <Text>ID: {info.id}</Text>
+            //     // <Text>Name: {info.name}</Text>
+            //     // <Text>Created On: {new Date(info.created).toString()}</Text>
+            //     // <Text>
+            //     //   Last Updated On: {new Date(info.last_updated).toString()}
+            //     // </Text>
+            //     // <Text>{`Tracks (${musicInfo[keys.TRACKS].length}):`}</Text>
+            //     // {info.track_ids.map((id, trackIndex) => (
+            //     //   <Text key={trackIndex}>
+            //     //     {`  [${id}] ${
+            //     //       musicInfo[keys.TRACKS].find(t => t.id === id).title
+            //     //     }`}
+            //     //   </Text>
+            //     // ))}
+            //   ))}
+            // </>
+          )}
         </View>
       </ScreenContainer>
 
@@ -611,21 +644,6 @@ const Playlists = () => {
   );
 };
 
-const styles = StyleSheet.create({
-  screen: {
-    // flex: 1,
-    paddingHorizontal: 0,
-    paddingVertical: 0,
-  },
-  container: {
-    flex: 1,
-    borderTopStartRadius: 25,
-    borderTopEndRadius: 25,
-    elevation: 4,
-    marginTop: hp(0.4),
-    paddingHorizontal: wp(3),
-    paddingVertical: hp(2),
-  },
-});
+const styles = StyleSheet.create({});
 
 export default Playlists;

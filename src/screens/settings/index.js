@@ -39,6 +39,7 @@ const Settings = ({ navigation }) => {
       showHeader
       title={screenNames.appInfo}
       iconName={IconUtils.getInfo(keys.SETTINGS).name.default}
+      fixedHeight
       onBackPress={navigation.goBack}
       actionIcons={[
         {
