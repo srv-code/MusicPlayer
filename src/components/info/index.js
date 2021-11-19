@@ -15,9 +15,9 @@ import Icon from '../../components/icon';
 import IconUtils from '../../utils/icon';
 import { sortingOptions } from '../../constants/tracks';
 import { MusicContext } from '../../context/music';
-import PlaylistCover from '../playlist-cover';
+import TrackListCover from '../playlist-cover';
 
-// TODO Move all the hardcoded color values to colors.js file
+// TODO: Move all the hardcoded color values to colors.js file
 
 const Info = ({ type, data, artworkSize = hp(30) }) => {
   const { enabledDarkTheme } = useContext(PreferencesContext);
@@ -98,7 +98,7 @@ const Info = ({ type, data, artworkSize = hp(30) }) => {
           },
         ];
 
-      // TODO Complete
+      // TODO: Complete
       case keys.FOLDERS:
         return [];
 
@@ -133,7 +133,7 @@ const Info = ({ type, data, artworkSize = hp(30) }) => {
     }
   };
 
-  // TODO For Playlists, Albums, Artists & Folders render Playlist-Cover else this
+  // TODO: For Playlists, Albums, Artists & Folders render Playlist-Cover else this
   const renderArtwork = () => {
     // const renderBody = () => {
     //   switch (type) {

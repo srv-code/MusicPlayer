@@ -20,7 +20,7 @@ import {
   widthPercentageToDP as wp,
 } from 'react-native-responsive-screen';
 
-// TODO Remove this test component
+// TODO: Remove this test component
 const MyComponent = forwardRef(({ initialName }, ref) => {
   const [name, setName] = useState(initialName);
   // const [name, setName] = useState('');
@@ -55,7 +55,7 @@ const Folders = () => {
     <ScreenContainer
       noScroll
       hasRoundedContainer
-      varHeights={{ collapsed: hp(15), closed: hp(6) }}>
+      varHeights={{ collapsed: hp(14), closed: hp(6) }}>
       <Text>Folders screen</Text>
     </ScreenContainer>
   );

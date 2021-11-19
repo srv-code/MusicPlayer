@@ -30,7 +30,9 @@ const requiredPermissions = [
   PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
 ];
 
-// FIXME Sometimes the keys of music-info are in lowercase so no data is shown in the app
+// FIXME: Sometimes the keys of music-info are in lowercase so no data is shown in the app
+// TODO: Improvement: In case of any thumbnail where the corresponding track is not present, then delete that thumbnail file
+
 // const Splash = ({ navigation }) => {
 const Splash = ({ setShow, setMusicInfo }) => {
   const [loadingInfo, setLoadingInfo] = useState({
@@ -63,7 +65,7 @@ const Splash = ({ setShow, setMusicInfo }) => {
       artists = [],
       folders = [];
 
-    data.results.forEach(track => {
+    data.results?.forEach(track => {
       if (track.album && !albums.some(x => x.name === track.album))
         albums.push({ name: track.album, trackIds: [] });
 
@@ -79,7 +81,7 @@ const Splash = ({ setShow, setMusicInfo }) => {
     });
 
     /* adding additional summaries */
-    data.results.forEach(track => {
+    data.results?.forEach(track => {
       for (const album of albums)
         if (album.name === track.album) {
           album.trackIds.push(track.id);
@@ -100,20 +102,20 @@ const Splash = ({ setShow, setMusicInfo }) => {
         }
     });
 
-    // console.log(
-    //   `[Splash/stripTracks] (OUTPUT) result=${JSON.stringify({
-    //     tracks,
-    //     albums,
-    //     artists,
-    //     folders,
-    //   })}`,
-    // );
+    console.log(
+      `[Splash/stripTracks] (OUTPUT) result=${JSON.stringify({
+        tracks,
+        albums,
+        artists,
+        folders,
+      })}`,
+    );
 
     return {
-      [keys.TRACKS]: tracks,
-      [keys.ALBUMS]: albums,
-      [keys.ARTISTS]: artists,
-      [keys.FOLDERS]: folders,
+      [keys.TRACKS]: tracks || [],
+      [keys.ALBUMS]: albums || [],
+      [keys.ARTISTS]: artists || [],
+      [keys.FOLDERS]: folders || [],
       [keys.FAVORITE_IDS]: [],
       [keys.PLAYLISTS]: [],
     };
@@ -137,7 +139,7 @@ const Splash = ({ setShow, setMusicInfo }) => {
           const response = await PermissionsAndroid.requestMultiple(
             requiredPermissions,
           );
-          console.log('Splash: permission response:', response);
+          console.log('[Splash] permission response:', response);
           for (const perm of Object.keys(response))
             if (response[perm] !== PermissionsAndroid.RESULTS.GRANTED)
               throw new Error(`Permission ${perm} denied.`);

@@ -36,7 +36,7 @@ import IconUtils from '../../utils/icon';
 
 const playSpeeds = [0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2];
 
-// FIXME Player buttons are not corresponding to the actual play state (sometimes)
+// FIXME: Player buttons are not corresponding to the actual play state (sometimes)
 const NowPlaying = ({ navigation, extraData: { snapIndex, setSnapIndex } }) => {
   const { musicInfo, setMusicInfo } = useContext(MusicContext);
   const { enabledDarkTheme } = useContext(PreferencesContext);
@@ -109,7 +109,7 @@ const NowPlaying = ({ navigation, extraData: { snapIndex, setSnapIndex } }) => {
         )}, event=${JSON.stringify(event)}`,
       );
 
-      // TODO Add Queue ended event and show via AndroidToast
+      // TODO: Add Queue ended event and show via AndroidToast
 
       if (
         event.type === PlayerEvent.PlaybackTrackChanged &&
@@ -281,7 +281,7 @@ const NowPlaying = ({ navigation, extraData: { snapIndex, setSnapIndex } }) => {
     );
   };
 
-  // TODO Also check how it looks when no artwork is present (when using icon)
+  // TODO: Also check how it looks when no artwork is present (when using icon)
   const renderTrackArtwork = path => {
     const iconSizes = [6, 18, 30];
 
@@ -340,7 +340,7 @@ const NowPlaying = ({ navigation, extraData: { snapIndex, setSnapIndex } }) => {
             )}>
             <Icon
               name={IconUtils.getInfo(keys.PLAYLISTS).name.outlined}
-              // TODO update the button colors
+              // TODO: update the button colors
               size={wp(6)}
               // style={{ opacity: hasPreviousTrack ? 1 : 0.2 }}
             />
@@ -415,8 +415,8 @@ const NowPlaying = ({ navigation, extraData: { snapIndex, setSnapIndex } }) => {
                   trackInfo.markedFavorite ? 'filled' : 'outlined'
                 ]
               }
-              // TODO update the button colors
-              // TODO Implement spring animation and make icon bigger if marked favorite
+              // TODO: update the button colors
+              // TODO: Implement spring animation and make icon bigger if marked favorite
               size={wp(6)}
               // style={{ opacity: hasPreviousTrack ? 1 : 0.2 }}
             />
@@ -441,7 +441,7 @@ const NowPlaying = ({ navigation, extraData: { snapIndex, setSnapIndex } }) => {
                   ? IconUtils.getInfo(keys.REPEAT_ONCE).name.default
                   : IconUtils.getInfo(keys.REPEAT).name.default
               }
-              // TODO update the button colors
+              // TODO: update the button colors
               size={wp(6)}
               // style={{ opacity: hasPreviousTrack ? 1 : 0.2 }}
             />
@@ -458,7 +458,7 @@ const NowPlaying = ({ navigation, extraData: { snapIndex, setSnapIndex } }) => {
             })}>
             <Icon
               name={IconUtils.getInfo(keys.INFO).name.default}
-              // TODO update the button colors
+              // TODO: update the button colors
               size={wp(6)}
               // style={{ opacity: hasPreviousTrack ? 1 : 0.2 }}
             />
@@ -481,7 +481,7 @@ const NowPlaying = ({ navigation, extraData: { snapIndex, setSnapIndex } }) => {
           activeOpacity={hasPreviousTrack ? 0.2 : 1}
           onPress={skipBack}>
           <Icon
-            // TODO update the button colors
+            // TODO: update the button colors
             name={IconUtils.getInfo(keys.SKIP_BACK).name.filled}
             type={IconUtils.getInfo(keys.SKIP_BACK).type}
             size={wp(snapIndex === 2 ? 11 : 7)}
@@ -492,7 +492,7 @@ const NowPlaying = ({ navigation, extraData: { snapIndex, setSnapIndex } }) => {
         {isPlaying ? (
           <TouchableOpacity style={styles.playerButton} onPress={pause}>
             <Icon
-              // TODO update the button colors, add spring animation
+              // TODO: update the button colors, add spring animation
               name={IconUtils.getInfo(keys.PAUSE).name.filled}
               type={IconUtils.getInfo(keys.PAUSE).type}
               size={wp(snapIndex === 2 ? 12.4 : 8.4)}
@@ -501,7 +501,7 @@ const NowPlaying = ({ navigation, extraData: { snapIndex, setSnapIndex } }) => {
         ) : (
           <TouchableOpacity style={styles.playerButton} onPress={play}>
             <Icon
-              // TODO update the button colors, add spring animation
+              // TODO: update the button colors, add spring animation
               name={IconUtils.getInfo(keys.PLAY).name.filled}
               type={IconUtils.getInfo(keys.PLAY).type}
               size={wp(snapIndex === 2 ? 12 : 8)}
@@ -514,7 +514,7 @@ const NowPlaying = ({ navigation, extraData: { snapIndex, setSnapIndex } }) => {
           activeOpacity={hasNextTrack ? 0.2 : 1}
           onPress={skipForward}>
           <Icon
-            // TODO update the button colors
+            // TODO: update the button colors
             name={IconUtils.getInfo(keys.SKIP_NEXT).name.filled}
             type={IconUtils.getInfo(keys.SKIP_NEXT).type}
             style={{ opacity: hasNextTrack ? 1 : 0.2 }}

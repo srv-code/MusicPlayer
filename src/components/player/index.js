@@ -14,7 +14,7 @@ import { MusicContext } from '../../context/music';
 import PlayerUtils from '../../utils/player';
 import keys from '../../constants/keys';
 
-// TODO To be removed, for testing purpose only
+// TODO: To be removed, for testing purpose only
 const Player = ({ style }) => {
   const { musicInfo } = useContext(MusicContext);
 

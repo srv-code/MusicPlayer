@@ -21,7 +21,7 @@ export const handlers = {
 const PlayerBottomSheet = ({ navigator: Navigator }) => {
   const { enabledDarkTheme } = useContext(PreferencesContext);
 
-  const startSnapIndex = -1; // TODO: 0 indicates minimized, to hide pass -1 (when there's no currently playing)
+  const startSnapIndex = -1; // TODO:: 0 indicates minimized, to hide pass -1 (when there's no currently playing)
   const snapPoints = ['10%', '45%', '92%'];
   const [snapIndex, setSnapIndex] = useState(startSnapIndex);
   const [isContentPanningGestureEnabled, setIsContentPanningGestureEnabled] =

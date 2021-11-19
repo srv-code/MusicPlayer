@@ -74,7 +74,7 @@ const Albums = () => {
     <ScreenContainer
       noScroll
       hasRoundedContainer
-      varHeights={{ collapsed: hp(15), closed: hp(6) }}>
+      varHeights={{ collapsed: hp(14), closed: hp(6) }}>
       <Text>Albums screen</Text>
 
       <Text>Animation Tests</Text>
@@ -83,7 +83,7 @@ const Albums = () => {
       {/*<Text*/}
       {/*  onPress={() => {*/}
       {/*    setNote(null);*/}
-      {/*    // TODO Test: easing properties, parallel, spring*/}
+      {/*    // TODO: Test: easing properties, parallel, spring*/}
       {/*    if (0)*/}
       {/*      Animated.timing(dummyAnimValue, {*/}
       {/*        toValue: 200,*/}

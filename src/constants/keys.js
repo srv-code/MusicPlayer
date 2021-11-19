@@ -44,6 +44,7 @@ const keys = {
   SAVE: 'SAVE',
   BACK_ANDROID: 'BACK_ANDROID',
   BACK_IOS: 'BACK_IOS',
+  MUSIC: 'MUSIC',
 };
 
 export default keys;

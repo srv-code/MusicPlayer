@@ -72,6 +72,9 @@ export default class PlayerUtils {
     }
   };
 
+  /**
+   * @returns {Object} The track info of the first track
+   * */
   static playTracks = async (tracks, index = 0) => {
     console.log(
       `[PlayerUtils/playTracks] track to play=${JSON.stringify(tracks[index])}`,
@@ -82,6 +85,7 @@ export default class PlayerUtils {
     await TrackPlayer.skip(index);
     // playerControls.collapse();
     await TrackPlayer.play();
+    return tracks[index];
 
     // console.log(
     //   `[Tracks] Playing: {queue=${JSON.stringify(
@@ -95,6 +99,6 @@ export default class PlayerUtils {
     // console.log(`list=${randomizedList.map(e => e.id)}`);
     randomizedTracks.sort(() => 0.5 - Math.random());
     // console.log(`list(randomized)=${randomizedList.map(e => e.id)}`);
-    await PlayerUtils.playTracks(randomizedTracks);
+    return await PlayerUtils.playTracks(randomizedTracks);
   };
 }

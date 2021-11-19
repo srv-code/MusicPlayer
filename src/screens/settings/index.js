@@ -88,7 +88,7 @@ const Settings = ({ navigation }) => {
           }}>
           <Text style={{ fontSize: wp(4.5) }}>Theme</Text>
           <View style={styles.themeToggleContainer}>
-            {/* TODO Add system option also */}
+            {/* TODO: Add system option also */}
             <ToggleButton
               icon={IconUtils.getInfo(keys.LIGHT_MODE).name.default}
               onPress={setEnabledDarkTheme.bind(this, false)}

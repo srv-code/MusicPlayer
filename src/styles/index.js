@@ -1,5 +1,5 @@
 const globalStyles = {
-  screen: {}, // TODO fill this and use in every screen
+  screen: {}, // TODO: fill this and use in every screen
   button: {
     alignSelf: 'flex-start',
   },

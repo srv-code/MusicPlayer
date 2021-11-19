@@ -34,49 +34,50 @@ const TEXT_BG_COLORS = [
   '#cd00cd',
 ];
 
-// FIXME Disintegrate the lower panel (which holds the name, menu etc.)
+// FIXME: Disintegrate the lower panel (which holds the name, menu etc.)
 //  and keep only the cover portion rendering
-// FIXME Showing pause icon on the incorrect playlist cover
+// FIXME: Showing pause icon on the incorrect playlist cover
 //  (than the one currently being played)
+// TODO: Test with different counts of coverContents
 
-const PlaylistCover = ({
+const TrackListCover = ({
   style,
-  playlistId,
-  onEdit,
-  onPlay,
-  onShuffle,
-  onAddToQueue,
-  // onShowInfo,
-  onDelete,
-}) => {
-  const { musicInfo } = useContext(MusicContext);
-  const { enabledDarkTheme } = useContext(PreferencesContext);
+  playlist,
+  tracks,
+  children,
 
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [info, setInfo] = useState({});
-  const [coverContents, setCoverContents] = useState([]);
-  const [showMenu, setShowMenu] = useState(false);
+  // onEdit,
+  // onPlay,
+  // onShuffle,
+  // onAddToQueue,
+  // onDelete,
+}) => {
+  // const { musicInfo } = useContext(MusicContext);
+  // const { enabledDarkTheme } = useContext(PreferencesContext);
+
+  // const [isPlaying, setIsPlaying] = useState(false);
+  // const [info, setInfo] = useState({});
+  const [contents, setContents] = useState([]);
+  // const [showMenu, setShowMenu] = useState(false);
 
   useEffect(() => {
-    if (playlistId && musicInfo?.[keys.TRACKS]?.length) {
-      const _info = musicInfo[keys.PLAYLISTS].find(pl => pl.id === playlistId);
-      setInfo(_info);
-      console.log(
-        `[Playlist-Cover] musicInfo.currentlyPlaying?.playlistId=${musicInfo.currentlyPlaying?.playlistId}, playlistId=${playlistId}`,
-      );
-      setIsPlaying(musicInfo.currentlyPlaying?.playlistId === playlistId);
+    if (playlist.id && tracks.length) {
+      // const _info = musicInfo[keys.PLAYLISTS].find(pl => pl.id === playlistId);
+      // setInfo(_info);
+      // console.log(
+      //   `[Playlist-Cover] musicInfo.currentlyPlaying?.playlistId=${musicInfo.currentlyPlaying?.playlistId}, playlistId=${playlistId}`,
+      // );
+      // setIsPlaying(musicInfo.currentlyPlaying?.playlistId === playlistId);
 
       TEXT_BG_COLORS.sort(() => 0.5 - Math.random());
       const artworks = [];
       for (
         let i = 0, colorIdx = 0;
-        // i < 16;
-        i < _info.track_ids.length;
+        // i < 8;
+        i < playlist.track_ids.length;
         i++
       ) {
-        const track = musicInfo[keys.TRACKS].find(
-          tr => tr.id === _info.track_ids[i],
-        );
+        const track = tracks.find(tr => tr.id === playlist.track_ids[i]);
         // if (false) {
         if (track.artwork) {
           if (
@@ -131,16 +132,16 @@ const PlaylistCover = ({
       else count *= COVER_ROW_CELL_COUNT;
 
       artworks.splice(count);
-      setCoverContents(artworks);
+      setContents(artworks);
     }
-  }, [playlistId]);
+  }, [playlist]);
 
   // console.log(
   //   `[Playlist-Cover] coverContents=${JSON.stringify(coverContents)}`,
   // );
 
   const renderCoverArt = () => {
-    // TODO For testing, have to remove later to avoid variable shadowing
+    // TODO: For testing, have to remove later to avoid variable shadowing
     // TEXT_BG_COLORS.sort(() => 0.5 - Math.random());
     // const coverContents = [
     //   { content: 'AB', color: TEXT_BG_COLORS[0] },
@@ -164,18 +165,18 @@ const PlaylistCover = ({
     //   { content: 'GH', color: TEXT_BG_COLORS[15] },
     // ];
 
-    if (!coverContents.length) return null;
+    if (!contents.length) return null;
 
     let size = null,
       textFontSize = null,
       columnItemCount = null;
     const divContents = [];
-    if (coverContents.length === 1) {
+    if (contents.length === 1) {
       columnItemCount = 1;
       size = hp(24);
       textFontSize = wp(32);
     } else {
-      const rows = coverContents.length / COVER_ROW_CELL_COUNT;
+      const rows = contents.length / COVER_ROW_CELL_COUNT;
       // console.log(`rows=${rows}`);
       switch (rows) {
         case 1:
@@ -204,13 +205,13 @@ const PlaylistCover = ({
     }
 
     const rowItems = [];
-    for (let i = 0; i < coverContents.length; i++) {
+    for (let i = 0; i < contents.length; i++) {
       if (i !== 0 && i % columnItemCount === 0) {
         divContents.push([...rowItems]);
         rowItems.length = 0;
       }
-      rowItems.push(coverContents[i]);
-      if (i === coverContents.length - 1) divContents.push([...rowItems]);
+      rowItems.push(contents[i]);
+      if (i === contents.length - 1) divContents.push([...rowItems]);
     }
 
     // console.log(`[PlaylistCover] divContents=${divContents}`);
@@ -260,178 +261,181 @@ const PlaylistCover = ({
           </View>
         ))}
 
-        <View
-          style={{
-            position: 'absolute',
-            // flex: 1,
-            height: '100%',
-            width: '100%',
-            zIndex: 1,
-            backgroundColor: colors.black,
-            opacity: 0.3,
-          }}
-        />
+        {children}
 
-        <TouchableOpacity
-          onPress={onPlay}
-          style={{
-            // flex: 1,
-            // backgroundColor: colors.black,
-            // backgroundColor: 'transparent',
-            alignSelf: 'center',
-            position: 'absolute',
-            zIndex: 2,
-            // left: '50%',
-            // top: '50%',
-            opacity: 1,
-          }}>
-          {/* TODO Add a playing animation like in Google Music along with the pause icon */}
-          <Icon
-            name={
-              IconUtils.getInfo(keys[isPlaying ? 'PAUSE' : 'PLAY']).name
-                .outlined
-            }
-            // name="ios-play-circle"
-            // name="pause-circle"
-            // name="play-circle"
-            // name="md-play-circle-outline"
-            // name="md-pause-circle-outline"
-            // type="Ionicons"
-            // type="FontAwesome5"
-            type={IconUtils.getInfo(keys.PLAY).type}
-            color={colors.white1}
-            size={hp(5)}
-            // size={hp(15)}
-          />
-        </TouchableOpacity>
+        {/*<View*/}
+        {/*  style={{*/}
+        {/*    position: 'absolute',*/}
+        {/*    // flex: 1,*/}
+        {/*    height: '100%',*/}
+        {/*    width: '100%',*/}
+        {/*    zIndex: 1,*/}
+        {/*    backgroundColor: colors.black,*/}
+        {/*    opacity: 0.3,*/}
+        {/*  }}*/}
+        {/*/>*/}
+
+        {/*<TouchableOpacity*/}
+        {/*  // onPress={onPlay}*/}
+        {/*  style={{*/}
+        {/*    // flex: 1,*/}
+        {/*    // backgroundColor: colors.black,*/}
+        {/*    // backgroundColor: 'transparent',*/}
+        {/*    alignSelf: 'center',*/}
+        {/*    position: 'absolute',*/}
+        {/*    zIndex: 2,*/}
+        {/*    // left: '50%',*/}
+        {/*    // top: '50%',*/}
+        {/*    opacity: 1,*/}
+        {/*  }}>*/}
+        {/*  /!* TODO: Add a playing animation like in Google Music along with the pause icon *!/*/}
+        {/*  <Icon*/}
+        {/*    name={*/}
+        {/*      IconUtils.getInfo(keys[isPlaying ? 'PAUSE' : 'PLAY']).name*/}
+        {/*        .outlined*/}
+        {/*    }*/}
+        {/*    // name="ios-play-circle"*/}
+        {/*    // name="pause-circle"*/}
+        {/*    // name="play-circle"*/}
+        {/*    // name="md-play-circle-outline"*/}
+        {/*    // name="md-pause-circle-outline"*/}
+        {/*    // type="Ionicons"*/}
+        {/*    // type="FontAwesome5"*/}
+        {/*    type={IconUtils.getInfo(keys.PLAY).type}*/}
+        {/*    color={colors.white1}*/}
+        {/*    size={hp(5)}*/}
+        {/*    // size={hp(15)}*/}
+        {/*  />*/}
+        {/*</TouchableOpacity>*/}
       </View>
     );
   };
 
-  if (!playlistId) return null;
-  return (
-    <TouchableOpacity
-      onPress={onEdit.bind(this, info)}
-      style={{
-        ...styles.container,
-        backgroundColor: enabledDarkTheme ? colors.darker : colors.lighter,
-        ...style,
-      }}>
-      {renderCoverArt()}
-      <View
-        style={{
-          flexDirection: 'row',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          zIndex: 2,
-          marginVertical: hp(0.5),
-        }}>
-        <View
-          style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-          }}>
-          <Icon
-            size={wp(4)}
-            name={IconUtils.getInfo(keys.PLAYLISTS).name.filled}
-            color={colors.lightGrey}
-          />
-          <Text style={{ fontSize: wp(3), color: colors.lightGrey }}>
-            {info?.track_ids?.length}
-          </Text>
-        </View>
+  return <View style={style}>{renderCoverArt()}</View>;
 
-        <Text
-          titleEllipsizeMode="tail"
-          style={{
-            fontSize: wp(4),
-            textAlign: 'center',
-            width: wp(
-              coverContents.length === COVER_ROW_CELL_COUNT * 2 ? 90 : 28,
-            ),
-          }}>
-          {info.name}
-        </Text>
-
-        <Menu
-          visible={showMenu}
-          onDismiss={setShowMenu.bind(this, false)}
-          anchor={
-            <IconButton
-              style={{
-                padding: 0,
-                margin: 0,
-              }}
-              icon={IconUtils.getInfo(keys.VERTICAL_ELLIPSIS).name.default}
-              size={wp(4)}
-              color={colors.lightGrey}
-              onPress={setShowMenu.bind(this, true)}
-            />
-          }>
-          <Menu.Item
-            icon={IconUtils.getInfo(keys.PLAY).name.default}
-            title={labels.play}
-            onPress={() => {
-              onPlay(playlistId);
-              setShowMenu(false);
-            }}
-          />
-          <Menu.Item
-            icon={IconUtils.getInfo(keys.SHUFFLE).name.default}
-            title={labels.shuffleAndPlay}
-            onPress={() => {
-              onShuffle();
-              onPlay(false);
-              setShowMenu(false);
-            }}
-          />
-          <Menu.Item
-            icon={IconUtils.getInfo(keys.ADD_TO_QUEUE).name.default}
-            title={labels.addToQueue}
-            onPress={() => {
-              onAddToQueue();
-              setShowMenu(false);
-            }}
-          />
-          <Menu.Item
-            icon={IconUtils.getInfo(keys.PLAYLIST_EDIT).name.default}
-            title={labels.edit}
-            onPress={() => {
-              onEdit(info);
-              setShowMenu(false);
-            }}
-          />
-          <Menu.Item
-            icon={IconUtils.getInfo(keys.DELETE).name.default}
-            title={labels.delete}
-            onPress={() => {
-              onDelete(playlistId);
-              setShowMenu(false);
-            }}
-          />
-          {/*<Menu.Item*/}
-          {/*  icon={IconUtils.getInfo(keys.INFO).name.default}*/}
-          {/*  title={labels.showInfo}*/}
-          {/*  onPress={() => {*/}
-          {/*    onShowInfo();*/}
-          {/*    setShowMenu(false);*/}
-          {/*  }}*/}
-          {/*/>*/}
-        </Menu>
-      </View>
-    </TouchableOpacity>
-  );
+  // return (
+  //   <TouchableOpacity
+  //     onPress={onEdit.bind(this, info)}
+  //     style={{
+  //       ...styles.container,
+  //       backgroundColor: enabledDarkTheme ? colors.darker : colors.lighter,
+  //       ...style,
+  //     }}>
+  //     {renderCoverArt()}
+  //     <View
+  //       style={{
+  //         flexDirection: 'row',
+  //         alignItems: 'center',
+  //         justifyContent: 'space-between',
+  //         zIndex: 2,
+  //         marginVertical: hp(0.5),
+  //       }}>
+  //       <View
+  //         style={{
+  //           flexDirection: 'row',
+  //           alignItems: 'center',
+  //         }}>
+  //         <Icon
+  //           size={wp(4)}
+  //           name={IconUtils.getInfo(keys.PLAYLISTS).name.filled}
+  //           color={colors.lightGrey}
+  //         />
+  //         <Text style={{ fontSize: wp(3), color: colors.lightGrey }}>
+  //           {info?.track_ids?.length}
+  //         </Text>
+  //       </View>
+  //
+  //       <Text
+  //         titleEllipsizeMode="tail"
+  //         style={{
+  //           fontSize: wp(4),
+  //           textAlign: 'center',
+  //           width: wp(
+  //             coverContents.length === COVER_ROW_CELL_COUNT * 2 ? 90 : 28,
+  //           ),
+  //         }}>
+  //         {info.name}
+  //       </Text>
+  //
+  //       <Menu
+  //         visible={showMenu}
+  //         onDismiss={setShowMenu.bind(this, false)}
+  //         anchor={
+  //           <IconButton
+  //             style={{
+  //               padding: 0,
+  //               margin: 0,
+  //             }}
+  //             icon={IconUtils.getInfo(keys.VERTICAL_ELLIPSIS).name.default}
+  //             size={wp(4)}
+  //             color={colors.lightGrey}
+  //             onPress={setShowMenu.bind(this, true)}
+  //           />
+  //         }>
+  //         <Menu.Item
+  //           icon={IconUtils.getInfo(keys.PLAY).name.default}
+  //           title={labels.play}
+  //           onPress={() => {
+  //             onPlay(playlistId);
+  //             setShowMenu(false);
+  //           }}
+  //         />
+  //         <Menu.Item
+  //           icon={IconUtils.getInfo(keys.SHUFFLE).name.default}
+  //           title={labels.shuffleAndPlay}
+  //           onPress={() => {
+  //             onShuffle();
+  //             onPlay(false);
+  //             setShowMenu(false);
+  //           }}
+  //         />
+  //         <Menu.Item
+  //           icon={IconUtils.getInfo(keys.ADD_TO_QUEUE).name.default}
+  //           title={labels.addToQueue}
+  //           onPress={() => {
+  //             onAddToQueue();
+  //             setShowMenu(false);
+  //           }}
+  //         />
+  //         <Menu.Item
+  //           icon={IconUtils.getInfo(keys.PLAYLIST_EDIT).name.default}
+  //           title={labels.edit}
+  //           onPress={() => {
+  //             onEdit(info);
+  //             setShowMenu(false);
+  //           }}
+  //         />
+  //         <Menu.Item
+  //           icon={IconUtils.getInfo(keys.DELETE).name.default}
+  //           title={labels.delete}
+  //           onPress={() => {
+  //             onDelete(playlistId);
+  //             setShowMenu(false);
+  //           }}
+  //         />
+  //         {/*<Menu.Item*/}
+  //         {/*  icon={IconUtils.getInfo(keys.INFO).name.default}*/}
+  //         {/*  title={labels.showInfo}*/}
+  //         {/*  onPress={() => {*/}
+  //         {/*    onShowInfo();*/}
+  //         {/*    setShowMenu(false);*/}
+  //         {/*  }}*/}
+  //         {/*/>*/}
+  //       </Menu>
+  //     </View>
+  //   </TouchableOpacity>
+  // );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    alignSelf: 'flex-start',
-    borderRadius: 10,
-    overflow: 'hidden',
-    elevation: 2,
-    alignItems: 'center',
-    marginVertical: hp(1),
-  },
+  // container: {
+  //   alignSelf: 'flex-start',
+  //   borderRadius: 10,
+  //   overflow: 'hidden',
+  //   elevation: 2,
+  //   alignItems: 'center',
+  //   marginVertical: hp(1),
+  // },
 });
 
-export default PlaylistCover;
+export default TrackListCover;

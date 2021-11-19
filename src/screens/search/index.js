@@ -36,12 +36,12 @@ import keys from '../../constants/keys';
 import { displayModes as ItemInfoDisplayModes } from '../item-info';
 import IconUtils from '../../utils/icon';
 
-// TODO Save the searched term in async-storage (avoid duplicates)
-// TODO Pressing space also returns search results (trim search term)
-// TODO ** Apply TrackList here and remove duplicate codes
-// FIXME 'Synthetic reuse' on context menu press
-// FIXME Inputting space shows all results
-// TODO Add discovery for playlists, folders, settings also
+// TODO: Save the searched term in async-storage (avoid duplicates)
+// TODO: Pressing space also returns search results (trim search term)
+// TODO: ** Apply TrackList here and remove duplicate codes
+// FIXME: 'Synthetic reuse' on context menu press
+// FIXME: Inputting space shows all results
+// TODO: Add discovery for playlists, folders, settings also
 
 const Search = ({ navigation }) => {
   const { musicInfo } = useContext(MusicContext);
@@ -514,7 +514,7 @@ const Search = ({ navigation }) => {
               <>
                 <List.Item
                   onPress={() => {
-                    // TODO
+                    // TODO:
                     //  - tracks: insert current track in the stack (at the top) & play it
                     //  - albums|artists|folders: show album tracks
                     Alert.alert(`${type} Info`, JSON.stringify(item));
@@ -582,7 +582,7 @@ const Search = ({ navigation }) => {
     );
   };
 
-  // TODO move to item-app-info screen
+  // TODO: move to item-app-info screen
   const renderInfoModalContent = () => {
     console.log('[Search]', { infoModalData });
 

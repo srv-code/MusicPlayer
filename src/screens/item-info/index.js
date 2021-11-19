@@ -36,9 +36,9 @@ export const getScreenTitle = type => {
   }
 };
 
-// FIXME I suspect the scrolling in MODAL mode is off
-// TODO Add capability for playlists also
-// TODO Move the rendering to a component and use here and all the places required
+// FIXME: I suspect the scrolling in MODAL mode is off
+// TODO: Add capability for playlists also
+// TODO: Move the rendering to a component and use here and all the places required
 const ItemInfo = ({ navigation, route, extraData }) => {
   const { enabledDarkTheme } = useContext(PreferencesContext);
 
@@ -76,6 +76,7 @@ const ItemInfo = ({ navigation, route, extraData }) => {
             contentContainerStyle={{
               // flex: 1,
               paddingHorizontal: wp(4),
+              paddingBottom: hp(1),
               overflow: 'visible',
             }}>
             {children}

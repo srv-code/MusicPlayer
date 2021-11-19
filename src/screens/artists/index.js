@@ -20,7 +20,7 @@ const Artists = () => {
     <ScreenContainer
       noScroll
       hasRoundedContainer
-      varHeights={{ collapsed: hp(15), closed: hp(6) }}>
+      varHeights={{ collapsed: hp(14), closed: hp(6) }}>
       <Text>Artists screen</Text>
 
       <FlatList

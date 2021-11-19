@@ -33,7 +33,7 @@ const App = () => {
 
   const [enabledDarkTheme, setEnabledDarkTheme] = useState(
     // useColorScheme() === 'dark',
-    false, // TODO revert later, for testing purpose only
+    false, // TODO: revert later, for testing purpose only
     // true,
   );
   const [musicInfo, setMusicInfo] = useState(null);
@@ -161,7 +161,7 @@ const App = () => {
   //     }, SPLASH_TIMEOUT);
   // }, []);
 
-  // TODO remove later, test code
+  // TODO: remove later, test code
   // return (
   //   <TouchableOpacity
   //     onPress={async () => {

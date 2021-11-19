@@ -12,6 +12,7 @@ A cross-platform (Android & iOS) music player.
 1. Cannot open app when pressing the notification (implement React-Native-Linking)
 2. Capabilities: Like/Dislike/Rating
 3. Show a loader below the FlatList when its loading rest of the items
+4. Apply a file logger and sends the error logs to the developer team (with the prior permission of the user) to improve performance
 
 ### Finalising
 

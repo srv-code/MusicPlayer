@@ -12,13 +12,13 @@ import {
   heightPercentageToDP as hp,
   widthPercentageToDP as wp,
 } from 'react-native-responsive-screen';
-import { Snackbar, Text } from 'react-native-paper';
+import { IconButton, Menu, Snackbar, Text } from 'react-native-paper';
 import ScreenContainer from '../../components/screen-container';
 import colors from '../../constants/colors';
 import { PreferencesContext } from '../../context/preferences';
 import keys from '../../constants/keys';
 import { MusicContext } from '../../context/music';
-import PlaylistCover from '../../components/playlist-cover';
+import TrackListCover from '../../components/playlist-cover';
 import Modal from 'react-native-modal';
 import Playlist from '../../components/playlist';
 import PlaylistControls from '../../components/playlist-controls';
@@ -32,10 +32,10 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import PlayerUtils from '../../utils/player';
 import TrackPlayer from 'react-native-track-player';
 
-// FIXME The corner of the playlist covers are getting cut off
-// FIXME Render the panel below playlist covers here and also provide
-//    some vertical & horizontal margins to avoid colliding witht the
-//    adjacent ones
+// FIXME: The corner of the playlist covers are getting cut off
+// FIXME: Render the panel below playlist covers here and also provide some vertical & horizontal
+//  margins to avoid colliding with the adjacent ones
+// FIXME: Not updating the thumbnail when track list is edited
 
 const Playlists = () => {
   const { enabledDarkTheme } = useContext(PreferencesContext);
@@ -48,6 +48,7 @@ const Playlists = () => {
   const [itemInfo, setItemInfo] = useState(null);
   const [infoPanelAnimatedValue] = useState(new Animated.Value(0));
   const [snackbarMessage, setSnackbarMessage] = useState(null);
+  const [showMenuForId, setShowMenuForId] = useState(null);
 
   const playlist = useRef(null);
 
@@ -203,7 +204,7 @@ const Playlists = () => {
     // if (!itemInfo) setItemInfo({ type, data });
     setItemInfo({ type, data });
     Animated.timing(infoPanelAnimatedValue, {
-      // Animated.spring(infoPanelAnimatedValue, { // TODO Implement this
+      // Animated.spring(infoPanelAnimatedValue, { // TODO: Implement this
       // toValue: itemInfo ? 0 : 1,
       toValue: 1,
       duration: 400,
@@ -224,7 +225,7 @@ const Playlists = () => {
 
     // console.log(`[hideItemInfoPanel] itemInfo=${itemInfo}`);
     Animated.timing(infoPanelAnimatedValue, {
-      // Animated.spring(infoPanelAnimatedValue, { // TODO Implement this
+      // Animated.spring(infoPanelAnimatedValue, { // TODO: Implement this
       toValue: 0,
       duration: 400,
       useNativeDriver: true,
@@ -233,7 +234,7 @@ const Playlists = () => {
     });
   };
 
-  // FIXME Screen is not scrollable
+  // FIXME: Screen is not scrollable
   const getInfoPanelHeaderText = type =>
     `${
       type === keys.TRACKS
@@ -244,10 +245,10 @@ const Playlists = () => {
   return (
     <>
       <ScreenContainer
-        customStyles={{ wrapper: { flex: 1 } }}
+        styles={{ wrapper: { flex: 1 } }}
         noScroll
         hasRoundedContainer
-        varHeights={{ collapsed: hp(15), closed: hp(5) }}>
+        varHeights={{ collapsed: hp(14), closed: hp(5) }}>
         <PlaylistControls
           enabledDarkTheme={enabledDarkTheme}
           disabled={!musicInfo?.[keys.PLAYLISTS]?.length}
@@ -295,7 +296,9 @@ const Playlists = () => {
                 flex: 1,
                 flexDirection: 'row',
                 alignContent: 'center',
+                // paddingHorizontal: wp(3),
                 // backgroundColor: 'blue',
+                marginHorizontal: wp(-2.5),
               }}
               contentContainerStyle={{
                 flex: 1,
@@ -304,25 +307,204 @@ const Playlists = () => {
                 flexWrap: 'wrap',
                 justifyContent: 'space-between',
                 alignItems: 'center',
-                // backgroundColor: 'red',
               }}
               data={playlists}
               keyExtractor={(_, index) => index.toString()}
               renderItem={({ item }) => (
-                <PlaylistCover
-                  playlistId={item.id}
-                  onEdit={info => setEditingPlaylistId(info.id)}
-                  // onEdit={fillEditingPlaylistInfo}
-                  onPlay={onPlayPlaylist}
-                  onShuffle={onShufflePlaylist}
-                  onAddToQueue={onAddPlaylistToQueue}
-                  // onShowInfo={onShowPlaylistInfo}
-                  onDelete={onDeletePlaylist}
-                  // style={{
-                  //   backgroundColor: 'lightblue',
-                  //   // marginVertical: hp(1)
-                  // }}
-                />
+                <TouchableOpacity
+                  onPress={setEditingPlaylistId.bind(this, item.id)}
+                  style={{
+                    alignSelf: 'flex-start',
+                    borderRadius: 10,
+                    overflow: 'hidden',
+                    elevation: 2,
+                    alignItems: 'center',
+                    marginVertical: hp(1),
+                    marginHorizontal: wp(1.5),
+                    backgroundColor: enabledDarkTheme
+                      ? colors.darker
+                      : colors.lighter,
+                  }}>
+                  <TrackListCover
+                    // playlistId={item.id}
+                    playlist={item}
+                    tracks={musicInfo[keys.TRACKS]}
+
+                    // onEdit={info => setEditingPlaylistId(info.id)}
+                    // onEdit={fillEditingPlaylistInfo}
+                    // onPlay={onPlayPlaylist}
+                    // onShuffle={onShufflePlaylist}
+                    // onAddToQueue={onAddPlaylistToQueue}
+                    // onShowInfo={onShowPlaylistInfo}
+                    // onDelete={onDeletePlaylist}
+                    // style={{
+                    //   backgroundColor: 'lightblue',
+                    //   // marginVertical: hp(1)
+                    // }}
+                  >
+                    <View
+                      style={{
+                        position: 'absolute',
+                        // flex: 1,
+                        height: '100%',
+                        width: '100%',
+                        zIndex: 1,
+                        backgroundColor: colors.black,
+                        opacity: 0.3,
+                      }}
+                    />
+
+                    <TouchableOpacity
+                      onPress={onPlayPlaylist.bind(this, item.id)}
+                      style={{
+                        // flex: 1,
+                        // backgroundColor: colors.black,
+                        // backgroundColor: 'transparent',
+                        alignSelf: 'center',
+                        position: 'absolute',
+                        zIndex: 2,
+                        // left: '50%',
+                        // top: '50%',
+                        opacity: 1,
+                      }}>
+                      {/* TODO: Add a playing animation like in Google Music along with the pause icon */}
+                      <Icon
+                        name={
+                          IconUtils.getInfo(
+                            keys[
+                              item.id === musicInfo.currentlyPlaying?.playlistId
+                                ? 'PAUSE'
+                                : 'PLAY'
+                            ],
+                          ).name.outlined
+                        }
+                        // name="ios-play-circle"
+                        // name="pause-circle"
+                        // name="play-circle"
+                        // name="md-play-circle-outline"
+                        // name="md-pause-circle-outline"
+                        // type="Ionicons"
+                        // type="FontAwesome5"
+                        type={IconUtils.getInfo(keys.PLAY).type}
+                        color={colors.white1}
+                        size={hp(5)}
+                        // size={hp(15)}
+                      />
+                    </TouchableOpacity>
+                  </TrackListCover>
+                  <View
+                    style={{
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      zIndex: 2,
+                      marginVertical: hp(0.5),
+                    }}>
+                    <View
+                      style={{
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                      }}>
+                      <Icon
+                        size={wp(4)}
+                        name={IconUtils.getInfo(keys.PLAYLISTS).name.filled}
+                        color={colors.lightGrey}
+                      />
+                      <Text
+                        style={{ fontSize: wp(3), color: colors.lightGrey }}>
+                        {/*{info?.track_ids?.length}*/}
+                        {item.track_ids?.length}
+                      </Text>
+                    </View>
+
+                    <Text
+                      titleEllipsizeMode="tail"
+                      style={{
+                        fontSize: wp(4),
+                        textAlign: 'center',
+                        width: wp(28),
+                        // TODO: Take care of the below width calc
+                        // width: wp(
+                        //   coverContents.length === COVER_ROW_CELL_COUNT * 2
+                        //     ? 90
+                        //     : 28,
+                        // ),
+                      }}>
+                      {item.name}
+                    </Text>
+
+                    <Menu
+                      visible={item.id === showMenuForId}
+                      onDismiss={setShowMenuForId.bind(this, null)}
+                      anchor={
+                        <IconButton
+                          style={{
+                            padding: 0,
+                            margin: 0,
+                          }}
+                          icon={
+                            IconUtils.getInfo(keys.VERTICAL_ELLIPSIS).name
+                              .default
+                          }
+                          size={wp(4)}
+                          color={colors.lightGrey}
+                          onPress={setShowMenuForId.bind(this, item.id)}
+                        />
+                      }>
+                      <Menu.Item
+                        icon={IconUtils.getInfo(keys.PLAY).name.default}
+                        title={labels.play}
+                        onPress={() => {
+                          onPlayPlaylist(item.id);
+                          setShowMenuForId(null);
+                        }}
+                      />
+                      <Menu.Item
+                        icon={IconUtils.getInfo(keys.SHUFFLE).name.default}
+                        title={labels.shuffleAndPlay}
+                        onPress={() => {
+                          onShufflePlaylist(item.id);
+                          onPlayPlaylist(item.id);
+                          setShowMenuForId(null);
+                        }}
+                      />
+                      <Menu.Item
+                        icon={IconUtils.getInfo(keys.ADD_TO_QUEUE).name.default}
+                        title={labels.addToQueue}
+                        onPress={() => {
+                          onAddPlaylistToQueue(item.id);
+                          setShowMenuForId(null);
+                        }}
+                      />
+                      <Menu.Item
+                        icon={
+                          IconUtils.getInfo(keys.PLAYLIST_EDIT).name.default
+                        }
+                        title={labels.edit}
+                        onPress={() => {
+                          setEditingPlaylistId(item.id);
+                          setShowMenuForId(null);
+                        }}
+                      />
+                      <Menu.Item
+                        icon={IconUtils.getInfo(keys.DELETE).name.default}
+                        title={labels.delete}
+                        onPress={() => {
+                          onDeletePlaylist(item.id);
+                          setShowMenuForId(null);
+                        }}
+                      />
+                      {/*<Menu.Item*/}
+                      {/*  icon={IconUtils.getInfo(keys.INFO).name.default}*/}
+                      {/*  title={labels.showInfo}*/}
+                      {/*  onPress={() => {*/}
+                      {/*    onShowInfo();*/}
+                      {/*    setShowMenu(false);*/}
+                      {/*  }}*/}
+                      {/*/>*/}
+                    </Menu>
+                  </View>
+                </TouchableOpacity>
               )}
             />
 
@@ -416,7 +598,7 @@ const Playlists = () => {
 
           {/*<Text>{JSON.stringify(navigator)}</Text>*/}
 
-          {/* FIXME Spoiling the styles of Playlist component */}
+          {/* FIXME: Spoiling the styles of Playlist component */}
           <View
             style={{
               flexDirection: 'row',

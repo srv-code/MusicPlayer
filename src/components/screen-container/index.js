@@ -11,7 +11,7 @@ import Icon from '../icon';
 import { MusicContext } from '../../context/music';
 
 const ScreenContainer = ({
-  customStyles = { wrapper: {}, container: {}, content: {} },
+  styles: customStyles = { wrapper: {}, container: {}, content: {} },
   showHeader,
   title,
   subtitle,
@@ -152,15 +152,15 @@ const styles = StyleSheet.create({
   scrollView: {
     flex: 1,
   },
-  scrollViewContent: {
-    // flex: 1,
-    paddingHorizontal: wp(5),
-    paddingVertical: hp(2),
-
-    // backgroundColor: 'red',
-    // borderWidth: 2,
-    // borderColor: 'blue',
-  },
+  // scrollViewContent: {
+  //   // flex: 1,
+  //   paddingHorizontal: wp(5),
+  //   paddingVertical: hp(2),
+  //
+  //   // backgroundColor: 'red',
+  //   // borderWidth: 2,
+  //   // borderColor: 'blue',
+  // },
 });
 
 export default ScreenContainer;

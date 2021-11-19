@@ -21,10 +21,10 @@ import Playlist from '../../components/playlist';
 
 // const maxPlaylistNameLength = 25;
 
-// TODO Can reorder the tracks by dragging items
+// TODO: Can reorder the tracks by dragging items
 const CurrentPlaylist = ({ navigation, route, extraData: { snapIndex } }) => {
   const isFocused = useIsFocused();
-  // TODO Move to Playlist component
+  // TODO: Move to Playlist component
   // useBackHandler(() => {
   //   if (isEditingPlaylistName) {
   //     setIsEditingPlaylistName(false);
@@ -39,26 +39,26 @@ const CurrentPlaylist = ({ navigation, route, extraData: { snapIndex } }) => {
   }, [snapIndex]);
 
   useEffect(async () => {
-    // TODO [START] Move to Playlist component
-    // FIXME In case the playlist is unsaved then should fetch from the TrackPlayer.getQueue() else should fetch from the playlist track list itself
+    // TODO: [START] Move to Playlist component
+    // FIXME: In case the playlist is unsaved then should fetch from the TrackPlayer.getQueue() else should fetch from the playlist track list itself
     // if (isFocused) setTracks(await TrackPlayer.getQueue());
     // setIsFABVisible(isFocused);
-    // TODO [END] Move to Playlist component
+    // TODO: [END] Move to Playlist component
 
     playerBottomSheetHandlers.setIsContentPanningGestureEnabled?.(!isFocused);
   }, [isFocused]);
 
   // useEffect(() => {
   //   if (route.params.playlistId) {
-  //     // FIXME Why is this required?
+  //     // FIXME: Why is this required?
   //     setPlaylistId(route.params.playlistId);
   //
-  //     // TODO Move to Playlist component
+  //     // TODO: Move to Playlist component
   //     setPlaylistName(
   //       musicInfo[keys.PLAYLISTS].find(pl => pl.id === route.params.playlistId)
   //         .name,
   //     );
-  //     // TODO Move to Playlist component
+  //     // TODO: Move to Playlist component
   //   }
   // }, [route.params.playlistId]);
 
@@ -96,7 +96,7 @@ const CurrentPlaylist = ({ navigation, route, extraData: { snapIndex } }) => {
   //   setFABActions(actions);
   // }, [playlistId]);
 
-  // TODO Move this to Playlist component
+  // TODO: Move this to Playlist component
   // useEffect(() => {
   //   // console.log(
   //   //   `[Current-Playlist] focusing on playlist input... cond=${Boolean(
@@ -108,7 +108,7 @@ const CurrentPlaylist = ({ navigation, route, extraData: { snapIndex } }) => {
 
   // console.log(`[Current-Playlist] playlistInput=${playlistInput.current}`);
 
-  // TODO Move this to Playlist component
+  // TODO: Move this to Playlist component
   // const onSavePlaylist = () => {
   //   console.log(
   //     `[Current-Playlist] playlists=${JSON.stringify(
@@ -161,7 +161,7 @@ const CurrentPlaylist = ({ navigation, route, extraData: { snapIndex } }) => {
 
   // console.log(`[Current-Playlist] musicInfo=${JSON.stringify(musicInfo)}`);
 
-  // TODO Add a transparent background when dragging
+  // TODO: Add a transparent background when dragging
   // const renderTrackItem = ({ item: track, index, drag, isActive }) => {
   //   return (
   //     <View
@@ -224,7 +224,7 @@ const CurrentPlaylist = ({ navigation, route, extraData: { snapIndex } }) => {
       }}>
       {/*<Text>{tracks.length}</Text>*/}
 
-      {/* TODO Move this to Playlist component */}
+      {/* TODO: Move this to Playlist component */}
       {/*{isEditingPlaylistName ? (*/}
       {/*  <TextInput*/}
       {/*    // // multiline*/}

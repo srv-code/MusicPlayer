@@ -75,6 +75,8 @@ const labels = {
   nothingHere: 'Nothing Here',
   playlistDeletedSuccessfully: 'Playlist deleted successfully',
   errorDeletingPlaylist: 'Error deleting playlist',
+  favorites: 'favorites',
+  from: 'from',
 };
 
 export default labels;
