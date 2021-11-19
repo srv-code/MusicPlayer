@@ -38,19 +38,20 @@ import keys from '../../constants/keys';
 import PlayerUtils from '../../utils/player';
 import PlaylistControls from '../../components/playlist-controls';
 
-// TODO Scroll to the currently playing track automatically
-// TODO Add a go up button (same as in Samsung Music)
-// TODO Add a scroll handle (same as in Samsung Music)
-// FIXME When shuffling the playlist skip to previous & next tracks player buttons are not correctly disabled
-// FIXME Selecting another item should not show the same toast message ("selected from all tracks")
-// FIXME Selecting a track (which is not the first one) should not highlight the first one
-// FIXME When the playlist bottom-sheet is closed then also the highlight in the track list should
+// TODO: Scroll to the currently playing track automatically
+// TODO: Add a go up button (same as in Samsung Music)
+// TODO: Add a scroll handle (same as in Samsung Music)
+// FIXME: When shuffling the playlist skip to previous & next tracks player buttons are not correctly disabled
+// FIXME: Selecting another item should not show the same toast message ("selected from all tracks")
+// FIXME: Selecting a track (which is not the first one) should not highlight the first one
+// FIXME: When the playlist bottom-sheet is closed then also the highlight in the track list should
 //    go away (possible reason: the MusicContext.currentlyPlaying is not getting reset)
+// TODO: Store the sorting order
+// TODO: Set a specific playlist ID when playing from this list
 
 const Tracks = () => {
   const { enabledDarkTheme } = useContext(PreferencesContext);
-  const { playerControls, musicInfo, bottomSheetMiniPositionIndex } =
-    useContext(MusicContext);
+  const { playerControls, musicInfo } = useContext(MusicContext);
 
   // const [showSortingMenu, setShowSortingMenu] = useState(false);
   const [sortBy, setSortBy] = useState(sortingOptions.TITLE);
@@ -75,14 +76,14 @@ const Tracks = () => {
     }
   }, [musicInfo?.[keys.TRACKS]]);
 
-  useEffect(() => {
-    // console.log(
-    //   `>> [Tracks] currentlyPlaying.trackId=${musicInfo.currentlyPlaying?.trackId}`,
-    // );
-    setCurrentlyPlayingTrackId(musicInfo.currentlyPlaying?.trackId);
-  }, [musicInfo.currentlyPlaying]);
+  // useEffect(() => {
+  //   // console.log(
+  //   //   `>> [Tracks] currentlyPlaying.trackId=${musicInfo.currentlyPlaying?.trackId}`,
+  //   // );
+  //   setCurrentlyPlayingTrackId(musicInfo.currentlyPlaying?.trackId);
+  // }, [musicInfo.currentlyPlaying]);
 
-  // TODO apply useMemo later
+  // TODO: apply useMemo later
   const dynamicStyles = {
     screen: {
       ...styles.screen,
@@ -133,7 +134,8 @@ const Tracks = () => {
     // // console.log(`list(randomized)=${randomizedList.map(e => e.id)}`);
 
     PlayerUtils.shuffleAndPlayTracks(tracks)
-      .then(() => {
+      .then(currentTrack => {
+        setCurrentlyPlayingTrackId(currentTrack.id);
         playerControls.collapse();
         ToastAndroid.show(
           `${labels.shuffled} ${tracks.length} ${labels.tracks}`,
@@ -151,7 +153,8 @@ const Tracks = () => {
 
   const onPlayWholePlayList = () => {
     PlayerUtils.playTracks(tracks)
-      .then(() => {
+      .then(currentTrack => {
+        setCurrentlyPlayingTrackId(currentTrack.id);
         playerControls.collapse();
         ToastAndroid.show(
           `${labels.playing} ${tracks.length} ${labels.tracks}`,
@@ -218,7 +221,13 @@ const Tracks = () => {
           source={{ uri: `file://${track.artwork}` }}
         />
       );
-    return <Avatar.Icon size={hp(6)} icon="music" style={styles.musicIcon} />;
+    return (
+      <Avatar.Icon
+        size={hp(6)}
+        icon={IconUtils.getInfo(keys.MUSIC).name.default}
+        style={styles.musicIcon}
+      />
+    );
   };
 
   const renderTrackItemRightComponent = (track, props) => (
@@ -303,7 +312,8 @@ const Tracks = () => {
           }}
           onPress={() => {
             PlayerUtils.playTracks(tracks, index)
-              .then(() => {
+              .then(currentTrack => {
+                setCurrentlyPlayingTrackId(currentTrack.id);
                 playerControls.collapse();
                 ToastAndroid.show(
                   `${labels.playing} ${labels.fromAll} ${tracks.length} ${labels.tracks}`,
@@ -395,7 +405,7 @@ const Tracks = () => {
     <ScreenContainer
       noScroll
       hasRoundedContainer
-      varHeights={{ collapsed: hp(15), closed: hp(6) }}>
+      varHeights={{ collapsed: hp(14), closed: hp(5) }}>
       {/*<Text>{`bottomSheetMiniPositionIndex=${bottomSheetMiniPositionIndex}`}</Text>*/}
       {/*<View style={styles.container}>*/}
       {/*{playerControls && (*/}
@@ -579,10 +589,8 @@ const Tracks = () => {
           <Text style={styles.noTracksText}>{labels.noTracksFound}</Text>
         ) : (
           <FlatList
-            contentContainerStyle={{
-              ...styles.musicList,
-              // paddingBottom: hp(bottomSheetMiniPositionIndex === 0 ? 15 : 5),
-            }}
+            style={{ marginHorizontal: wp(-2) }}
+            contentContainerStyle={styles.musicList}
             data={tracks}
             keyExtractor={(_, index) => index.toString()}
             renderItem={renderTrackItem}
@@ -700,7 +708,9 @@ const styles = StyleSheet.create({
     opacity: 0.1,
     borderRadius: 10,
     alignSelf: 'center',
-    marginTop: hp(1),
+    // marginTop: hp(1),
+    // marginBottom: hp(2),
+    // marginVertical: hp(1),
   },
   musicIcon: {
     backgroundColor: colors.lightPurple,
@@ -713,6 +723,7 @@ const styles = StyleSheet.create({
   },
   musicList: {
     paddingHorizontal: wp(2),
+    paddingBottom: hp(1),
   },
 });
 

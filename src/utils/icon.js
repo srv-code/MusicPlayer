@@ -377,6 +377,13 @@ export default class IconUtils {
           },
         };
 
+      case keys.MUSIC:
+        return {
+          name: {
+            default: 'music',
+          },
+        };
+
       default:
         throw new Error(`Invalid key: ${key}`);
     }

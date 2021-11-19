@@ -55,7 +55,7 @@ const snackbarMessageType = {
 
 const MAX_PLAYLIST_NAME_LENGTH = 25;
 
-// FIXME [Algorithm #1] for saving the playlist:
+// FIXME: [Algorithm #1] for saving the playlist:
 //  - hasUnsavedChanges hook initially set to false
 //  - Actions: renaming, tracks re-ordering/removing
 //  - Also can re-order/remove from an unsaved playlist for which hasUnsavedChanges will be false
@@ -66,7 +66,7 @@ const MAX_PLAYLIST_NAME_LENGTH = 25;
 //  - When renaming but cancelled in between: using back-button / minimizing (resulting in navigating to now-playing screen): ??
 //  - When name is changed but not saved: ??
 
-// FIXME [Algorithm #1/Solution]
+// FIXME: [Algorithm #1/Solution]
 //  - Add a hook: id (initially update with _id)
 //  - Inside useBackHandler() saved only if id is non-null
 //  - When track is re-ordered/removed or playlist name is updated,
@@ -81,7 +81,7 @@ const MAX_PLAYLIST_NAME_LENGTH = 25;
 //      if the process is cancelled then the previous state is restored
 //        (if saved then keep the previous name else keep it unsaved)
 
-// TODO [Complete]
+// TODO: [Complete]
 //  - [LATER] Long press to select many tracks to re-order or delete them
 //  - Replace the test hardcoded colors with the ones from colors object
 //  - Restructure all the playlist related functionalities here (from current-playlist screen & playlists)
@@ -90,12 +90,12 @@ const MAX_PLAYLIST_NAME_LENGTH = 25;
 //  - Add a delete option when a prop deletable is passed
 //  - Make all the animations native (useNativeDriver: true) so that the track row closing become smoother
 
-// FIXME [Bugs]
+// FIXME: [Bugs]
 //  - When selecting a song from this component and pressing on the nav back button
 //      then bottom sheet is showing unexpected behaviour
 //  - When inside the modal (in playlists screen), FAB shadow is not covering up
 
-// TODO [Test]
+// TODO: [Test]
 //  - Play sequence in current & other playlists
 //  - If all the unsaved changes are saved when required and also if its handled properly
 //      when the current playlist is from tracks (unsaved & untitled)
@@ -189,7 +189,7 @@ const Playlist = forwardRef(({ style, id: _id, showItemInfo }, ref) => {
       );
 
       /* Set currently playing track ID from this playlist */
-      // FIXME Check if this is required as another useEffect is added with musicInfo.currentlyPlaying as a dep
+      // FIXME: Check if this is required as another useEffect is added with musicInfo.currentlyPlaying as a dep
       _setCurrentlyPlayingTrackId(_id);
 
       /* Update tracks */
@@ -271,7 +271,7 @@ const Playlist = forwardRef(({ style, id: _id, showItemInfo }, ref) => {
   }, [isFocused]);
 
   useEffect(() => {
-    // FIXME Check if this function is called when this component is first initialised
+    // FIXME: Check if this function is called when this component is first initialised
     //    and the track is still not changed
     _setCurrentlyPlayingTrackId(id);
   }, [musicInfo.currentlyPlaying]);
@@ -335,7 +335,7 @@ const Playlist = forwardRef(({ style, id: _id, showItemInfo }, ref) => {
       resolve(newName);
     });
 
-  // TODO Update with the newer scheme
+  // TODO: Update with the newer scheme
   const save = async () => {
     console.log(
       `[Playlist/savePlaylist] isFocused=${isFocused}, hasUnsavedChanges=${hasUnsavedChanges}, id=${id}, name=${name}, tracks=${tracks.map(
@@ -558,7 +558,13 @@ const Playlist = forwardRef(({ style, id: _id, showItemInfo }, ref) => {
             source={{ uri: `file://${data.item.artwork}` }}
           />
         );
-      return <Avatar.Icon size={hp(6)} icon="music" style={styles.musicIcon} />;
+      return (
+        <Avatar.Icon
+          size={hp(6)}
+          icon={IconUtils.getInfo(keys.MUSIC).name.default}
+          style={styles.musicIcon}
+        />
+      );
     };
 
     const renderRightComponent = props => {
@@ -590,7 +596,7 @@ const Playlist = forwardRef(({ style, id: _id, showItemInfo }, ref) => {
       );
     };
 
-    // FIXME Not working
+    // FIXME: Not working
     const renderDivider = () => {
       if (data.index === tracks.length - 1) {
         return <View style={styles.listItemEndSmallBar} />;
@@ -625,7 +631,7 @@ const Playlist = forwardRef(({ style, id: _id, showItemInfo }, ref) => {
 
             // opacity: 0.3,
             borderRadius: currentlyPlayingTrackId === data.item.id ? wp(2) : 0,
-            // backgroundColor: // FIXME Integrate this coloring scheme too when removal animation is not in progress
+            // backgroundColor: // FIXME: Integrate this coloring scheme too when removal animation is not in progress
             //   currentlyPlayingTrackId === data.item.id
             //     ? enabledDarkTheme
             //       ? colors.darker
