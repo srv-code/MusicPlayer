@@ -93,7 +93,7 @@ const TrackListCover = ({
           let text = '';
           for (
             let i = 0,
-              splits = track.title.split(' '),
+              splits = track.title.split(' '), // FIXME: split(/\s+/g),
               len =
                 splits.length < MAX_ACRONYM_COUNT
                   ? splits.length

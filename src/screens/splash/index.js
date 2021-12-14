@@ -32,6 +32,7 @@ const requiredPermissions = [
 
 // FIXME: Sometimes the keys of music-info are in lowercase so no data is shown in the app
 // TODO: Improvement: In case of any thumbnail where the corresponding track is not present, then delete that thumbnail file
+// TODO: Update musicInfo in the background (preferably in a background thread) silently without blocking the UI operations
 
 // const Splash = ({ navigation }) => {
 const Splash = ({ setShow, setMusicInfo }) => {

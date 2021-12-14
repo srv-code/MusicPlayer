@@ -567,7 +567,9 @@ const Favorites = () => {
 
   return (
     <ScreenContainer
-      // ref={scrollView}
+      ref={_ref => {
+        console.log(`[Favorites] ScreenContainer: _ref=${JSON.stringify(ref)}`);
+      }}
       noScroll
       hasRoundedContainer
       varHeights={{ collapsed: hp(14), closed: hp(6) }}>
