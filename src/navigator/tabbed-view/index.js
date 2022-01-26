@@ -85,7 +85,9 @@ const TabbedView = ({ navigation }) => {
   const { enabledDarkTheme } = useContext(PreferencesContext);
   const { musicInfo } = useContext(MusicContext);
 
-  const [currentRouteIndex, setCurrentRouteIndex] = useState(2);
+  const [currentRouteIndex, setCurrentRouteIndex] = useState(
+    routeData.findIndex(d => d.key === screenNames.tracks),
+  );
   const [routes] = useState(routeData);
   const [showSearch, setShowSearch] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
