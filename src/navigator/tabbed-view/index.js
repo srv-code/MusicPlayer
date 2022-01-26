@@ -25,15 +25,15 @@ import IconUtils from '../../utils/icon';
 import keys from '../../constants/keys';
 
 const routeData = [
-  {
-    key: screenNames.favorites,
-    title: screenNames.favorites,
-    screen: Favorites,
-    icon: {
-      color: colors.red,
-      ...IconUtils.getInfo(keys.FAVORITE),
-    },
-  },
+  // { // TODO: Enable this screen once the functionality is built properly
+  //   key: screenNames.favorites,
+  //   title: screenNames.favorites,
+  //   screen: Favorites,
+  //   icon: {
+  //     color: colors.red,
+  //     ...IconUtils.getInfo(keys.FAVORITE),
+  //   },
+  // },
   {
     key: screenNames.playlists,
     title: screenNames.playlists,
@@ -90,7 +90,7 @@ const TabbedView = ({ navigation }) => {
   const [showSearch, setShowSearch] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [tabItemCounts, setTabItemCounts] = useState({
-    [screenNames.favorites]: null,
+    // [screenNames.favorites]: null, // TODO: Enable when functionality is built
     [screenNames.playlists]: null,
     [screenNames.tracks]: null,
     [screenNames.albums]: null,
@@ -118,7 +118,7 @@ const TabbedView = ({ navigation }) => {
   useEffect(() => {
     if (musicInfo) {
       setTabItemCounts({
-        [screenNames.favorites]: musicInfo[keys.FAVORITE_IDS]?.length || null,
+        // [screenNames.favorites]: musicInfo[keys.FAVORITE_IDS]?.length || null, // TODO: Enable when functionality is built
         [screenNames.playlists]: musicInfo[keys.PLAYLISTS]?.length || null,
         [screenNames.tracks]: musicInfo[keys.TRACKS]?.length || null,
         [screenNames.albums]: musicInfo[keys.ALBUMS]?.length || null,
