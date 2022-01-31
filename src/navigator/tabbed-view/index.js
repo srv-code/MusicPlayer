@@ -3,6 +3,7 @@ import { useBackHandler } from '@react-native-community/hooks';
 import { Image, View, StyleSheet } from 'react-native';
 import { SceneMap, TabBar, TabView } from 'react-native-tab-view';
 import { Appbar, Badge, Menu, Text } from 'react-native-paper';
+import PullToRefreshView from 'react-native-pull-to-refresh';
 import screenNames from '../../constants/screen-names';
 import Playlists from '../../screens/playlists';
 import Tracks from '../../screens/tracks';
@@ -141,7 +142,17 @@ const TabbedView = ({ navigation }) => {
   const [isMenuVisible, setIsMenuVisible] = useState(false);
   const toggleMenuVisibility = () => setIsMenuVisible(!isMenuVisible);
 
-  const onDataSync = () => {};
+  // TODO: Complete the logic
+  const onRefresh = () => {
+    console.log('started syncing...');
+  };
+
+  // new Promise(resolve => {
+  //   setTimeout(() => {
+  //     console.log('refresh music data');
+  //     resolve(1);
+  //   }, 2000);
+  // });
 
   const renderAppbar = () => (
     <Appbar.Header
@@ -165,14 +176,14 @@ const TabbedView = ({ navigation }) => {
             onPress={toggleMenuVisibility}
           />
         }>
-        <Menu.Item
+        {/* <Menu.Item // Replaced with pull-to-refresh control
           icon={IconUtils.getInfo(keys.SYNC).name.default}
           title={labels.sync}
           onPress={() => {
             onDataSync();
             toggleMenuVisibility();
           }}
-        />
+        /> */}
         <Menu.Item
           icon={IconUtils.getInfo(keys.SETTINGS).name.default}
           title={labels.settings}
@@ -277,10 +288,10 @@ const TabbedView = ({ navigation }) => {
   };
 
   return (
-    <>
+    <PullToRefreshView onRefresh={onRefresh}>
       {renderAppbar()}
       {renderTabView()}
-    </>
+    </PullToRefreshView>
   );
 };
 

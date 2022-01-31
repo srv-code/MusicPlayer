@@ -160,6 +160,7 @@ const Splash = ({ setShow, setMusicInfo }) => {
         console.log(
           `[Splash] musicInfo (from cache)=${JSON.stringify(
             Object.keys(musicInfo || {}),
+            // musicInfo,
           )}`,
         );
 

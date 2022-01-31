@@ -64,9 +64,9 @@ const Tracks = () => {
   useEffect(() => {
     if (musicInfo?.[keys.TRACKS]?.length) {
       console.log(
-        `[Tracks] Populating tracks for first time, tracks=${
-          musicInfo[keys.TRACKS]
-        }`,
+        `[Tracks] Populating tracks for first time, tracks=${JSON.stringify(
+          musicInfo[keys.TRACKS],
+        )}`,
       );
       sortTracks(
         [...musicInfo[keys.TRACKS]],
