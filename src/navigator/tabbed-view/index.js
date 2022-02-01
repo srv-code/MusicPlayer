@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { useBackHandler } from '@react-native-community/hooks';
-import { Image, View, StyleSheet } from 'react-native';
+import { Image, View, StyleSheet, Alert } from 'react-native';
 import { SceneMap, TabBar, TabView } from 'react-native-tab-view';
 import { Appbar, Badge, Menu, Text } from 'react-native-paper';
 import PullToRefreshView from 'react-native-pull-to-refresh';
@@ -24,6 +24,7 @@ import Folders from '../../screens/folders';
 import { MusicContext } from '../../context/music';
 import IconUtils from '../../utils/icon';
 import keys from '../../constants/keys';
+import TrackUtils from '../../utils/track';
 
 const routeData = [
   // { // TODO: Enable this screen once the functionality is built properly
@@ -84,7 +85,7 @@ const routeData = [
 
 const TabbedView = ({ navigation }) => {
   const { enabledDarkTheme } = useContext(PreferencesContext);
-  const { musicInfo } = useContext(MusicContext);
+  const { musicInfo, setMusicInfo } = useContext(MusicContext);
 
   const [currentRouteIndex, setCurrentRouteIndex] = useState(
     routeData.findIndex(d => d.key === screenNames.tracks),
@@ -100,6 +101,9 @@ const TabbedView = ({ navigation }) => {
     [screenNames.artists]: null,
     [screenNames.folders]: null,
   });
+  const [isMenuVisible, setIsMenuVisible] = useState(false);
+
+  const toggleMenuVisibility = () => setIsMenuVisible(!isMenuVisible);
 
   useBackHandler(() => {
     if (showSearch) {
@@ -139,12 +143,31 @@ const TabbedView = ({ navigation }) => {
     })(),
   );
 
-  const [isMenuVisible, setIsMenuVisible] = useState(false);
-  const toggleMenuVisibility = () => setIsMenuVisible(!isMenuVisible);
-
   // TODO: Complete the logic
   const onRefresh = () => {
-    console.log('started syncing...');
+    console.log('[TabbedView] Syncing music info started...');
+    return new Promise(resolve => {
+      TrackUtils.loadMusicInfo(true)
+        .then(data => {
+          console.log(`[loadMusicInfo] Storing track info in context...`);
+          setMusicInfo(data);
+        })
+        .catch(err => {
+          console.log(
+            `[TabbedView] Error: ${err.title}. ${err.message}\n${JSON.stringify(
+              err,
+            )}`,
+          );
+          Alert.alert(
+            err.title,
+            `${err.message}\nReason: ${err.cause.message}`,
+          );
+        })
+        .finally(() => {
+          console.log('[TabbedView] Syncing music info finished');
+          resolve(null);
+        });
+    });
   };
 
   // new Promise(resolve => {

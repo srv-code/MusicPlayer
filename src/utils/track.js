@@ -196,7 +196,7 @@ export default class TrackUtils {
     };
   };
 
-  static loadMusicInfo = async () => {
+  static loadMusicInfo = async throwDummyError => {
     const error = {};
     try {
       error.title = 'Storage Read Error';
@@ -258,7 +258,6 @@ export default class TrackUtils {
         musicInfo = tracks;
       }
 
-      console.log(`[loadMusicInfo] Storing track info in context...`);
       return musicInfo;
     } catch (err) {
       console.log(

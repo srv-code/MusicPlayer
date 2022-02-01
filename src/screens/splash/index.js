@@ -71,11 +71,14 @@ const Splash = ({ setShow, setMusicInfo }) => {
           info: 'Loading music tracks...',
         });
 
-        await TrackUtils.loadMusicInfo().catch(e => {
+        try {
+          console.log(`[loadMusicInfo] Storing track info in context...`);
+          setMusicInfo(await TrackUtils.loadMusicInfo());
+        } catch (e) {
           error.title = e.title;
           error.message = e.message;
           throw e.cause;
-        });
+        }
       } catch (err) {
         console.log(
           `[Splash] Error: ${error.title}. ${error.message}\n${JSON.stringify(
