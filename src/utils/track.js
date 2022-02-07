@@ -196,7 +196,7 @@ export default class TrackUtils {
     };
   };
 
-  static loadMusicInfo = async throwDummyError => {
+  static loadMusicInfo = async () => {
     const error = {};
     try {
       error.title = 'Storage Read Error';
