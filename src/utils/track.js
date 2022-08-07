@@ -196,14 +196,16 @@ export default class TrackUtils {
     };
   };
 
-  static loadMusicInfo = async () => {
+  static loadMusicInfo = async ignoreCache => {
     const error = {};
     try {
       error.title = 'Storage Read Error';
       error.message = 'Failed reading music information from storage';
 
       console.log(`[loadMusicInfo] Loading track info from cache...`);
-      let musicInfo = JSON.parse(await AsyncStorage.getItem(keys.MUSIC_INFO));
+      let musicInfo = ignoreCache
+        ? null
+        : JSON.parse(await AsyncStorage.getItem(keys.MUSIC_INFO));
       console.log(
         `[loadMusicInfo] musicInfo (from cache)=${JSON.stringify(
           Object.keys(musicInfo || {}),
