@@ -143,7 +143,6 @@ const TabbedView = ({ navigation }) => {
     })(),
   );
 
-  // TODO: Complete the logic
   const onRefresh = () => {
     console.log('[TabbedView] Syncing music info started...');
     return new Promise(resolve => {
@@ -311,7 +310,7 @@ const TabbedView = ({ navigation }) => {
   };
 
   return (
-    <PullToRefreshView onRefresh={onRefresh}>
+    <PullToRefreshView style={{ flex: 1 }} onRefresh={onRefresh}>
       {renderAppbar()}
       {renderTabView()}
     </PullToRefreshView>
